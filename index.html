@@ -98,6 +98,9 @@
     <span id="progress-text">טעינה...</span>
     <button id="sound-toggle" class="tab-btn" style="font-size:13px; padding:5px 10px;">🔊 קול</button>
   </div>
+  <div id="update-banner" style="display:none; background:#ffeb3b; color:#333; border:1px solid #fbc02d; border-radius:10px; padding:8px 10px; margin:8px auto; max-width:500px; text-align:center;">
+    גרסה חדשה זמינה. <button id="refresh-btn" class="tab-btn" style="font-size:13px; padding:5px 10px;">טען מחדש</button>
+  </div>
 
   <div class="tabs learning-tabs" id="learning-tabs">
     <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
@@ -884,7 +887,44 @@ if (soundToggle) {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Service Worker registered!'))
+      .then(reg => {
+        console.log('Service Worker registered!');
+
+        function showUpdateBanner() {
+          const banner = document.getElementById('update-banner');
+          const refreshBtn = document.getElementById('refresh-btn');
+          if (!banner || !refreshBtn) return;
+          banner.style.display = 'block';
+          refreshBtn.onclick = () => {
+            banner.style.display = 'none';
+            if (navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage({ action: 'skipWaiting' });
+            }
+          };
+        }
+
+        if (reg.waiting) {
+          showUpdateBanner();
+        }
+
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateBanner();
+              }
+            });
+          }
+        });
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+      })
       .catch(err => console.log('SW registration failed:', err));
   });
 }

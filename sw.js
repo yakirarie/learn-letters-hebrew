@@ -26,6 +26,13 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// Handle Skip-Waiting message from client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
 // Fetching strategy: Network first, fallback to cache
 self.addEventListener('fetch', (e) => {
   e.respondWith(
