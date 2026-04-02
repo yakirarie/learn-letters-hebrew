@@ -196,6 +196,26 @@ const numbers = [
   { n:8, word:'שמונה', pic:'8️⃣', color:'#fbc02d' },
   { n:9, word:'תשעה', pic:'9️⃣', color:'#6d4c41' },
   { n:10, word:'עשרה', pic:'🔟', color:'#546e7a' },
+  { n:11, word:'אחת עשרה', pic:'11', color:'#e53935' },
+  { n:12, word:'שתים עשרה', pic:'12', color:'#8e24aa' },
+  { n:13, word:'שלוש עשרה', pic:'13', color:'#3949ab' },
+  { n:14, word:'ארבע עשרה', pic:'14', color:'#00897b' },
+  { n:15, word:'חמש עשרה', pic:'15', color:'#43a047' },
+  { n:16, word:'שש עשרה', pic:'16', color:'#f4511e' },
+  { n:17, word:'שבע עשרה', pic:'17', color:'#fb8c00' },
+  { n:18, word:'שמונה עשרה', pic:'18', color:'#fbc02d' },
+  { n:19, word:'תשע עשרה', pic:'19', color:'#6d4c41' },
+  { n:20, word:'עשרים', pic:'20', color:'#546e7a' },
+  { n:21, word:'עשרים ואחד', pic:'21', color:'#e53935' },
+  { n:22, word:'עשרים ושניים', pic:'22', color:'#8e24aa' },
+  { n:23, word:'עשרים ושלושה', pic:'23', color:'#3949ab' },
+  { n:24, word:'עשרים וארבעה', pic:'24', color:'#00897b' },
+  { n:25, word:'עשרים וחמישה', pic:'25', color:'#43a047' },
+  { n:26, word:'עשרים ושישה', pic:'26', color:'#f4511e' },
+  { n:27, word:'עשרים ושבעה', pic:'27', color:'#fb8c00' },
+  { n:28, word:'עשרים ושמונה', pic:'28', color:'#fbc02d' },
+  { n:29, word:'עשרים ותשעה', pic:'29', color:'#6d4c41' },
+  { n:30, word:'שלושים', pic:'30', color:'#546e7a' },
 ];
 
 const vowelExercises = [
@@ -435,17 +455,15 @@ function showLearn(idx) {
 function showNumber(idx) {
   numberIndex = idx;
   const n = numbers[idx];
-  const itemIcon = '🍎'; // Use apple as the item
-  const items = itemIcon.repeat(n.n);
-  document.getElementById('letter-display').textContent = items;
+  document.getElementById('letter-display').textContent = n.n;
   document.getElementById('letter-display').style.color = n.color;
   // Adjust font size based on number to fit better
-  const fontSize = n.n <= 3 ? '130px' : n.n <= 6 ? '100px' : '80px';
+  const fontSize = n.n <= 10 ? '130px' : n.n <= 20 ? '100px' : '80px';
   document.getElementById('letter-display').style.fontSize = fontSize;
   document.getElementById('picture').textContent = n.pic;
   document.getElementById('word-display').textContent = n.word;
   document.getElementById('mode-label').textContent = 'מספרים - למידה';
-  document.getElementById('prompt').textContent = 'לחץ על הפריטים כדי לשמוע את המספר';
+  document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
   document.getElementById('word-chips').innerHTML = '';
 
   // אין כפתורי קיצור בסרגל התחתון לפי בקשה.
