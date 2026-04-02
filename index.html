@@ -280,41 +280,22 @@ function setGameType(type) {
 }
 function renderStars() {
   const row = document.getElementById('stars');
+  const progressWrap = document.getElementById('progress-bar-wrap');
+  if (tab !== 'quiz') {
+    row.style.display = 'none';
+    progressWrap.style.display = 'none';
+    return;
+  }
+
+  row.style.display = 'flex';
+  progressWrap.style.display = 'block';
   row.innerHTML = '';
   let total = 1;
   let currentProgress = 0;
-  let color = '#aaa';
+  let color = '#673AB7';
 
-  if (tab === 'numbers') {
-    total = numbers.length;
-    currentProgress = numberScore;
-    color = numbers[numberIndex] ? numbers[numberIndex].color : '#aaa';
-  } else if (tab === 'vowels') {
-    total = vowelExercises.length;
-    currentProgress = vowelScore;
-    color = '#607D8B';
-  } else if (tab === 'wordplay') {
-    total = countChallenges.length;
-    currentProgress = wordplayIndex;
-    color = '#4CAF50';
-  } else if (tab === 'quiz') {
-    total = quizItems.length || 1;
-    currentProgress = quizScore;
-    color = '#673AB7';
-  } else if (tab === 'trace') {
-    const arr = traceMode === 'letters' ? letters : numbers;
-    total = arr.length;
-    currentProgress = traceIdx + 1;
-    color = arr[traceIdx] ? arr[traceIdx].color : '#aaa';
-  } else if (tab === 'learn') {
-    total = letters.length;
-    currentProgress = current + 1;
-    color = letters[current] ? letters[current].color : '#aaa';
-  } else {
-    total = 1;
-    currentProgress = 0;
-    color = '#aaa';
-  }
+  total = quizItems.length || 1;
+  currentProgress = quizScore;
 
   for (let i = 0; i < total; i++) {
     const s = document.createElement('span');
