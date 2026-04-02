@@ -40,3 +40,8 @@ publicDir = "."
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 30000
+
+[userenv]
+
+[userenv.shared]
+GITHUB_TOKEN = "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"
