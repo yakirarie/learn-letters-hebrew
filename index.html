@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>לומדים אותיות</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff9f0; direction: rtl; -webkit-tap-highlight-color: transparent; }
+    #app { padding: 0.75rem; text-align: center; max-width: 500px; margin: 0 auto; }
+    h1 { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 0.2rem; }
+
+    .tabs { display: flex; gap: 6px; justify-content: center; margin: 0.5rem 0; flex-wrap: wrap; }
+    .tab-btn {
+      font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 20px;
+      border: 1.5px solid #ddd; background: #fff; color: #666; cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .tab-btn.active { background: #222; color: #fff; border-color: #222; }
+
+    #letter-display {
+      font-size: 130px; font-weight: 700; line-height: 1; margin: 0.3rem 0;
+      transition: transform 0.15s; cursor: pointer; display: inline-block; user-select: none;
+    }
+    #letter-display:active { transform: scale(0.88); }
+    #word-display { font-size: 28px; font-weight: 600; color: #222; margin: 0.2rem 0; min-height: 40px; }
+    #picture { font-size: 72px; margin: 0.2rem 0; min-height: 80px; }
+    #prompt { font-size: 15px; color: #555; margin-bottom: 0.5rem; min-height: 26px; }
+    #mode-label { font-size: 12px; color: #aaa; margin-bottom: 0.1rem; letter-spacing: 0.04em; }
+
+    .word-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 0.3rem 0; }
+    .chip {
+      font-size: 15px; padding: 5px 14px; border-radius: 20px; border: 1.5px solid #ddd;
+      background: #fff; cursor: pointer; transition: all 0.12s; font-family: inherit; font-weight: 500;
+    }
+    .chip:hover { background: #f5f5f5; }
+    .chip.active { color: #fff; border-color: transparent; }
+
+    .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 0.4rem; }
+    .tap-btn {
+      font-size: 15px; font-weight: 500; padding: 11px 20px; border-radius: 14px;
+      border: 1.5px solid #ddd; background: #fff; color: #222; cursor: pointer;
+      transition: background 0.12s, transform 0.1s; font-family: inherit;
+    }
+    .tap-btn:hover { background: #f0f0f0; }
+    .tap-btn:active { transform: scale(0.96); }
+
+    .star-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 2px; margin: 0.2rem 0; }
+    .star { font-size: 16px; transition: transform 0.2s; }
+    .star.lit { transform: scale(1.3); }
+    #progress-bar-wrap { background: #eee; border-radius: 8px; height: 7px; margin: 0.4rem auto; max-width: 280px; overflow: hidden; }
+    #progress-bar { height: 100%; border-radius: 8px; transition: width 0.4s; }
+
+    #trace-section { display: none; }
+    #trace-section.visible { display: block; }
+    #trace-wrap { position: relative; display: inline-block; margin: 0.4rem 0; }
+    #trace-ghost {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 190px; font-weight: 700; opacity: 0.07; pointer-events: none;
+      line-height: 1; user-select: none;
+    }
+    canvas#traceCanvas {
+      border-radius: 16px; border: 2px dashed #ccc; background: #fffdf8;
+      touch-action: none; cursor: crosshair; display: block;
+    }
+    .trace-controls { display: flex; gap: 10px; justify-content: center; margin-top: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .color-dot {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; transition: transform 0.12s; flex-shrink: 0;
+    }
+    .color-dot.selected { border-color: #333; transform: scale(1.25); }
+
+    #memory-section { display: none; }
+    #memory-section.visible { display: block; }
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0.5rem 0; }
+    .mem-card {
+      aspect-ratio: 1; border-radius: 12px; border: 2px solid #ddd; background: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .mem-card.flipped { background: #e8f4ff; border-color: #90caf9; }
+    .mem-card.matched { background: #e8f5e9; border-color: #81c784; opacity: 0.75; }
+    .mem-card.shake { animation: shake 0.4s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    #mem-score { font-size: 15px; color: #555; margin: 0.4rem 0; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <h1>לומדים אותיות 📖</h1>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('learn')">📚 למידה</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">🎮 חידון</button>
+    <button class="tab-btn" onclick="switchTab('trace')">✏️ כתיבה</button>
+    <button class="tab-btn" onclick="switchTab('memory')">🃏 זיכרון</button>
+  </div>
+
+  <div id="mode-label"></div>
+  <div class="star-row" id="stars"></div>
+  <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+  <div id="main-display">
+    <div id="letter-display" onclick="onLetterTap()"></div>
+    <div id="picture"></div>
+    <div id="word-display"></div>
+    <div class="word-chips" id="word-chips"></div>
+    <div id="prompt"></div>
+    <div class="btn-row" id="btn-row"></div>
+  </div>
+
+  <div id="trace-section">
+    <div id="trace-letter-label" style="font-size:20px;font-weight:700;color:#333;margin:0.3rem 0;"></div>
+    <div id="trace-wrap">
+      <div id="trace-ghost"></div>
+      <canvas id="traceCanvas" width="300" height="300"></canvas>
+    </div>
+    <div class="trace-controls">
+      <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)"></div>
+      <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)"></div>
+      <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)"></div>
+      <div class="color-dot" style="background:#FF9800" onclick="setColor('#FF9800',this)"></div>
+      <div class="color-dot" style="background:#9C27B0" onclick="setColor('#9C27B0',this)"></div>
+      <button class="tap-btn" onclick="clearTrace()" style="padding:6px 16px;font-size:14px;">🗑️ נקה</button>
+      <button class="tap-btn" onclick="traceNext()" style="padding:6px 16px;font-size:14px;">הבא ⬅</button>
+    </div>
+  </div>
+
+  <div id="memory-section">
+    <div id="mem-score"></div>
+    <div class="memory-grid" id="memory-grid"></div>
+    <div class="btn-row" style="margin-top:0.5rem;">
+      <button class="tap-btn" onclick="startMemory()">🔄 משחק חדש</button>
+      <button class="tap-btn" onclick="switchTab('learn')">📚 ללמידה</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const letters = [
+  { l:'א', examples:[{word:'ארנב',pic:'🐰'},{word:'אריה',pic:'🦁'},{word:'אבטיח',pic:'🍉'},{word:'אוטו',pic:'🚗'}], color:'#E84040' },
+  { l:'ב', examples:[{word:'בית',pic:'🏠'},{word:'בלון',pic:'🎈'},{word:'בננה',pic:'🍌'},{word:'בובה',pic:'🪆'}], color:'#2196F3' },
+  { l:'ג', examples:[{word:'גמל',pic:'🐪'},{word:'גשר',pic:'🌉'},{word:'גזר',pic:'🥕'},{word:'גלידה',pic:'🍦'}], color:'#FF9800' },
+  { l:'ד', examples:[{word:'דג',pic:'🐟'},{word:'דב',pic:'🐻'},{word:'דלת',pic:'🚪'},{word:'דבש',pic:'🍯'}], color:'#00BCD4' },
+  { l:'ה', examples:[{word:'הר',pic:'⛰️'},{word:'הדס',pic:'🌿'},{word:'הליקופטר',pic:'🚁'}], color:'#795548' },
+  { l:'ו', examples:[{word:'ורד',pic:'🌹'},{word:'ווילון',pic:'🪟'},{word:'ורוד',pic:'🩷'}], color:'#E91E63' },
+  { l:'ז', examples:[{word:'זאב',pic:'🐺'},{word:'זית',pic:'🫒'},{word:'זברה',pic:'🦓'},{word:'זהב',pic:'🌟'}], color:'#607D8B' },
+  { l:'ח', examples:[{word:'חתול',pic:'🐱'},{word:'חמור',pic:'🫏'},{word:'חלב',pic:'🥛'},{word:'חמניה',pic:'🌻'}], color:'#FF7043' },
+  { l:'ט', examples:[{word:'טלה',pic:'🐑'},{word:'טיגריס',pic:'🐯'},{word:'טלפון',pic:'📱'},{word:'טוס',pic:'✈️'}], color:'#9C27B0' },
+  { l:'י', examples:[{word:'ירח',pic:'🌙'},{word:'ים',pic:'🌊'},{word:'יונה',pic:'🕊️'},{word:'ילד',pic:'👦'}], color:'#3F51B5' },
+  { l:'כ', examples:[{word:'כלב',pic:'🐶'},{word:'כוכב',pic:'⭐'},{word:'כיסא',pic:'🪑'},{word:'כדור',pic:'⚽'}], color:'#8B6914' },
+  { l:'ל', examples:[{word:'לב',pic:'❤️'},{word:'לוויתן',pic:'🐋'},{word:'לחם',pic:'🍞'},{word:'לימון',pic:'🍋'}], color:'#F44336' },
+  { l:'מ', examples:[{word:'מטוס',pic:'✈️'},{word:'מכונית',pic:'🚙'},{word:'מגדל',pic:'🗼'},{word:'מלפפון',pic:'🥒'}], color:'#4CAF50' },
+  { l:'נ', examples:[{word:'נחש',pic:'🐍'},{word:'נמר',pic:'🐆'},{word:'נר',pic:'🕯️'},{word:'נשר',pic:'🦅'}], color:'#009688' },
+  { l:'ס', examples:[{word:'סוס',pic:'🐴'},{word:'ספר',pic:'📚'},{word:'סירה',pic:'⛵'},{word:'סנאי',pic:'🐿️'}], color:'#795548' },
+  { l:'ע', examples:[{word:'עוגה',pic:'🎂'},{word:'עגבניה',pic:'🍅'},{word:'עץ',pic:'🌳'},{word:'עכבר',pic:'🐭'}], color:'#E91E63' },
+  { l:'פ', examples:[{word:'פרפר',pic:'🦋'},{word:'פרח',pic:'🌸'},{word:'פיל',pic:'🐘'},{word:'פינגווין',pic:'🐧'}], color:'#9C27B0' },
+  { l:'צ', examples:[{word:'צב',pic:'🐢'},{word:'צפרדע',pic:'🐸'},{word:'צבי',pic:'🦌'},{word:'צהוב',pic:'💛'}], color:'#4CAF50' },
+  { l:'ק', examples:[{word:'קוף',pic:'🐒'},{word:'קיפוד',pic:'🦔'},{word:'קשת',pic:'🌈'},{word:'קרנף',pic:'🦏'}], color:'#FF9800' },
+  { l:'ר', examples:[{word:'רכבת',pic:'🚂'},{word:'רובוט',pic:'🤖'},{word:'רוח',pic:'💨'},{word:'ריקוד',pic:'💃'}], color:'#F44336' },
+  { l:'ש', examples:[{word:'שמש',pic:'☀️'},{word:'שפן',pic:'🐇'},{word:'שוקולד',pic:'🍫'},{word:'שועל',pic:'🦊'}], color:'#FFC107' },
+  { l:'ת', examples:[{word:'תות',pic:'🍓'},{word:'תרנגול',pic:'🐓'},{word:'תפוח',pic:'🍎'},{word:'תנין',pic:'🐊'}], color:'#E84040' },
+];
+
+function pickExample(idx) {
+  const ex = letters[idx].examples;
+  return ex[Math.floor(Math.random() * ex.length)];
+}
+
+let tab = 'learn';
+let current = 0;
+let score = 0;
+let quizOrder = [], quizIdx = 0, answered = false;
+let traceIdx = 0, traceColor = '#2196F3';
+let memCards = [], memFlipped = [], memMatched = [], memPairs = 0, memMoves = 0, memLock = false;
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+function speak(text, rate=0.8, pitch=1.2) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'he-IL'; u.rate = rate; u.pitch = pitch; u.volume = 1;
+  speechSynthesis.speak(u);
+}
+
+function switchTab(t) {
+  tab = t;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['learn','quiz','trace','memory'][i] === t);
+  });
+  document.getElementById('main-display').style.display = (t==='learn'||t==='quiz') ? 'block' : 'none';
+  document.getElementById('trace-section').className = t==='trace' ? 'visible' : '';
+  document.getElementById('memory-section').className = t==='memory' ? 'visible' : '';
+  if (t==='learn') showLearn(current);
+  if (t==='quiz') startQuiz();
+  if (t==='trace') showTrace(traceIdx);
+  if (t==='memory') startMemory();
+}
+
+function renderStars() {
+  const row = document.getElementById('stars');
+  row.innerHTML = '';
+  const total = letters.length;
+  for (let i = 0; i < total; i++) {
+    const s = document.createElement('span');
+    s.className = 'star' + (i < score ? ' lit' : '');
+    s.textContent = i < score ? '⭐' : '☆';
+    row.appendChild(s);
+  }
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = (score / total * 100) + '%';
+  bar.style.background = letters[current] ? letters[current].color : '#aaa';
+}
+
+function onLetterTap() { if (tab === 'learn') sayLetter(); }
+
+function sayLetter() {
+  const d = letters[current];
+  const ex = pickExample(current);
+  speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
+  const el = document.getElementById('letter-display');
+  el.style.transform = 'scale(1.15)';
+  setTimeout(() => el.style.transform = '', 200);
+}
+
+function showLearn(idx) {
+  current = idx;
+  const d = letters[idx];
+  const ex = pickExample(idx);
+
+  document.getElementById('letter-display').textContent = d.l;
+  document.getElementById('letter-display').style.color = d.color;
+  document.getElementById('letter-display').style.fontSize = '130px';
+  document.getElementById('picture').textContent = ex.pic;
+  document.getElementById('word-display').textContent = ex.word;
+  document.getElementById('mode-label').textContent = 'לחץ על האות כדי לשמוע אותה!';
+  document.getElementById('prompt').textContent = '';
+
+  const chips = document.getElementById('word-chips');
+  chips.innerHTML = '';
+  d.examples.forEach(e => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (e.word === ex.word ? ' active' : '');
+    if (e.word === ex.word) c.style.background = d.color;
+    c.textContent = e.pic + ' ' + e.word;
+    c.onclick = () => {
+      document.getElementById('picture').textContent = e.pic;
+      document.getElementById('word-display').textContent = e.word;
+      chips.querySelectorAll('.chip').forEach(x => { x.classList.remove('active'); x.style.background = ''; });
+      c.classList.add('active'); c.style.background = d.color;
+      speak(d.l + ' כמו ' + e.word, 0.75, 1.3);
+    };
+    chips.appendChild(c);
+  });
+
+  renderBtns([
+    { label: '➡ הקודם', fn: () => { if(current>0) showLearn(current-1); } },
+    { label: '🎮 חידון', fn: () => switchTab('quiz'), accent: true },
+    { label: 'הבא ⬅', fn: () => { if(current<letters.length-1) showLearn(current+1); else switchTab('quiz'); } },
+  ]);
+  speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
+  renderStars();
+}
+
+function startQuiz() {
+  quizOrder = shuffle(letters.map((_,i) => i));
+  quizIdx = 0; answered = false;
+  document.getElementById('word-chips').innerHTML = '';
+  nextQuiz();
+}
+
+function nextQuiz() {
+  if (quizIdx >= quizOrder.length) { showCelebration(); return; }
+  answered = false;
+  current = quizOrder[quizIdx];
+  const d = letters[current];
+  const ex = pickExample(current);
+
+  document.getElementById('letter-display').textContent = '?';
+  document.getElementById('letter-display').style.color = '#bbb';
+  document.getElementById('letter-display').style.fontSize = '130px';
+  document.getElementById('picture').textContent = ex.pic;
+  document.getElementById('word-display').textContent = ex.word;
+  document.getElementById('mode-label').textContent = '⁉️ חידון!';
+  document.getElementById('prompt').textContent = 'באיזו אות מתחילה המילה ' + ex.word + '?';
+  document.getElementById('word-chips').innerHTML = '';
+
+  const pool = shuffle(letters.filter((_,i) => i !== current)).slice(0,3).map(x => x.l);
+  const choices = shuffle([d.l, ...pool]);
+  renderBtns(choices.map(ch => ({ label: ch, fn: () => checkAnswer(ch, d.l, ex), big: true })));
+  speak('באיזו אות מתחילה המילה ' + ex.word + '?', 0.8, 1.2);
+  renderStars();
+}
+
+function checkAnswer(chosen, correct, ex) {
+  if (answered) return;
+  answered = true;
+  const d = letters[current];
+  if (chosen === correct) {
+    score++;
+    document.getElementById('letter-display').textContent = correct;
+    document.getElementById('letter-display').style.color = d.color;
+    document.getElementById('prompt').textContent = '🎉 כל הכבוד! ' + correct + ' כמו ' + ex.word + '!';
+    speak('כל הכבוד! ' + correct + '! ' + correct + ' כמו ' + ex.word, 0.85, 1.4);
+    renderStars();
+    setTimeout(() => { quizIdx++; nextQuiz(); }, 1800);
+  } else {
+    document.getElementById('prompt').textContent = '😊 נסו שוב!';
+    speak('נסו שוב!', 0.8, 1.1);
+    setTimeout(() => { answered = false; }, 700);
+  }
+}
+
+function showCelebration() {
+  document.getElementById('letter-display').textContent = '🏆';
+  document.getElementById('letter-display').style.color = '#FFD700';
+  document.getElementById('letter-display').style.fontSize = '100px';
+  document.getElementById('picture').textContent = '🎉🎊🌟';
+  document.getElementById('word-display').textContent = 'עשית עבודה מעולה!';
+  document.getElementById('mode-label').textContent = 'סיימתם!';
+  document.getElementById('prompt').textContent = 'למדתם את כל האותיות!';
+  document.getElementById('word-chips').innerHTML = '';
+  speak('כל הכבוד! למדת את כל האותיות! אתה כל כך חכם!', 0.8, 1.4);
+  renderBtns([{ label: '🔄 משחק חדש!', fn: () => { score=0; switchTab('learn'); showLearn(0); } }]);
+}
+
+function renderBtns(defs) {
+  const row = document.getElementById('btn-row');
+  row.innerHTML = '';
+  defs.forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'tap-btn';
+    b.textContent = d.label;
+    if (d.big) { b.style.fontSize = '28px'; b.style.minWidth = '64px'; b.style.padding = '14px 18px'; }
+    if (d.accent) b.style.background = letters[current].color + '22';
+    b.onclick = d.fn;
+    row.appendChild(b);
+  });
+}
+
+// ── TRACE ─────────────────────────────────────────────────────────────
+function showTrace(idx) {
+  traceIdx = idx;
+  const d = letters[idx];
+  document.getElementById('trace-ghost').textContent = d.l;
+  document.getElementById('trace-ghost').style.color = d.color;
+  document.getElementById('trace-letter-label').textContent = 'תצייר את האות: ' + d.l;
+  clearTrace();
+  speak('צייר את האות ' + d.l, 0.8, 1.2);
+}
+
+function clearTrace() {
+  const canvas = document.getElementById('traceCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function traceNext() {
+  traceIdx = (traceIdx + 1) % letters.length;
+  showTrace(traceIdx);
+}
+
+function setColor(c, el) {
+  traceColor = c;
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+(function() {
+  const canvas = document.getElementById('traceCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, lx = 0, ly = 0;
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * (canvas.width / r.width), y: (src.clientY - r.top) * (canvas.height / r.height) };
+  }
+  function start(e) { e.preventDefault(); drawing = true; const p = getPos(e); lx=p.x; ly=p.y; }
+  function move(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle = traceColor; ctx.lineWidth = 11; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.stroke();
+    lx=p.x; ly=p.y;
+  }
+  function end(e) { e.preventDefault(); drawing = false; }
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end, {passive:false});
+})();
+
+// ── MEMORY GAME ───────────────────────────────────────────────────────
+function startMemory() {
+  memFlipped = []; memPairs = 0; memMoves = 0; memLock = false;
+  const chosen = shuffle(letters).slice(0, 6);
+  const pairs = [];
+  chosen.forEach(d => {
+    pairs.push({ id: d.l, display: d.l, color: d.color, type: 'letter' });
+    pairs.push({ id: d.l, display: d.examples[0].pic, color: d.color, type: 'pic' });
+  });
+  memCards = shuffle(pairs).map((c, i) => ({ ...c, idx: i, flipped: false, matched: false }));
+  document.getElementById('mem-score').textContent = 'מצאו את כל הזוגות! 🔍';
+  renderMemory();
+}
+
+function renderMemory() {
+  const grid = document.getElementById('memory-grid');
+  grid.innerHTML = '';
+  memCards.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'mem-card' + (c.flipped||c.matched ? ' flipped' : '') + (c.matched ? ' matched' : '');
+    div.style.fontSize = c.type === 'letter' ? '32px' : '34px';
+    if (c.flipped || c.matched) {
+      div.textContent = c.display;
+      if (c.type === 'letter') div.style.color = c.color;
+    } else {
+      div.textContent = '?';
+      div.style.color = '#ccc';
+    }
+    div.onclick = () => flipCard(i);
+    grid.appendChild(div);
+  });
+}
+
+function flipCard(i) {
+  if (memLock || memCards[i].flipped || memCards[i].matched) return;
+  memCards[i].flipped = true;
+  memFlipped.push(i);
+  renderMemory();
+  if (memCards[i].type === 'letter') speak(memCards[i].id, 0.8, 1.3);
+  if (memFlipped.length === 2) {
+    memLock = true; memMoves++;
+    const [a, b] = memFlipped;
+    if (memCards[a].id === memCards[b].id) {
+      memCards[a].matched = memCards[b].matched = true;
+      memPairs++;
+      memFlipped = []; memLock = false;
+      speak('כל הכבוד! זוג!', 0.85, 1.4);
+      document.getElementById('mem-score').textContent = 'זוגות: ' + memPairs + '/6 | מהלכים: ' + memMoves;
+      renderMemory();
+      if (memPairs === 6) setTimeout(() => {
+        speak('מדהים! מצאת את כל הזוגות!', 0.8, 1.4);
+        document.getElementById('mem-score').textContent = '🏆 מעולה! ' + memMoves + ' מהלכים בסך הכל!';
+      }, 400);
+    } else {
+      setTimeout(() => {
+        memCards[a].flipped = memCards[b].flipped = false;
+        memFlipped = []; memLock = false;
+        document.getElementById('mem-score').textContent = 'נסו שוב! מהלכים: ' + memMoves;
+        renderMemory();
+      }, 900);
+    }
+  }
+}
+
+showLearn(0);
+</script>
+</body>
+</html>
