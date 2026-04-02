@@ -805,24 +805,18 @@ function startMemory() {
 
   const allItems = [
     ...letters.map(l => ({ kind: 'letter', id: l.l, display: l.l, color: l.color, pic: pickExample(letters.indexOf(l)).pic })),
-    ...numbers.map(n => ({ kind: 'number', id: String(n.n), display: String(n.n), color: n.color, pic: n.pic })),
   ];
 
-  const chosen = shuffle(allItems).slice(0, 6);
+  const chosen = shuffle(allItems).slice(0, 8);
   const pairs = [];
 
   chosen.forEach(item => {
-    if (item.kind === 'letter') {
-      pairs.push({ id: item.id, display: item.display, color: item.color, type: 'letter' });
-      pairs.push({ id: item.id, display: item.pic, color: item.color, type: 'pic' });
-    } else {
-      pairs.push({ id: item.id, display: item.display, color: item.color, type: 'number' });
-      pairs.push({ id: item.id, display: item.pic, color: item.color, type: 'pic' });
-    }
+    pairs.push({ id: item.id, display: item.display, color: item.color, type: 'letter' });
+    pairs.push({ id: item.id, display: item.pic, color: item.color, type: 'pic' });
   });
 
   memCards = shuffle(pairs).map((c, i) => ({ ...c, idx: i, flipped: false, matched: false }));
-  document.getElementById('mem-score').textContent = 'מצאו את כל הזוגות! 🔍';
+  document.getElementById('mem-score').textContent = 'מצאו את כל הזוגות! 🔍 (8 זוגות)';
   renderMemory();
 }
 
@@ -861,7 +855,7 @@ function flipCard(i) {
       speak('כל הכבוד! זוג!', 0.85, 1.4);
       document.getElementById('mem-score').textContent = 'זוגות: ' + memPairs + '/6 | מהלכים: ' + memMoves;
       renderMemory();
-      if (memPairs === 6) setTimeout(() => {
+      if (memPairs === 8) setTimeout(() => {
         speak('מדהים! מצאת את כל הזוגות!', 0.8, 1.4);
         document.getElementById('mem-score').textContent = '🏆 מעולה! ' + memMoves + ' מהלכים בסך הכל!';
       }, 400);
