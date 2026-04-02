@@ -435,13 +435,17 @@ function showLearn(idx) {
 function showNumber(idx) {
   numberIndex = idx;
   const n = numbers[idx];
-  document.getElementById('letter-display').textContent = n.n;
+  const itemIcon = '🍎'; // Use apple as the item
+  const items = itemIcon.repeat(n.n);
+  document.getElementById('letter-display').textContent = items;
   document.getElementById('letter-display').style.color = n.color;
-  document.getElementById('letter-display').style.fontSize = '130px';
+  // Adjust font size based on number to fit better
+  const fontSize = n.n <= 3 ? '130px' : n.n <= 6 ? '100px' : '80px';
+  document.getElementById('letter-display').style.fontSize = fontSize;
   document.getElementById('picture').textContent = n.pic;
   document.getElementById('word-display').textContent = n.word;
   document.getElementById('mode-label').textContent = 'מספרים - למידה';
-  document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
+  document.getElementById('prompt').textContent = 'לחץ על הפריטים כדי לשמוע את המספר';
   document.getElementById('word-chips').innerHTML = '';
 
   // אין כפתורי קיצור בסרגל התחתון לפי בקשה.
