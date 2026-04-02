@@ -127,15 +127,22 @@
       <canvas id="traceCanvas" width="300" height="300"></canvas>
     </div>
     <div class="trace-controls">
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
       <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;">📚 אותיות</button>
       <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;">🔢 מספרים</button>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
       <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)"></div>
       <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)"></div>
       <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)"></div>
       <div class="color-dot" style="background:#FF9800" onclick="setColor('#FF9800',this)"></div>
       <div class="color-dot" style="background:#9C27B0" onclick="setColor('#9C27B0',this)"></div>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
       <button class="tap-btn" onclick="clearTrace()" style="padding:6px 16px;font-size:14px;">🗑️ נקה</button>
+      <button class="tap-btn" onclick="tracePrev()" style="padding:6px 16px;font-size:14px;">⬅ קודם</button>
       <button class="tap-btn" onclick="traceNext()" style="padding:6px 16px;font-size:14px;">הבא ⬅</button>
+    </div>
     </div>
   </div>
 
@@ -688,6 +695,12 @@ function showTrace(idx) {
 function clearTrace() {
   const canvas = document.getElementById('traceCanvas');
   canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function tracePrev() {
+  const arr = traceMode === 'letters' ? letters : numbers;
+  traceIdx = (traceIdx - 1 + arr.length) % arr.length;
+  showTrace(traceIdx);
 }
 
 function traceNext() {
