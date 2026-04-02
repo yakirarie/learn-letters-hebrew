@@ -747,12 +747,25 @@ function setTraceMode(mode) {
 function startMemory() {
   document.getElementById('mode-label').textContent = 'משחק הזיכרון התחיל';
   memFlipped = []; memPairs = 0; memMoves = 0; memLock = false;
-  const chosen = shuffle(letters).slice(0, 6);
+
+  const allItems = [
+    ...letters.map(l => ({ kind: 'letter', id: l.l, display: l.l, color: l.color, pic: pickExample(letters.indexOf(l)).pic })),
+    ...numbers.map(n => ({ kind: 'number', id: String(n.n), display: String(n.n), color: n.color, pic: n.pic })),
+  ];
+
+  const chosen = shuffle(allItems).slice(0, 6);
   const pairs = [];
-  chosen.forEach(d => {
-    pairs.push({ id: d.l, display: d.l, color: d.color, type: 'letter' });
-    pairs.push({ id: d.l, display: d.examples[0].pic, color: d.color, type: 'pic' });
+
+  chosen.forEach(item => {
+    if (item.kind === 'letter') {
+      pairs.push({ id: item.id, display: item.display, color: item.color, type: 'letter' });
+      pairs.push({ id: item.id, display: item.pic, color: item.color, type: 'pic' });
+    } else {
+      pairs.push({ id: item.id, display: item.display, color: item.color, type: 'number' });
+      pairs.push({ id: item.id, display: item.pic, color: item.color, type: 'pic' });
+    }
   });
+
   memCards = shuffle(pairs).map((c, i) => ({ ...c, idx: i, flipped: false, matched: false }));
   document.getElementById('mem-score').textContent = 'מצאו את כל הזוגות! 🔍';
   renderMemory();
