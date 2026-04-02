@@ -94,6 +94,10 @@
 <body>
 <div id="app">
   <h1>לומדים עברית 📖</h1>
+  <div id="status-bar">
+    <span id="progress-text">טעינה...</span>
+    <button id="sound-toggle" class="tab-btn" style="font-size:13px; padding:5px 10px;">🔊 קול</button>
+  </div>
 
   <div class="tabs learning-tabs" id="learning-tabs">
     <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
@@ -223,6 +227,46 @@ let quizIdx = 0;
 let quizScore = 0;
 let answered = false;
 let traceMode = 'letters';
+
+let appState = {
+  soundEnabled: true,
+  bestQuizScore: 0,
+  lastTab: 'learn',
+  currentLetter: 0,
+  currentNumber: 0
+};
+
+function loadAppState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('learn-hebrew-app-state') || '{}');
+    appState = { ...appState, ...saved };
+  } catch (err) {
+    console.warn('State load failed', err);
+  }
+  if (appState.lastTab) tab = appState.lastTab;
+  current = appState.currentLetter || 0;
+  numberIndex = appState.currentNumber || 0;
+}
+
+function saveAppState() {
+  appState.lastTab = tab;
+  appState.currentLetter = current;
+  appState.currentNumber = numberIndex;
+  localStorage.setItem('learn-hebrew-app-state', JSON.stringify(appState));
+}
+
+function updateStatusText() {
+  const textEl = document.getElementById('progress-text');
+  if (!textEl) return;
+  textEl.textContent = 'מצב: ' + (tab === 'learn' ? 'לומדים אותיות' : tab) + ' | ציון חידון מקסימלי: ' + appState.bestQuizScore + ' | קול: ' + (appState.soundEnabled ? 'פעיל' : 'כבוי');
+}
+
+function setSoundEnabled(enabled) {
+  appState.soundEnabled = enabled;
+  document.getElementById('sound-toggle').textContent = enabled ? '🔊 קול (כבוי)' : '🔇 קול (הפעל)';
+  updateStatusText();
+  saveAppState();
+}
 let traceIdx = 0, traceColor = '#2196F3';
 let memCards = [], memFlipped = [], memMatched = [], memPairs = 0, memMoves = 0, memLock = false;
 
@@ -233,7 +277,7 @@ function pickExample(idx) {  const ex = letters[idx].examples;
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 
 function speak(text, rate=0.8, pitch=1.2) {
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis || !appState.soundEnabled) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'he-IL'; u.rate = rate; u.pitch = pitch; u.volume = 1;
@@ -286,6 +330,8 @@ function switchTab(t) {
     startMemory();
   }
 
+  updateStatusText();
+  saveAppState();
   renderStars();
 }
 
@@ -651,6 +697,9 @@ function showCelebration(mode='mixed') {
 
   document.getElementById('word-display').textContent = 'כל הכבוד! סיימת חידון מעורב!';
   document.getElementById('prompt').textContent = 'צברת ' + quizScore + ' נקודות מתוך ' + quizItems.length;
+  appState.bestQuizScore = Math.max(appState.bestQuizScore, quizScore);
+  saveAppState();
+  updateStatusText();
   speak('איזה יופי! סיימת את כל השאלות!', 0.8, 1.4);
   renderBtns([{ label: '🔄 שוב', fn: () => { quizScore = 0; startQuiz(); } }]);
   document.getElementById('mode-label').textContent = 'סיימתם!';
@@ -823,7 +872,15 @@ function flipCard(i) {
   }
 }
 
-switchTab('learn');
+loadAppState();
+setSoundEnabled(appState.soundEnabled);
+switchTab(tab);
+
+const soundToggle = document.getElementById('sound-toggle');
+if (soundToggle) {
+  soundToggle.addEventListener('click', () => setSoundEnabled(!appState.soundEnabled));
+}
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
