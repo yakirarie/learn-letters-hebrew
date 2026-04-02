@@ -251,24 +251,31 @@ function switchTab(t) {
   const pageTitle = document.querySelector('#app h1');
   if (t === 'numbers') {
     pageTitle.textContent = 'לומדים מספרים 🔢';
+    document.getElementById('mode-label').textContent = 'מספרים - למידה';
     showNumber(numberIndex);
   } else if (t === 'vowels') {
     pageTitle.textContent = 'לומדים ניקוד 🔠';
+    document.getElementById('mode-label').textContent = 'ניקוד למילים';
     startVowels();
   } else if (t === 'wordplay') {
     pageTitle.textContent = 'כמות וחיבור 🧩';
+    document.getElementById('mode-label').textContent = 'משחק כמות (3+)';
     startWordPlay();
   } else if (t === 'learn') {
     pageTitle.textContent = 'לומדים אותיות 📖';
+    document.getElementById('mode-label').textContent = 'לחץ על האות כדי לשמוע אותה!';
     showLearn(current);
   } else if (t === 'quiz') {
     pageTitle.textContent = 'חידון 🎯';
+    document.getElementById('mode-label').textContent = 'חידון מעורב';
     startQuiz();
   } else if (t === 'trace') {
     pageTitle.textContent = 'כתיבה ✏️';
+    document.getElementById('mode-label').textContent = 'המשך לצייר על הלוח';
     showTrace(traceIdx);
   } else if (t === 'memory') {
     pageTitle.textContent = 'זיכרון 🃏';
+    document.getElementById('mode-label').textContent = 'מצא זוגות תואמים';
     startMemory();
   }
 }
@@ -660,6 +667,7 @@ function renderBtns(defs) {
 // ── TRACE ─────────────────────────────────────────────────────────────
 function showTrace(idx) {
   traceIdx = idx;
+  document.getElementById('mode-label').textContent = 'כתיבה בתרגול';
   let item, label, speakText;
   if (traceMode === 'letters') {
     item = letters[idx];
@@ -724,6 +732,7 @@ function setTraceMode(mode) {
 
 // ── MEMORY GAME ───────────────────────────────────────────────────────
 function startMemory() {
+  document.getElementById('mode-label').textContent = 'משחק הזיכרון התחיל';
   memFlipped = []; memPairs = 0; memMoves = 0; memLock = false;
   const chosen = shuffle(letters).slice(0, 6);
   const pairs = [];
