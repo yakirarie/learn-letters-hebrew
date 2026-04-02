@@ -460,7 +460,7 @@ function showNumber(idx) {
   // Adjust font size based on number to fit better
   const fontSize = n.n <= 10 ? '130px' : n.n <= 20 ? '100px' : '80px';
   document.getElementById('letter-display').style.fontSize = fontSize;
-  document.getElementById('picture').textContent = n.pic;
+  document.getElementById('picture').textContent = '';
   document.getElementById('word-display').textContent = n.word;
   document.getElementById('mode-label').textContent = 'מספרים - למידה';
   document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
