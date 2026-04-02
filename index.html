@@ -298,12 +298,12 @@ function switchTab(t) {
     document.getElementById('mode-label').textContent = 'מספרים - למידה';
     showNumber(numberIndex);
   } else if (t === 'vowels') {
-    pageTitle.textContent = 'לומדים ניקוד 🔠';
-    document.getElementById('mode-label').textContent = 'ניקוד למילים';
+    pageTitle.textContent = 'תרגול ניקוד 🔠';
+    document.getElementById('mode-label').textContent = 'תרגול ניקוד למילים';
     startVowels();
   } else if (t === 'wordplay') {
-    pageTitle.textContent = 'כמות וחיבור 🧩';
-    document.getElementById('mode-label').textContent = 'משחק כמות (3+)';
+    pageTitle.textContent = 'תרגול כמות 🧩';
+    document.getElementById('mode-label').textContent = 'תרגול כמות';
     startWordPlay();
   } else if (t === 'learn') {
     pageTitle.textContent = 'לומדים אותיות 📖';
@@ -459,7 +459,6 @@ function showNumber(idx) {
 
 function startVowels() {
   vowelIndex = 0;
-  vowelScore = 0;
   showVowel(vowelIndex);
 }
 
@@ -495,35 +494,27 @@ function showVowel(idx) {
     chips.appendChild(c);
   });
   // אין כפתורים בסרגל התחתון בסשן ניקוד.
-  renderStars();
 }
 
 function checkVowelAnswer(choice) {
   if (choice === vowelExercises[vowelIndex].correct) {
-    vowelScore++;
     document.getElementById('prompt').textContent = '👍 נכון!';
     speak('נכון!', 0.85, 1.3);
-    if (vowelIndex < vowelExercises.length - 1) {
-      setTimeout(() => { vowelIndex++; showVowel(vowelIndex); }, 1000);
-    } else {
-      setTimeout(() => {
-        document.getElementById('letter-display').textContent = '🎉';
-        document.getElementById('word-display').textContent = 'כל הכבוד! סיימת תרגיל ניקוד';
-        document.getElementById('prompt').textContent = '';
-        renderBtns([{ label: '🔄 התחל שוב', fn: startVowels }]);
-      }, 1000);
-    }
+    setTimeout(() => {
+      vowelIndex = (vowelIndex + 1) % vowelExercises.length;
+      showVowel(vowelIndex);
+    }, 1000);
   } else {
     document.getElementById('prompt').textContent = '❌ נסה שוב!';
     speak('נסה שוב', 0.8, 1.1);
     setTimeout(() => { document.getElementById('prompt').textContent = ''; }, 900);
   }
+}
   renderStars();
 }
 
 function startWordPlay() {
   wordplayIndex = 0;
-  wordplayScore = 0;
   showCountChallenge();
 }
 
@@ -549,32 +540,22 @@ function showCountChallenge() {
   });
 
   // אין כפתורי קיצור בסרגל התחתון בסשן כמות/חיבור.
-  renderStars();
 }
 
 function checkCountAnswer(choice) {
   const challenge = countChallenges[wordplayIndex];
   if (choice === challenge.answer) {
-    wordplayScore++;
     document.getElementById('prompt').textContent = '🎉 נכון!';
     speak('נכון!', 0.85, 1.3);
-    if (wordplayIndex < countChallenges.length - 1) {
-      wordplayIndex++;
-      setTimeout(showCountChallenge, 900);
-    } else {
-      setTimeout(() => {
-        document.getElementById('letter-display').textContent = '🏆';
-        document.getElementById('word-display').textContent = 'יופי! סיימת את משחק הכמות';
-        document.getElementById('prompt').textContent = '';
-        renderBtns([{ label: '🔄 התחלה מחדש', fn: startWordPlay }]);
-      }, 1000);
-    }
+    setTimeout(() => {
+      wordplayIndex = (wordplayIndex + 1) % countChallenges.length;
+      showCountChallenge();
+    }, 900);
   } else {
     document.getElementById('prompt').textContent = 'נסה שוב 😉';
     speak('נסה שוב', 0.8, 1.1);
     setTimeout(() => { document.getElementById('prompt').textContent = ''; }, 800);
   }
-  renderStars();
 }
 
 function startQuiz() {
