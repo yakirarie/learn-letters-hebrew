@@ -631,9 +631,9 @@ function nextMixedQuiz() {
 
   } else if (currentQuizItem.type === 'number') {
     const item = numbers[currentQuizItem.idx];
-    document.getElementById('letter-display').textContent = item.pic;
+    document.getElementById('letter-display').textContent = item.word;
     document.getElementById('letter-display').style.color = item.color;
-    document.getElementById('letter-display').style.fontSize = '130px';
+    document.getElementById('letter-display').style.fontSize = '80px'; // Smaller for words
     document.getElementById('picture').textContent = '';
     document.getElementById('word-display').textContent = 'איזה מספר זה?';
     document.getElementById('mode-label').textContent = '⁉️ חידון מספרים';
