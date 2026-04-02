@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>לומדים אותיות</title>
+  <title>לומדים עברית</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196F3">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3409/3409040.png">
@@ -127,6 +127,8 @@
       <canvas id="traceCanvas" width="300" height="300"></canvas>
     </div>
     <div class="trace-controls">
+      <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;">📚 אותיות</button>
+      <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;">🔢 מספרים</button>
       <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)"></div>
       <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)"></div>
       <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)"></div>
@@ -213,6 +215,7 @@ let currentQuizItem = null;
 let quizIdx = 0;
 let quizScore = 0;
 let answered = false;
+let traceMode = 'letters';
 let traceIdx = 0, traceColor = '#2196F3';
 let memCards = [], memFlipped = [], memMatched = [], memPairs = 0, memMoves = 0, memLock = false;
 
@@ -298,6 +301,11 @@ function renderStars() {
     total = quizItems.length || 1;
     currentProgress = quizScore;
     color = '#673AB7';
+  } else if (tab === 'trace') {
+    const arr = traceMode === 'letters' ? letters : numbers;
+    total = arr.length;
+    currentProgress = traceIdx + 1;
+    color = arr[traceIdx] ? arr[traceIdx].color : '#aaa';
   } else if (tab === 'learn') {
     total = letters.length;
     currentProgress = current + 1;
@@ -655,12 +663,21 @@ function renderBtns(defs) {
 // ── TRACE ─────────────────────────────────────────────────────────────
 function showTrace(idx) {
   traceIdx = idx;
-  const d = letters[idx];
-  document.getElementById('trace-ghost').textContent = d.l;
-  document.getElementById('trace-ghost').style.color = d.color;
-  document.getElementById('trace-letter-label').textContent = 'תצייר את האות: ' + d.l;
+  let item, label, speakText;
+  if (traceMode === 'letters') {
+    item = letters[idx];
+    label = 'תצייר את האות: ' + item.l;
+    speakText = 'צייר את האות ' + item.l;
+  } else {
+    item = numbers[idx];
+    label = 'תצייר את המספר: ' + item.n;
+    speakText = 'צייר את המספר ' + item.n;
+  }
+  document.getElementById('trace-ghost').textContent = item.l || item.n;
+  document.getElementById('trace-ghost').style.color = item.color;
+  document.getElementById('trace-letter-label').textContent = label;
   clearTrace();
-  speak('צייר את האות ' + d.l, 0.8, 1.2);
+  speak(speakText, 0.8, 1.2);
 }
 
 function clearTrace() {
@@ -669,14 +686,15 @@ function clearTrace() {
 }
 
 function traceNext() {
-  traceIdx = (traceIdx + 1) % letters.length;
+  const arr = traceMode === 'letters' ? letters : numbers;
+  traceIdx = (traceIdx + 1) % arr.length;
   showTrace(traceIdx);
 }
 
-function setColor(c, el) {
-  traceColor = c;
-  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-  el.classList.add('selected');
+function setTraceMode(mode) {
+  traceMode = mode;
+  traceIdx = 0;
+  showTrace(traceIdx);
 }
 
 (function() {

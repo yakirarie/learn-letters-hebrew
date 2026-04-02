@@ -1,7 +1,7 @@
 {
-  "name": "לומדים אותיות - Learning Hebrew",
-  "short_name": "אותיות",
-  "description": "An interactive app to learn the Hebrew alphabet.",
+  "name": "לומדים עברית - Learning Hebrew",
+  "short_name": "עברית",
+  "description": "An interactive app to learn Hebrew letters, numbers, and games.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#fff9f0",
