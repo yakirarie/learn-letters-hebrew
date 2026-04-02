@@ -101,7 +101,6 @@
 
   <div class="tabs learning-tabs" id="learning-tabs">
     <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
-    <button class="tab-btn" data-target="vowels" onclick="switchTab('vowels')">🔠 ניקוד</button>
     <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מספרים</button>
     <button class="tab-btn" data-target="wordplay" onclick="switchTab('wordplay')">🧩 כמות וחיבור</button>
     <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
@@ -168,71 +167,63 @@
 
 <script>
 const letters = [
-  { l:'א', examples:[{word:'ארנב',pic:'🐰'},{word:'אריה',pic:'🦁'},{word:'אבטיח',pic:'🍉'},{word:'אוטו',pic:'🚗'}], color:'#E84040' },
-  { l:'ב', examples:[{word:'בית',pic:'🏠'},{word:'בלון',pic:'🎈'},{word:'בננה',pic:'🍌'},{word:'בובה',pic:'🪆'}], color:'#2196F3' },
-  { l:'ג', examples:[{word:'גמל',pic:'🐪'},{word:'גשר',pic:'🌉'},{word:'גזר',pic:'🥕'},{word:'גלידה',pic:'🍦'}], color:'#FF9800' },
-  { l:'ד', examples:[{word:'דג',pic:'🐟'},{word:'דב',pic:'🐻'},{word:'דלת',pic:'🚪'},{word:'דבש',pic:'🍯'}], color:'#00BCD4' },
-  { l:'ה', examples:[{word:'הר',pic:'⛰️'},{word:'הדס',pic:'🌿'},{word:'הליקופטר',pic:'🚁'}], color:'#795548' },
-  { l:'ו', examples:[{word:'ורד',pic:'🌹'},{word:'ווילון',pic:'🪟'},{word:'ורוד',pic:'🩷'}], color:'#E91E63' },
-  { l:'ז', examples:[{word:'זאב',pic:'🐺'},{word:'זית',pic:'🫒'},{word:'זברה',pic:'🦓'},{word:'זהב',pic:'🌟'}], color:'#607D8B' },
-  { l:'ח', examples:[{word:'חתול',pic:'🐱'},{word:'חמור',pic:'🫏'},{word:'חלב',pic:'🥛'},{word:'חמניה',pic:'🌻'}], color:'#FF7043' },
-  { l:'ט', examples:[{word:'טלה',pic:'🐑'},{word:'טיגריס',pic:'🐯'},{word:'טלפון',pic:'📱'},{word:'טווס',pic:'🦚'}], color:'#9C27B0' },
-  { l:'י', examples:[{word:'ירח',pic:'🌙'},{word:'ים',pic:'🌊'},{word:'יונה',pic:'🕊️'},{word:'ילד',pic:'👦'}], color:'#3F51B5' },
-  { l:'כ', examples:[{word:'כלב',pic:'🐶'},{word:'כוכב',pic:'⭐'},{word:'כיסא',pic:'🪑'},{word:'כדור',pic:'⚽'}], color:'#8B6914' },
-  { l:'ל', examples:[{word:'לב',pic:'❤️'},{word:'לוויתן',pic:'🐋'},{word:'לחם',pic:'🍞'},{word:'לימון',pic:'🍋'}], color:'#F44336' },
-  { l:'מ', examples:[{word:'מטוס',pic:'✈️'},{word:'מכונית',pic:'🚙'},{word:'מגדל',pic:'🗼'},{word:'מלפפון',pic:'🥒'}], color:'#4CAF50' },
-  { l:'נ', examples:[{word:'נחש',pic:'🐍'},{word:'נמר',pic:'🐆'},{word:'נר',pic:'🕯️'},{word:'נשר',pic:'🦅'}], color:'#009688' },
-  { l:'ס', examples:[{word:'סוס',pic:'🐴'},{word:'ספר',pic:'📚'},{word:'סירה',pic:'⛵'},{word:'סנאי',pic:'🐿️'}], color:'#795548' },
-  { l:'ע', examples:[{word:'עוגה',pic:'🎂'},{word:'עגבניה',pic:'🍅'},{word:'עץ',pic:'🌳'},{word:'עכבר',pic:'🐭'}], color:'#E91E63' },
-  { l:'פ', examples:[{word:'פרפר',pic:'🦋'},{word:'פרח',pic:'🌸'},{word:'פיל',pic:'🐘'},{word:'פינגווין',pic:'🐧'}], color:'#9C27B0' },
-  { l:'צ', examples:[{word:'צב',pic:'🐢'},{word:'צפרדע',pic:'🐸'},{word:'צבי',pic:'🦌'},{word:'צהוב',pic:'💛'}], color:'#4CAF50' },
-  { l:'ק', examples:[{word:'קוף',pic:'🐒'},{word:'קיפוד',pic:'🦔'},{word:'קשת',pic:'🌈'},{word:'קרנף',pic:'🦏'}], color:'#FF9800' },
-  { l:'ר', examples:[{word:'רכבת',pic:'🚂'},{word:'רובוט',pic:'🤖'},{word:'רוח',pic:'💨'},{word:'ריקוד',pic:'💃'}], color:'#F44336' },
-  { l:'ש', examples:[{word:'שמש',pic:'☀️'},{word:'שפן',pic:'🐇'},{word:'שוקולד',pic:'🍫'},{word:'שועל',pic:'🦊'}], color:'#FFC107' },
-  { l:'ת', examples:[{word:'תות',pic:'🍓'},{word:'תרנגול',pic:'🐓'},{word:'תפוח',pic:'🍎'},{word:'תנין',pic:'🐊'}], color:'#E84040' },
+  { l:'א', examples:[{word:'אַרְנָב',pic:'🐰'},{word:'אַרְיֵה',pic:'🦁'},{word:'אַבְטִיחַ',pic:'🍉'},{word:'אוֹטוֹ',pic:'🚗'}], color:'#E84040' },
+  { l:'ב', examples:[{word:'בַּיִת',pic:'🏠'},{word:'בַּלּוֹן',pic:'🎈'},{word:'בַּנָּנָה',pic:'🍌'},{word:'בּוּבָּה',pic:'🪆'}], color:'#2196F3' },
+  { l:'ג', examples:[{word:'גָּמָל',pic:'🐪'},{word:'גֶּשֶׁר',pic:'🌉'},{word:'גֶּזֶר',pic:'🥕'},{word:'גְּלִידָה',pic:'🍦'}], color:'#FF9800' },
+  { l:'ד', examples:[{word:'דָּג',pic:'🐟'},{word:'דֹּב',pic:'🐻'},{word:'דֶּלֶת',pic:'🚪'},{word:'דְּבַשׁ',pic:'🍯'}], color:'#00BCD4' },
+  { l:'ה', examples:[{word:'הַר',pic:'⛰️'},{word:'הֲדַס',pic:'🌿'},{word:'הֶלִיקוֹפְּטֶר',pic:'🚁'}], color:'#795548' },
+  { l:'ו', examples:[{word:'וֶרֶד',pic:'🌹'},{word:'וִילוֹן',pic:'🪟'},{word:'וָרֹד',pic:'🩷'}], color:'#E91E63' },
+  { l:'ז', examples:[{word:'זְאֵב',pic:'🐺'},{word:'זַיִת',pic:'🫒'},{word:'זֶבְּרָה',pic:'🦓'},{word:'זָהָב',pic:'🌟'}], color:'#607D8B' },
+  { l:'ח', examples:[{word:'חָתוּל',pic:'🐱'},{word:'חֲמוֹר',pic:'🫏'},{word:'חָלָב',pic:'🥛'},{word:'חַמָּנִיָּה',pic:'🌻'}], color:'#FF7043' },
+  { l:'ט', examples:[{word:'טָלֶה',pic:'🐑'},{word:'טִיגְרִיס',pic:'🐯'},{word:'טֶלֶפוֹן',pic:'📱'},{word:'טַוָּס',pic:'🦚'}], color:'#9C27B0' },
+  { l:'י', examples:[{word:'יָרֵחַ',pic:'🌙'},{word:'יָם',pic:'🌊'},{word:'יוֹנָה',pic:'🕊️'},{word:'יֶלֶד',pic:'👦'}], color:'#3F51B5' },
+  { l:'כ', examples:[{word:'כֶּלֶב',pic:'🐶'},{word:'כּוֹכָב',pic:'⭐'},{word:'כִּסֵּא',pic:'🪑'},{word:'כַּדּוּר',pic:'⚽'}], color:'#8B6914' },
+  { l:'ל', examples:[{word:'לֵב',pic:'❤️'},{word:'לִוְיָתָן',pic:'🐋'},{word:'לֶחֶם',pic:'🍞'},{word:'לִימוֹן',pic:'🍋'}], color:'#F44336' },
+  { l:'מ', examples:[{word:'מָטוֹס',pic:'✈️'},{word:'מְכוֹנִית',pic:'🚙'},{word:'מִגְדָּל',pic:'🗼'},{word:'מְלָפְפוֹן',pic:'🥒'}], color:'#4CAF50' },
+  { l:'נ', examples:[{word:'נָחָשׁ',pic:'🐍'},{word:'נָמֵר',pic:'🐆'},{word:'נֵר',pic:'🕯️'},{word:'נֶשֶׁר',pic:'🦅'}], color:'#009688' },
+  { l:'ס', examples:[{word:'סוּס',pic:'🐴'},{word:'סֵפֶר',pic:'📚'},{word:'סִירָה',pic:'⛵'},{word:'סְנָאי',pic:'🐿️'}], color:'#795548' },
+  { l:'ע', examples:[{word:'עוּגָה',pic:'🎂'},{word:'עַגְבָנִיָּה',pic:'🍅'},{word:'עֵץ',pic:'🌳'},{word:'עַכְבָּר',pic:'🐭'}], color:'#E91E63' },
+  { l:'פ', examples:[{word:'פַּרְפַּר',pic:'🦋'},{word:'פֶּרַח',pic:'🌸'},{word:'פִּיל',pic:'🐘'},{word:'פִּינְגְּוִין',pic:'🐧'}], color:'#9C27B0' },
+  { l:'צ', examples:[{word:'צָב',pic:'🐢'},{word:'צְפַרְדֵּעַ',pic:'🐸'},{word:'צְבִי',pic:'🦌'},{word:'צָהֹב',pic:'💛'}], color:'#4CAF50' },
+  { l:'ק', examples:[{word:'קוֹף',pic:'🐒'},{word:'קִיפּוֹד',pic:'🦔'},{word:'קֶשֶׁת',pic:'🌈'},{word:'קַרְנָף',pic:'🦏'}], color:'#FF9800' },
+  { l:'ר', examples:[{word:'רַכֶּבֶת',pic:'🚂'},{word:'רוֹבּוֹט',pic:'🤖'},{word:'רוּחַ',pic:'💨'},{word:'רִיקּוּד',pic:'💃'}], color:'#F44336' },
+  { l:'ש', examples:[{word:'שֶׁמֶשׁ',pic:'☀️'},{word:'שָׁפָן',pic:'🐇'},{word:'שׁוֹקוֹלָד',pic:'🍫'},{word:'שׁוּעָל',pic:'🦊'}], color:'#FFC107' },
+  { l:'ת', examples:[{word:'תּוּת',pic:'🍓'},{word:'תַּרְנְגוֹל',pic:'🐓'},{word:'תַּפּוּחַ',pic:'🍎'},{word:'תַּנִּין',pic:'🐊'}], color:'#E84040' },
 ];
 
 const numbers = [
-  { n:1, word:'אחד', pic:'1️⃣', color:'#e53935' },
-  { n:2, word:'שניים', pic:'2️⃣', color:'#8e24aa' },
-  { n:3, word:'שלושה', pic:'3️⃣', color:'#3949ab' },
-  { n:4, word:'ארבעה', pic:'4️⃣', color:'#00897b' },
-  { n:5, word:'חמישה', pic:'5️⃣', color:'#43a047' },
-  { n:6, word:'שישה', pic:'6️⃣', color:'#f4511e' },
-  { n:7, word:'שבעה', pic:'7️⃣', color:'#fb8c00' },
-  { n:8, word:'שמונה', pic:'8️⃣', color:'#fbc02d' },
-  { n:9, word:'תשעה', pic:'9️⃣', color:'#6d4c41' },
-  { n:10, word:'עשרה', pic:'🔟', color:'#546e7a' },
-  { n:11, word:'אחת עשרה', pic:'11', color:'#e53935' },
-  { n:12, word:'שתים עשרה', pic:'12', color:'#8e24aa' },
-  { n:13, word:'שלוש עשרה', pic:'13', color:'#3949ab' },
-  { n:14, word:'ארבע עשרה', pic:'14', color:'#00897b' },
-  { n:15, word:'חמש עשרה', pic:'15', color:'#43a047' },
-  { n:16, word:'שש עשרה', pic:'16', color:'#f4511e' },
-  { n:17, word:'שבע עשרה', pic:'17', color:'#fb8c00' },
-  { n:18, word:'שמונה עשרה', pic:'18', color:'#fbc02d' },
-  { n:19, word:'תשע עשרה', pic:'19', color:'#6d4c41' },
-  { n:20, word:'עשרים', pic:'20', color:'#546e7a' },
-  { n:21, word:'עשרים ואחד', pic:'21', color:'#e53935' },
-  { n:22, word:'עשרים ושניים', pic:'22', color:'#8e24aa' },
-  { n:23, word:'עשרים ושלושה', pic:'23', color:'#3949ab' },
-  { n:24, word:'עשרים וארבעה', pic:'24', color:'#00897b' },
-  { n:25, word:'עשרים וחמישה', pic:'25', color:'#43a047' },
-  { n:26, word:'עשרים ושישה', pic:'26', color:'#f4511e' },
-  { n:27, word:'עשרים ושבעה', pic:'27', color:'#fb8c00' },
-  { n:28, word:'עשרים ושמונה', pic:'28', color:'#fbc02d' },
-  { n:29, word:'עשרים ותשעה', pic:'29', color:'#6d4c41' },
-  { n:30, word:'שלושים', pic:'30', color:'#546e7a' },
+  { n:1, word:'אֶחָד', pic:'1️⃣', color:'#e53935' },
+  { n:2, word:'שְׁנַיִם', pic:'2️⃣', color:'#8e24aa' },
+  { n:3, word:'שְׁלוֹשָׁה', pic:'3️⃣', color:'#3949ab' },
+  { n:4, word:'אַרְבָּעָה', pic:'4️⃣', color:'#00897b' },
+  { n:5, word:'חֲמִשָּׁה', pic:'5️⃣', color:'#43a047' },
+  { n:6, word:'שִׁשָּׁה', pic:'6️⃣', color:'#f4511e' },
+  { n:7, word:'שִׁבְעָה', pic:'7️⃣', color:'#fb8c00' },
+  { n:8, word:'שְׁמוֹנֶה', pic:'8️⃣', color:'#fbc02d' },
+  { n:9, word:'תִּשְׁעָה', pic:'9️⃣', color:'#6d4c41' },
+  { n:10, word:'עֲשָׂרָה', pic:'🔟', color:'#546e7a' },
+  { n:11, word:'אַחַת עֶשְׂרֵה', pic:'11', color:'#e53935' },
+  { n:12, word:'שְׁתֵּים עֶשְׂרֵה', pic:'12', color:'#8e24aa' },
+  { n:13, word:'שְׁלוֹשׁ עֶשְׂרֵה', pic:'13', color:'#3949ab' },
+  { n:14, word:'אַרְבַּע עֶשְׂרֵה', pic:'14', color:'#00897b' },
+  { n:15, word:'חֲמֵשׁ עֶשְׂרֵה', pic:'15', color:'#43a047' },
+  { n:16, word:'שֵׁשׁ עֶשְׂרֵה', pic:'16', color:'#f4511e' },
+  { n:17, word:'שְׁבַע עֶשְׂרֵה', pic:'17', color:'#fb8c00' },
+  { n:18, word:'שְׁמוֹנֶה עֶשְׂרֵה', pic:'18', color:'#fbc02d' },
+  { n:19, word:'תְּשַׁע עֶשְׂרֵה', pic:'19', color:'#6d4c41' },
+  { n:20, word:'עֶשְׂרִים', pic:'20', color:'#546e7a' },
+  { n:21, word:'עֶשְׂרִים וְאֶחָד', pic:'21', color:'#e53935' },
+  { n:22, word:'עֶשְׂרִים וּשְׁנַיִם', pic:'22', color:'#8e24aa' },
+  { n:23, word:'עֶשְׂרִים וּשְׁלוֹשָׁה', pic:'23', color:'#3949ab' },
+  { n:24, word:'עֶשְׂרִים וְאַרְבָּעָה', pic:'24', color:'#00897b' },
+  { n:25, word:'עֶשְׂרִים וַחֲמִשָּׁה', pic:'25', color:'#43a047' },
+  { n:26, word:'עֶשְׂרִים וְשִׁשָּׁה', pic:'26', color:'#f4511e' },
+  { n:27, word:'עֶשְׂרִים וְשִׁבְעָה', pic:'27', color:'#fb8c00' },
+  { n:28, word:'עֶשְׂרִים וּשְׁמוֹנֶה', pic:'28', color:'#fbc02d' },
+  { n:29, word:'עֶשְׂרִים וְתִשְׁעָה', pic:'29', color:'#6d4c41' },
+  { n:30, word:'שְׁלוֹשִׁים', pic:'30', color:'#546e7a' },
 ];
 
-const vowelExercises = [
-  { word:'בית', options:['בֵּית','בַּיִת','בֹּיִת'], correct:'בַּיִת' },
-  { word:'מים', options:['מַיִם','מֵיִם','מִים'], correct:'מַיִם' },
-  { word:'ספר', options:['סֵפֶר','סֻפְר','סָפָר'], correct:'סֵפֶר' },
-  { word:'חלב', options:['חָלָב','חַלָב','חָלֶב'], correct:'חָלָב' },
-  { word:'לימון', options:['לִימוּן','לִימוֹן','לָימוֹן'], correct:'לִימוֹן' },
-  { word:'פרח', options:['פֶּרַח','פְּרַח','פִּרַח'], correct:'פֶּרַח' },
-];
 
 const countChallenges = [
   { name:'תפוחים', icons:'🍎🍎🍎', answer:3 },
@@ -243,10 +234,8 @@ const countChallenges = [
 ];
 
 let tab = 'learn';
-let showNikud = false;
 let current = 0;
 let numberIndex = 0;
-let vowelIndex = 0;
 let wordplayIndex = 0;
 let quizItems = [];
 let currentQuizItem = null;
@@ -319,7 +308,7 @@ function switchTab(t) {
 
   const mainDisplay = document.getElementById('main-display');
   const btnRow = document.getElementById('btn-row');
-  mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'vowels' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
+  mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
   btnRow.style.display = (t === 'learn' || t === 'numbers' || t === 'quiz') ? 'flex' : 'none';
 
   document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
@@ -330,10 +319,6 @@ function switchTab(t) {
     pageTitle.textContent = 'לומדים מספרים 🔢';
     document.getElementById('mode-label').textContent = 'מספרים - למידה';
     showNumber(numberIndex);
-  } else if (t === 'vowels') {
-    pageTitle.textContent = 'תרגול ניקוד 🔠';
-    document.getElementById('mode-label').textContent = 'תרגול ניקוד למילים';
-    startVowels();
   } else if (t === 'wordplay') {
     pageTitle.textContent = 'תרגול כמות 🧩';
     document.getElementById('mode-label').textContent = 'תרגול כמות';
@@ -367,8 +352,6 @@ function setGameType(type) {
     showLearn(current);
   } else if (type === 'numbers') {
     showNumber(numberIndex);
-  } else if (type === 'vowels') {
-    startVowels();
   } else if (type === 'wordplay') {
     startWordPlay();
   }
@@ -488,59 +471,6 @@ function showNumber(idx) {
   renderStars();
 }
 
-function startVowels() {
-  vowelIndex = 0;
-  showVowel(vowelIndex);
-}
-
-function showVowel(idx) {
-  const v = vowelExercises[idx];
-  document.getElementById('letter-display').textContent = v.word;
-  document.getElementById('letter-display').style.color = '#5d4037';
-  document.getElementById('letter-display').style.fontSize = '120px';
-  document.getElementById('picture').textContent = '🔡';
-  document.getElementById('word-display').textContent = 'בחרו את המילה עם הניקוד הנכון';
-  document.getElementById('mode-label').textContent = 'ניקוד למילים';
-  document.getElementById('prompt').textContent = '';
-
-  const chips = document.getElementById('word-chips');
-  chips.innerHTML = '';
-  v.options.forEach(option => {
-    const c = document.createElement('button');
-    c.className = 'chip';
-    c.textContent = option;
-    c.onclick = () => {
-      if (appState.soundEnabled && window.speechSynthesis) {
-        const utterance = new SpeechSynthesisUtterance(option);
-        utterance.lang = 'he-IL';
-        utterance.rate = 0.85;
-        utterance.pitch = 1.2;
-        utterance.volume = 1;
-        speechSynthesis.speak(utterance);
-        setTimeout(() => checkVowelAnswer(option), 1000); // Wait 1 second for speech
-      } else {
-        checkVowelAnswer(option);
-      }
-    };
-    chips.appendChild(c);
-  });
-  // אין כפתורים בסרגל התחתון בסשן ניקוד.
-}
-
-function checkVowelAnswer(choice) {
-  if (choice === vowelExercises[vowelIndex].correct) {
-    document.getElementById('prompt').textContent = '👍 נכון!';
-    speak('נכון!', 0.85, 1.3);
-    setTimeout(() => {
-      vowelIndex = (vowelIndex + 1) % vowelExercises.length;
-      showVowel(vowelIndex);
-    }, 1000);
-  } else {
-    document.getElementById('prompt').textContent = '❌ נסה שוב!';
-    speak('נסה שוב', 0.8, 1.1);
-    setTimeout(() => { document.getElementById('prompt').textContent = ''; }, 900);
-  }
-}
 
 let wordplayChallenges = [];
 
@@ -614,10 +544,9 @@ function startQuiz() {
 
   const letterItems = letters.map((_, i) => ({ type: 'letter', idx: i }));
   const numberItems = numbers.map((_, i) => ({ type: 'number', idx: i }));
-  const vowelItems = vowelExercises.map((_, i) => ({ type: 'vowel', idx: i }));
   const wordplayItems = wordplayChallenges.map((_, i) => ({ type: 'count', idx: i }));
 
-  quizItems = shuffle([...letterItems, ...numberItems, ...vowelItems, ...wordplayItems]);
+  quizItems = shuffle([...letterItems, ...numberItems, ...wordplayItems]);
   document.getElementById('word-chips').innerHTML = '';
   nextMixedQuiz();
 }
@@ -659,20 +588,6 @@ function nextMixedQuiz() {
     renderBtns(choices.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
     speak('איזה מספר זה?', 0.8, 1.2);
 
-  } else if (currentQuizItem.type === 'vowel') {
-    const v = vowelExercises[currentQuizItem.idx];
-    document.getElementById('letter-display').textContent = v.word;
-    document.getElementById('letter-display').style.color = '#5d4037';
-    document.getElementById('letter-display').style.fontSize = '120px';
-    document.getElementById('picture').textContent = '🔡';
-    document.getElementById('word-display').textContent = 'בחר את הניקוד הנכון';
-    document.getElementById('mode-label').textContent = '⁉️ חידון ניקוד';
-    document.getElementById('prompt').textContent = '';
-
-    const choices = shuffle(v.options.slice());
-    renderBtns(choices.map(x => ({ label: x, fn: () => checkQuizAnswer(x), big: true })));
-    speak('בחר את הניקוד הנכון למילה', 0.8, 1.2);
-
   } else {
     const c = wordplayChallenges[currentQuizItem.idx];
     document.getElementById('letter-display').textContent = c.icons;
@@ -706,9 +621,6 @@ function checkQuizAnswer(chosen) {
   } else if (currentQuizItem.type === 'number') {
     correctAnswer = numbers[currentQuizItem.idx].n;
     confirmationText = numbers[currentQuizItem.idx].word;
-  } else if (currentQuizItem.type === 'vowel') {
-    correctAnswer = vowelExercises[currentQuizItem.idx].correct;
-    confirmationText = 'הניקוד הנכון הוא ' + correctAnswer;
   } else {
     correctAnswer = wordplayChallenges[currentQuizItem.idx].answer;
     confirmationText = 'התשובה נכונה היא ' + correctAnswer;
