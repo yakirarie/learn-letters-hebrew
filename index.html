@@ -141,6 +141,13 @@
       <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)"></div>
       <div class="color-dot" style="background:#FF9800" onclick="setColor('#FF9800',this)"></div>
       <div class="color-dot" style="background:#9C27B0" onclick="setColor('#9C27B0',this)"></div>
+      <div class="color-dot" style="background:#E91E63" onclick="setColor('#E91E63',this)"></div>
+      <div class="color-dot" style="background:#00BCD4" onclick="setColor('#00BCD4',this)"></div>
+      <div class="color-dot" style="background:#FFD600" onclick="setColor('#FFD600',this)"></div>
+      <div class="color-dot" style="background:#795548" onclick="setColor('#795548',this)"></div>
+      <div class="color-dot" style="background:#607D8B" onclick="setColor('#607D8B',this)"></div>
+      <div class="color-dot" style="background:#FF7043" onclick="setColor('#FF7043',this)"></div>
+      <div class="color-dot" style="background:#222222" onclick="setColor('#222222',this)"></div>
     </div>
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
       <button class="tap-btn" onclick="clearTrace()" style="padding:6px 16px;font-size:14px;">🗑️ נקה</button>
@@ -281,6 +288,12 @@ function setSoundEnabled(enabled) {
   saveAppState();
 }
 let traceIdx = 0, traceColor = '#2196F3';
+
+function setColor(color, el) {
+  traceColor = color;
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
 let memCards = [], memFlipped = [], memMatched = [], memPairs = 0, memMoves = 0, memLock = false;
 
 function pickExample(idx) {  const ex = letters[idx].examples;
