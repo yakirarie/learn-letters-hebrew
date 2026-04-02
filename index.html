@@ -891,7 +891,6 @@ if ('serviceWorker' in navigator) {
           if (!banner || !refreshBtn) return;
           banner.style.display = 'block';
           refreshBtn.onclick = () => {
-            banner.style.display = 'none';
             if (navigator.serviceWorker.controller) {
               navigator.serviceWorker.controller.postMessage({ action: 'skipWaiting' });
             }
