@@ -476,8 +476,17 @@ function showVowel(idx) {
     c.className = 'chip';
     c.textContent = option;
     c.onclick = () => {
-      speak(option, 0.85, 1.2);
-      checkVowelAnswer(option);
+      if (appState.soundEnabled && window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(option);
+        utterance.lang = 'he-IL';
+        utterance.rate = 0.85;
+        utterance.pitch = 1.2;
+        utterance.volume = 1;
+        utterance.onend = () => checkVowelAnswer(option);
+        speechSynthesis.speak(utterance);
+      } else {
+        checkVowelAnswer(option);
+      }
     };
     chips.appendChild(c);
   });
