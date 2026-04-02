@@ -529,14 +529,6 @@ function checkVowelAnswer(choice) {
   }
 }
 
-const countChallenges = [
-  { name:'תפוחים', icons:'🍎🍎🍎', answer:3 },
-  { name:'כדורים', icons:'⚽⚽', answer:2 },
-  { name:'פרחים', icons:'🌸🌸🌸🌸', answer:4 },
-  { name:'חתולים', icons:'🐱🐱🐱🐱🐱', answer:5 },
-  { name:'דגים', icons:'🐟🐟🐟🐟🐟🐟', answer:6 },
-];
-
 let wordplayChallenges = [];
 
 function startWordPlay() {
@@ -597,10 +589,20 @@ function startQuiz() {
   quizIdx = 0;
   answered = false;
 
+  // Generate random wordplay challenges for quiz
+  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍', '🥝', '🍉', '🍒', '🍊', '🥭', '🍋', '🍐', '🥥', '🥑', '🌶️'];
+  wordplayChallenges = [];
+  for (let i = 0; i < 5; i++) { // Fewer for quiz
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const answer = Math.floor(Math.random() * 30) + 1;
+    const icons = emoji.repeat(answer);
+    wordplayChallenges.push({ icons, answer });
+  }
+
   const letterItems = letters.map((_, i) => ({ type: 'letter', idx: i }));
   const numberItems = numbers.map((_, i) => ({ type: 'number', idx: i }));
   const vowelItems = vowelExercises.map((_, i) => ({ type: 'vowel', idx: i }));
-  const wordplayItems = countChallenges.map((_, i) => ({ type: 'count', idx: i }));
+  const wordplayItems = wordplayChallenges.map((_, i) => ({ type: 'count', idx: i }));
 
   quizItems = shuffle([...letterItems, ...numberItems, ...vowelItems, ...wordplayItems]);
   document.getElementById('word-chips').innerHTML = '';
@@ -659,17 +661,17 @@ function nextMixedQuiz() {
     speak('בחר את הניקוד הנכון למילה', 0.8, 1.2);
 
   } else {
-    const c = countChallenges[currentQuizItem.idx];
+    const c = wordplayChallenges[currentQuizItem.idx];
     document.getElementById('letter-display').textContent = c.icons;
     document.getElementById('letter-display').style.color = '#3f51b5';
-    document.getElementById('letter-display').style.fontSize = '90px';
+    document.getElementById('letter-display').style.fontSize = '60px';
     document.getElementById('picture').textContent = '';
     document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
     document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
     document.getElementById('prompt').textContent = '';
 
     const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
-      .map(n => Math.max(1, Math.min(10, n)))
+      .map(n => Math.max(1, Math.min(30, n)))
       .filter((v, i, a) => a.indexOf(v) === i));
     renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
     speak('כמה פריטים יש כאן?', 0.8, 1.2);
@@ -695,7 +697,7 @@ function checkQuizAnswer(chosen) {
     correctAnswer = vowelExercises[currentQuizItem.idx].correct;
     confirmationText = 'הניקוד הנכון הוא ' + correctAnswer;
   } else {
-    correctAnswer = countChallenges[currentQuizItem.idx].answer;
+    correctAnswer = wordplayChallenges[currentQuizItem.idx].answer;
     confirmationText = 'התשובה נכונה היא ' + correctAnswer;
   }
 
