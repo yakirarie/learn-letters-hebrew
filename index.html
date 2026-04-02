@@ -14,6 +14,8 @@
     h1 { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 0.2rem; }
 
     .tabs { display: flex; gap: 6px; justify-content: center; margin: 0.5rem 0; flex-wrap: wrap; }
+    .learning-tabs { margin-bottom: 0.3rem; }
+    .games-tabs { margin-top: 0.3rem; border-top: 1px solid #eee; padding-top: 0.5rem; }
     .tab-btn {
       font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 20px;
       border: 1.5px solid #ddd; background: #fff; color: #666; cursor: pointer;
@@ -93,11 +95,13 @@
 <div id="app">
   <h1>לומדים אותיות 📖</h1>
 
-  <div class="tabs" id="main-tabs">
+  <div class="tabs learning-tabs" id="learning-tabs">
     <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
     <button class="tab-btn" data-target="vowels" onclick="switchTab('vowels')">🔠 ניקוד</button>
     <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מספרים</button>
     <button class="tab-btn" data-target="wordplay" onclick="switchTab('wordplay')">🧩 כמות וחיבור</button>
+  </div>
+  <div class="tabs games-tabs" id="games-tabs">
     <button class="tab-btn" data-target="quiz" onclick="switchTab('quiz')">🎮 חידון</button>
     <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
     <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
@@ -229,7 +233,7 @@ function speak(text, rate=0.8, pitch=1.2) {
 function switchTab(t) {
   tab = t;
 
-  document.querySelectorAll('#main-tabs .tab-btn').forEach((b) => {
+  document.querySelectorAll('#learning-tabs .tab-btn, #games-tabs .tab-btn').forEach((b) => {
     b.classList.toggle('active', b.dataset.target === t);
   });
 
