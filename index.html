@@ -243,7 +243,7 @@ function switchTab(t) {
   const mainDisplay = document.getElementById('main-display');
   const btnRow = document.getElementById('btn-row');
   mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'vowels' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
-  btnRow.style.display = t === 'quiz' ? 'flex' : 'none';
+  btnRow.style.display = (t === 'learn' || t === 'numbers' || t === 'quiz') ? 'flex' : 'none';
 
   document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
   document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
