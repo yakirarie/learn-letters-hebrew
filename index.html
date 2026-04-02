@@ -475,7 +475,10 @@ function showVowel(idx) {
     const c = document.createElement('button');
     c.className = 'chip';
     c.textContent = option;
-    c.onclick = () => checkVowelAnswer(option);
+    c.onclick = () => {
+      speak(option, 0.85, 1.2);
+      checkVowelAnswer(option);
+    };
     chips.appendChild(c);
   });
   // אין כפתורים בסרגל התחתון בסשן ניקוד.
