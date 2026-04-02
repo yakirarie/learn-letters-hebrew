@@ -529,22 +529,40 @@ function checkVowelAnswer(choice) {
   }
 }
 
+const countChallenges = [
+  { name:'תפוחים', icons:'🍎🍎🍎', answer:3 },
+  { name:'כדורים', icons:'⚽⚽', answer:2 },
+  { name:'פרחים', icons:'🌸🌸🌸🌸', answer:4 },
+  { name:'חתולים', icons:'🐱🐱🐱🐱🐱', answer:5 },
+  { name:'דגים', icons:'🐟🐟🐟🐟🐟🐟', answer:6 },
+];
+
+let wordplayChallenges = [];
+
 function startWordPlay() {
+  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍', '🥝', '🍉', '🍒', '🍊', '🥭', '🍋', '🍐', '🥥', '🥑', '🌶️'];
+  wordplayChallenges = [];
+  for (let i = 0; i < 10; i++) {
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const answer = Math.floor(Math.random() * 30) + 1;
+    const icons = emoji.repeat(answer);
+    wordplayChallenges.push({ icons, answer });
+  }
   wordplayIndex = 0;
   showCountChallenge();
 }
 
 function showCountChallenge() {
-  const challenge = countChallenges[wordplayIndex];
+  const challenge = wordplayChallenges[wordplayIndex];
   document.getElementById('letter-display').textContent = challenge.icons;
   document.getElementById('letter-display').style.color = '#3f51b5';
-  document.getElementById('letter-display').style.fontSize = '90px';
+  document.getElementById('letter-display').style.fontSize = '60px'; // Smaller for many items
   document.getElementById('picture').textContent = '';
   document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
-  document.getElementById('mode-label').textContent = 'משחק כמות (3+)';
+  document.getElementById('mode-label').textContent = 'תרגול כמות';
   document.getElementById('prompt').textContent = '';
 
-  const options = shuffle([challenge.answer, challenge.answer+1, challenge.answer-1, challenge.answer+2].map(n => Math.max(1, Math.min(10,n)))).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
+  const options = shuffle([challenge.answer, challenge.answer+1, challenge.answer-1, challenge.answer+2].map(n => Math.max(1, Math.min(30,n)))).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
   const chips = document.getElementById('word-chips');
   chips.innerHTML = '';
   options.forEach(opt => {
@@ -559,12 +577,12 @@ function showCountChallenge() {
 }
 
 function checkCountAnswer(choice) {
-  const challenge = countChallenges[wordplayIndex];
+  const challenge = wordplayChallenges[wordplayIndex];
   if (choice === challenge.answer) {
     document.getElementById('prompt').textContent = '🎉 נכון!';
     speak('נכון!', 0.85, 1.3);
     setTimeout(() => {
-      wordplayIndex = (wordplayIndex + 1) % countChallenges.length;
+      wordplayIndex = (wordplayIndex + 1) % wordplayChallenges.length;
       showCountChallenge();
     }, 900);
   } else {
