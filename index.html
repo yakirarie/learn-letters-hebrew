@@ -503,8 +503,8 @@ function showVowel(idx) {
         utterance.rate = 0.85;
         utterance.pitch = 1.2;
         utterance.volume = 1;
-        utterance.onend = () => checkVowelAnswer(option);
         speechSynthesis.speak(utterance);
+        setTimeout(() => checkVowelAnswer(option), 1000); // Wait 1 second for speech
       } else {
         checkVowelAnswer(option);
       }
