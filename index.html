@@ -200,19 +200,16 @@ const countChallenges = [
 ];
 
 let tab = 'learn';
-let gameType = 'letters';
 let showNikud = false;
 let current = 0;
 let numberIndex = 0;
 let vowelIndex = 0;
 let wordplayIndex = 0;
-let letterScore = 0;
-let numberScore = 0;
-let vowelScore = 0;
-let wordplayScore = 0;
-let score = 0;
-let quizOrder = [], quizIdx = 0, answered = false;
-let numberQuizOrder = [], numberQuizIdx = 0;
+let quizItems = [];
+let currentQuizItem = null;
+let quizIdx = 0;
+let quizScore = 0;
+let answered = false;
 let traceIdx = 0, traceColor = '#2196F3';
 let memCards = [], memFlipped = [], memMatched = [], memPairs = 0, memMoves = 0, memLock = false;
 
@@ -238,7 +235,10 @@ function switchTab(t) {
   });
 
   const mainDisplay = document.getElementById('main-display');
+  const btnRow = document.getElementById('btn-row');
   mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'vowels' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
+  btnRow.style.display = t === 'quiz' ? 'flex' : 'none';
+
   document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
   document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
 
@@ -288,13 +288,21 @@ function renderStars() {
     currentProgress = vowelScore;
     color = '#607D8B';
   } else if (tab === 'wordplay') {
-    total = 6;
-    currentProgress = wordplayScore;
+    total = countChallenges.length;
+    currentProgress = wordplayIndex;
     color = '#4CAF50';
-  } else {
+  } else if (tab === 'quiz') {
+    total = quizItems.length || 1;
+    currentProgress = quizScore;
+    color = '#673AB7';
+  } else if (tab === 'learn') {
     total = letters.length;
-    currentProgress = score;
+    currentProgress = current + 1;
     color = letters[current] ? letters[current].color : '#aaa';
+  } else {
+    total = 1;
+    currentProgress = 0;
+    color = '#aaa';
   }
 
   for (let i = 0; i < total; i++) {
@@ -361,11 +369,7 @@ function showLearn(idx) {
     chips.appendChild(c);
   });
 
-  renderBtns([
-    { label: '➡ הקודם', fn: () => { if(current>0) showLearn(current-1); } },
-    { label: '🎮 חידון', fn: () => switchTab('quiz'), accent: true },
-    { label: 'הבא ⬅', fn: () => { if(current<letters.length-1) showLearn(current+1); else switchTab('quiz'); } },
-  ]);
+  // אין כפתורי קיצור בסרגל התחתון לפי בקשה.
   speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
   renderStars();
 }
@@ -382,11 +386,7 @@ function showNumber(idx) {
   document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
   document.getElementById('word-chips').innerHTML = '';
 
-  renderBtns([
-    { label: '➡ הקודם', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
-    { label: '🎮 חידון מספרים', fn: () => { setGameType('numbers'); switchTab('quiz'); }, accent: true },
-    { label: 'הבא ⬅', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); else switchTab('quiz'); } },
-  ]);
+  // אין כפתורי קיצור בסרגל התחתון לפי בקשה.
   speak(n.n + ' ' + n.word, 0.8, 1.2);
   renderStars();
 }
@@ -416,7 +416,7 @@ function showVowel(idx) {
     c.onclick = () => checkVowelAnswer(option);
     chips.appendChild(c);
   });
-  renderBtns([]);
+  // אין כפתורים בסרגל התחתון בסשן ניקוד.
   renderStars();
 }
 
@@ -470,10 +470,7 @@ function showCountChallenge() {
     chips.appendChild(c);
   });
 
-  renderBtns([
-    { label: '🔁 אתחול', fn: startWordPlay },
-    { label: '🎮 חזרה ללמידה', fn: () => switchTab('learn'), accent: true }
-  ]);
+  // אין כפתורי קיצור בסרגל התחתון בסשן כמות/חיבור.
   renderStars();
 }
 
@@ -503,114 +500,135 @@ function checkCountAnswer(choice) {
 }
 
 function startQuiz() {
-  if (gameType === 'numbers') {
-    numberQuizOrder = shuffle(numbers.map((_,i) => i));
-    numberQuizIdx = 0; answered = false;
-    nextNumberQuiz();
-    return;
-  }
+  quizScore = 0;
+  quizIdx = 0;
+  answered = false;
 
-  quizOrder = shuffle(letters.map((_,i) => i));
-  quizIdx = 0; answered = false;
+  const letterItems = letters.map((_, i) => ({ type: 'letter', idx: i }));
+  const numberItems = numbers.map((_, i) => ({ type: 'number', idx: i }));
+  const vowelItems = vowelExercises.map((_, i) => ({ type: 'vowel', idx: i }));
+  const wordplayItems = countChallenges.map((_, i) => ({ type: 'count', idx: i }));
+
+  quizItems = shuffle([...letterItems, ...numberItems, ...vowelItems, ...wordplayItems]);
   document.getElementById('word-chips').innerHTML = '';
-  nextQuiz();
+  nextMixedQuiz();
 }
 
-function nextNumberQuiz() {
-  if (numberQuizIdx >= numberQuizOrder.length) { showCelebration('numbers'); return; }
+function nextMixedQuiz() {
+  if (quizIdx >= quizItems.length) { showCelebration(); return; }
   answered = false;
-  numberIndex = numberQuizOrder[numberQuizIdx];
-  const item = numbers[numberIndex];
-
-  document.getElementById('letter-display').textContent = item.n;
-  document.getElementById('letter-display').style.color = item.color;
-  document.getElementById('picture').textContent = item.pic;
-  document.getElementById('word-display').textContent = item.word;
-  document.getElementById('mode-label').textContent = '⁉️ חידון מספרים';
-  document.getElementById('prompt').textContent = 'בחר את המספר המתאים';
+  currentQuizItem = quizItems[quizIdx];
   document.getElementById('word-chips').innerHTML = '';
 
-  const pool = shuffle(numbers.filter((_,i) => i !== numberIndex)).slice(0,3).map(x => x.n);
-  const choices = shuffle([item.n, ...pool]);
-  renderBtns(choices.map(n => ({ label: String(n), fn: () => checkNumberAnswer(n, item), big: true })));
-  speak('איזה מספר מתאים למה שרואים?', 0.8, 1.2);
+  if (currentQuizItem.type === 'letter') {
+    const d = letters[currentQuizItem.idx];
+    const ex = pickExample(currentQuizItem.idx);
+    document.getElementById('letter-display').textContent = '?';
+    document.getElementById('letter-display').style.color = '#bbb';
+    document.getElementById('letter-display').style.fontSize = '130px';
+    document.getElementById('picture').textContent = ex.pic;
+    document.getElementById('word-display').textContent = ex.word;
+    document.getElementById('mode-label').textContent = '⁉️ חידון אותיות';
+    document.getElementById('prompt').textContent = 'באיזו אות מתחילה המילה ' + ex.word + '?';
+
+    const pool = shuffle(letters.filter((_, i) => i !== currentQuizItem.idx)).slice(0, 3).map(x => x.l);
+    const choices = shuffle([d.l, ...pool]);
+    renderBtns(choices.map(ch => ({ label: ch, fn: () => checkQuizAnswer(ch), big: true })));
+    speak('באיזו אות מתחילה המילה ' + ex.word + '?', 0.8, 1.2);
+
+  } else if (currentQuizItem.type === 'number') {
+    const item = numbers[currentQuizItem.idx];
+    document.getElementById('letter-display').textContent = item.pic;
+    document.getElementById('letter-display').style.color = item.color;
+    document.getElementById('letter-display').style.fontSize = '130px';
+    document.getElementById('picture').textContent = '';
+    document.getElementById('word-display').textContent = 'איזה מספר זה?';
+    document.getElementById('mode-label').textContent = '⁉️ חידון מספרים';
+    document.getElementById('prompt').textContent = '';
+
+    const pool = shuffle(numbers.filter((_, i) => i !== currentQuizItem.idx)).slice(0, 3).map(x => x.n);
+    const choices = shuffle([item.n, ...pool]);
+    renderBtns(choices.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
+    speak('איזה מספר זה?', 0.8, 1.2);
+
+  } else if (currentQuizItem.type === 'vowel') {
+    const v = vowelExercises[currentQuizItem.idx];
+    document.getElementById('letter-display').textContent = v.word;
+    document.getElementById('letter-display').style.color = '#5d4037';
+    document.getElementById('letter-display').style.fontSize = '120px';
+    document.getElementById('picture').textContent = '🔡';
+    document.getElementById('word-display').textContent = 'בחר את הניקוד הנכון';
+    document.getElementById('mode-label').textContent = '⁉️ חידון ניקוד';
+    document.getElementById('prompt').textContent = '';
+
+    const choices = shuffle(v.options.slice());
+    renderBtns(choices.map(x => ({ label: x, fn: () => checkQuizAnswer(x), big: true })));
+    speak('בחר את הניקוד הנכון למילה', 0.8, 1.2);
+
+  } else {
+    const c = countChallenges[currentQuizItem.idx];
+    document.getElementById('letter-display').textContent = c.icons;
+    document.getElementById('letter-display').style.color = '#3f51b5';
+    document.getElementById('letter-display').style.fontSize = '90px';
+    document.getElementById('picture').textContent = '';
+    document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
+    document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
+    document.getElementById('prompt').textContent = '';
+
+    const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
+      .map(n => Math.max(1, Math.min(10, n)))
+      .filter((v, i, a) => a.indexOf(v) === i));
+    renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
+    speak('כמה פריטים יש כאן?', 0.8, 1.2);
+  }
+
   renderStars();
 }
 
-function checkNumberAnswer(chosen, item) {
+function checkQuizAnswer(chosen) {
   if (answered) return;
   answered = true;
-  if (chosen === item.n) {
-    numberScore++;
-    document.getElementById('prompt').textContent = '🎉 מצוין!';
+
+  let correctAnswer;
+  let confirmationText = '';
+
+  if (currentQuizItem.type === 'letter') {
+    correctAnswer = letters[currentQuizItem.idx].l;
+    confirmationText = 'כמו ' + pickExample(currentQuizItem.idx).word;
+  } else if (currentQuizItem.type === 'number') {
+    correctAnswer = numbers[currentQuizItem.idx].n;
+    confirmationText = numbers[currentQuizItem.idx].word;
+  } else if (currentQuizItem.type === 'vowel') {
+    correctAnswer = vowelExercises[currentQuizItem.idx].correct;
+    confirmationText = 'הניקוד הנכון הוא ' + correctAnswer;
+  } else {
+    correctAnswer = countChallenges[currentQuizItem.idx].answer;
+    confirmationText = 'התשובה נכונה היא ' + correctAnswer;
+  }
+
+  if (String(chosen) === String(correctAnswer)) {
+    quizScore++;
+    document.getElementById('prompt').textContent = '🎉 מצוין! ' + confirmationText;
     speak('כל הכבוד!', 0.85, 1.4);
-    setTimeout(() => { numberQuizIdx++; nextNumberQuiz(); }, 1500);
+    renderStars();
+    setTimeout(() => { quizIdx++; nextMixedQuiz(); }, 1400);
   } else {
     document.getElementById('prompt').textContent = '🤔 לא בדיוק, נסה שוב.';
     speak('נסו שוב', 0.8, 1.1);
-    setTimeout(() => { answered = false; }, 800);
+    setTimeout(() => { answered = false; document.getElementById('prompt').textContent = ''; }, 1000);
   }
 }
 
-function nextQuiz() {
-  if (quizIdx >= quizOrder.length) { showCelebration('letters'); return; }
-  answered = false;
-  current = quizOrder[quizIdx];
-  const d = letters[current];
-  const ex = pickExample(current);
-
-  document.getElementById('letter-display').textContent = '?';
-  document.getElementById('letter-display').style.color = '#bbb';
-  document.getElementById('letter-display').style.fontSize = '130px';
-  document.getElementById('picture').textContent = ex.pic;
-  document.getElementById('word-display').textContent = ex.word;
-  document.getElementById('mode-label').textContent = '⁉️ חידון!';
-  document.getElementById('prompt').textContent = 'באיזו אות מתחילה המילה ' + ex.word + '?';
-  document.getElementById('word-chips').innerHTML = '';
-
-  const pool = shuffle(letters.filter((_,i) => i !== current)).slice(0,3).map(x => x.l);
-  const choices = shuffle([d.l, ...pool]);
-  renderBtns(choices.map(ch => ({ label: ch, fn: () => checkAnswer(ch, d.l, ex), big: true })));
-  speak('באיזו אות מתחילה המילה ' + ex.word + '?', 0.8, 1.2);
-  renderStars();
-}
-
-function checkAnswer(chosen, correct, ex) {
-  if (answered) return;
-  answered = true;
-  const d = letters[current];
-  if (chosen === correct) {
-    score++;
-    document.getElementById('letter-display').textContent = correct;
-    document.getElementById('letter-display').style.color = d.color;
-    document.getElementById('prompt').textContent = '🎉 כל הכבוד! ' + correct + ' כמו ' + ex.word + '!';
-    speak('כל הכבוד! ' + correct + '! ' + correct + ' כמו ' + ex.word, 0.85, 1.4);
-    renderStars();
-    setTimeout(() => { quizIdx++; nextQuiz(); }, 1800);
-  } else {
-    document.getElementById('prompt').textContent = '😊 נסו שוב!';
-    speak('נסו שוב!', 0.8, 1.1);
-    setTimeout(() => { answered = false; }, 700);
-  }
-}
-
-function showCelebration(mode='letters') {
+function showCelebration(mode='mixed') {
   document.getElementById('letter-display').textContent = '🏆';
   document.getElementById('letter-display').style.color = '#FFD700';
   document.getElementById('letter-display').style.fontSize = '100px';
   document.getElementById('picture').textContent = '🎉🎊🌟';
 
-  if (mode === 'numbers') {
-    document.getElementById('word-display').textContent = 'כל הכבוד! סיימת חידון מספרים!';
-    document.getElementById('prompt').textContent = 'צברת ' + numberScore + ' נקודות';
-    speak('איזה יופי! סיימת את כל שאלות המספרים!', 0.8, 1.4);
-    renderBtns([{ label: '🔄 שוב', fn: () => { numberScore = 0; startQuiz(); } }]);
-  } else {
-    document.getElementById('word-display').textContent = 'עשית עבודה מעולה!';
-    document.getElementById('prompt').textContent = 'למדת את כל האותיות!';
-    speak('כל הכבוד! למדת את כל האותיות! אתה כל כך חכם!', 0.8, 1.4);
-    renderBtns([{ label: '🔄 משחק חדש!', fn: () => { score = 0; switchTab('learn'); showLearn(0); } }]);
-  }
+  document.getElementById('word-display').textContent = 'כל הכבוד! סיימת חידון מעורב!';
+  document.getElementById('prompt').textContent = 'צברת ' + quizScore + ' נקודות מתוך ' + quizItems.length;
+  speak('איזה יופי! סיימת את כל השאלות!', 0.8, 1.4);
+  renderBtns([{ label: '🔄 שוב', fn: () => { quizScore = 0; startQuiz(); } }]);
   document.getElementById('mode-label').textContent = 'סיימתם!';
 }
 
