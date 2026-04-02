@@ -248,19 +248,27 @@ function switchTab(t) {
   document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
   document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
 
+  const pageTitle = document.querySelector('#app h1');
   if (t === 'numbers') {
+    pageTitle.textContent = 'לומדים מספרים 🔢';
     showNumber(numberIndex);
   } else if (t === 'vowels') {
+    pageTitle.textContent = 'לומדים ניקוד 🔠';
     startVowels();
   } else if (t === 'wordplay') {
+    pageTitle.textContent = 'כמות וחיבור 🧩';
     startWordPlay();
   } else if (t === 'learn') {
+    pageTitle.textContent = 'לומדים אותיות 📖';
     showLearn(current);
   } else if (t === 'quiz') {
+    pageTitle.textContent = 'חידון 🎯';
     startQuiz();
   } else if (t === 'trace') {
+    pageTitle.textContent = 'כתיבה ✏️';
     showTrace(traceIdx);
   } else if (t === 'memory') {
+    pageTitle.textContent = 'זיכרון 🃏';
     startMemory();
   }
 }
