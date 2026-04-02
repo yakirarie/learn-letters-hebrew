@@ -93,11 +93,21 @@
 <div id="app">
   <h1>לומדים אותיות 📖</h1>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('learn')">📚 למידה</button>
-    <button class="tab-btn" onclick="switchTab('quiz')">🎮 חידון</button>
-    <button class="tab-btn" onclick="switchTab('trace')">✏️ כתיבה</button>
-    <button class="tab-btn" onclick="switchTab('memory')">🃏 זיכרון</button>
+  <div class="tabs" id="main-tabs">
+    <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
+    <button class="tab-btn" data-target="vowels" onclick="switchTab('vowels')">🔠 ניקוד</button>
+    <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מספרים</button>
+    <button class="tab-btn" data-target="wordplay" onclick="switchTab('wordplay')">🧩 כמות וחיבור</button>
+    <button class="tab-btn" data-target="quiz" onclick="switchTab('quiz')">🎮 חידון</button>
+    <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
+    <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
+  </div>
+
+  <div class="tabs" id="data-tabs" style="margin-bottom:0.55rem;">
+    <button class="tab-btn active" data-type="letters" onclick="setGameType('letters')">אותיות</button>
+    <button class="tab-btn" data-type="numbers" onclick="setGameType('numbers')">מספרים</button>
+    <button class="tab-btn" data-type="vowels" onclick="setGameType('vowels')">ניקוד</button>
+    <button class="tab-btn" data-type="wordplay" onclick="setGameType('wordplay')">כמות</button>
   </div>
 
   <div id="mode-label"></div>
@@ -166,17 +176,56 @@ const letters = [
   { l:'ת', examples:[{word:'תות',pic:'🍓'},{word:'תרנגול',pic:'🐓'},{word:'תפוח',pic:'🍎'},{word:'תנין',pic:'🐊'}], color:'#E84040' },
 ];
 
-function pickExample(idx) {
-  const ex = letters[idx].examples;
-  return ex[Math.floor(Math.random() * ex.length)];
-}
+const numbers = [
+  { n:1, word:'אחד', pic:'1️⃣', color:'#e53935' },
+  { n:2, word:'שניים', pic:'2️⃣', color:'#8e24aa' },
+  { n:3, word:'שלושה', pic:'3️⃣', color:'#3949ab' },
+  { n:4, word:'ארבעה', pic:'4️⃣', color:'#00897b' },
+  { n:5, word:'חמישה', pic:'5️⃣', color:'#43a047' },
+  { n:6, word:'שישה', pic:'6️⃣', color:'#f4511e' },
+  { n:7, word:'שבעה', pic:'7️⃣', color:'#fb8c00' },
+  { n:8, word:'שמונה', pic:'8️⃣', color:'#fbc02d' },
+  { n:9, word:'תשעה', pic:'9️⃣', color:'#6d4c41' },
+  { n:10, word:'עשרה', pic:'🔟', color:'#546e7a' },
+];
+
+const vowelExercises = [
+  { word:'בית', options:['בֵּית','בַּיִת','בֹּיִת'], correct:'בַּיִת' },
+  { word:'מים', options:['מַיִם','מֵיִם','מִים'], correct:'מַיִם' },
+  { word:'ספר', options:['סֵפֶר','סֻפְר','סָפָר'], correct:'סֵפֶר' },
+  { word:'חלב', options:['חָלָב','חַלָב','חָלֶב'], correct:'חָלָב' },
+  { word:'לימון', options:['לִימוּן','לִימוֹן','לָימוֹן'], correct:'לִימוֹן' },
+  { word:'פרח', options:['פֶּרַח','פְּרַח','פִּרַח'], correct:'פֶּרַח' },
+];
+
+const countChallenges = [
+  { name:'תפוחים', icons:'🍎🍎🍎', answer:3 },
+  { name:'כדורים', icons:'⚽⚽', answer:2 },
+  { name:'פרחים', icons:'🌸🌸🌸🌸', answer:4 },
+  { name:'חתולים', icons:'🐱🐱🐱🐱🐱', answer:5 },
+  { name:'דגים', icons:'🐟🐟🐟🐟🐟🐟', answer:6 },
+];
 
 let tab = 'learn';
+let gameType = 'letters';
+let showNikud = false;
 let current = 0;
+let numberIndex = 0;
+let vowelIndex = 0;
+let wordplayIndex = 0;
+let letterScore = 0;
+let numberScore = 0;
+let vowelScore = 0;
+let wordplayScore = 0;
 let score = 0;
 let quizOrder = [], quizIdx = 0, answered = false;
+let numberQuizOrder = [], numberQuizIdx = 0;
 let traceIdx = 0, traceColor = '#2196F3';
 let memCards = [], memFlipped = [], memMatched = [], memPairs = 0, memMoves = 0, memLock = false;
+
+function pickExample(idx) {  const ex = letters[idx].examples;
+  return ex[Math.floor(Math.random() * ex.length)];
+}
 
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 
@@ -190,39 +239,111 @@ function speak(text, rate=0.8, pitch=1.2) {
 
 function switchTab(t) {
   tab = t;
-  document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    b.classList.toggle('active', ['learn','quiz','trace','memory'][i] === t);
+
+  document.querySelectorAll('#main-tabs .tab-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.target === t);
   });
-  document.getElementById('main-display').style.display = (t==='learn'||t==='quiz') ? 'block' : 'none';
-  document.getElementById('trace-section').className = t==='trace' ? 'visible' : '';
-  document.getElementById('memory-section').className = t==='memory' ? 'visible' : '';
-  if (t==='learn') showLearn(current);
-  if (t==='quiz') startQuiz();
-  if (t==='trace') showTrace(traceIdx);
-  if (t==='memory') startMemory();
+  document.querySelectorAll('#data-tabs .tab-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.type === gameType);
+  });
+
+  const mainDisplay = document.getElementById('main-display');
+  mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'vowels' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
+  document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
+  document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
+
+  if (t === 'numbers') {
+    setGameType('numbers');
+    showNumber(numberIndex);
+  } else if (t === 'vowels') {
+    setGameType('vowels');
+    startVowels();
+  } else if (t === 'wordplay') {
+    setGameType('wordplay');
+    startWordPlay();
+  } else if (t === 'learn') {
+    setGameType('letters');
+    showLearn(current);
+  } else if (t === 'quiz') {
+    startQuiz();
+  } else if (t === 'trace') {
+    showTrace(traceIdx);
+  } else if (t === 'memory') {
+    startMemory();
+  }
+}
+
+function setGameType(type) {
+  gameType = type;
+  document.querySelectorAll('#data-tabs .tab-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+
+  if (type === 'letters') {
+    showLearn(current);
+  } else if (type === 'numbers') {
+    showNumber(numberIndex);
+  } else if (type === 'vowels') {
+    startVowels();
+  } else if (type === 'wordplay') {
+    startWordPlay();
+  }
 }
 
 function renderStars() {
   const row = document.getElementById('stars');
   row.innerHTML = '';
-  const total = letters.length;
+  let total = 1;
+  let currentProgress = 0;
+  let color = '#aaa';
+
+  if (tab === 'numbers') {
+    total = numbers.length;
+    currentProgress = numberScore;
+    color = numbers[numberIndex] ? numbers[numberIndex].color : '#aaa';
+  } else if (tab === 'vowels') {
+    total = vowelExercises.length;
+    currentProgress = vowelScore;
+    color = '#607D8B';
+  } else if (tab === 'wordplay') {
+    total = 6;
+    currentProgress = wordplayScore;
+    color = '#4CAF50';
+  } else {
+    total = letters.length;
+    currentProgress = score;
+    color = letters[current] ? letters[current].color : '#aaa';
+  }
+
   for (let i = 0; i < total; i++) {
     const s = document.createElement('span');
-    s.className = 'star' + (i < score ? ' lit' : '');
-    s.textContent = i < score ? '⭐' : '☆';
+    s.className = 'star' + (i < currentProgress ? ' lit' : '');
+    s.textContent = i < currentProgress ? '⭐' : '☆';
     row.appendChild(s);
   }
   const bar = document.getElementById('progress-bar');
-  bar.style.width = (score / total * 100) + '%';
-  bar.style.background = letters[current] ? letters[current].color : '#aaa';
+  bar.style.width = (total ? (currentProgress / total * 100) : 0) + '%';
+  bar.style.background = color;
 }
 
-function onLetterTap() { if (tab === 'learn') sayLetter(); }
+function onLetterTap() {
+  if (tab === 'learn') sayLetter();
+  else if (tab === 'numbers') sayNumber();
+}
 
 function sayLetter() {
   const d = letters[current];
   const ex = pickExample(current);
   speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
+  const el = document.getElementById('letter-display');
+  el.style.transform = 'scale(1.15)';
+  setTimeout(() => el.style.transform = '', 200);
+}
+
+function sayNumber() {
+  const n = numbers[numberIndex];
+  if (!n) return;
+  speak(n.n + ' - ' + n.word, 0.8, 1.2);
   const el = document.getElementById('letter-display');
   el.style.transform = 'scale(1.15)';
   setTimeout(() => el.style.transform = '', 200);
@@ -267,15 +388,190 @@ function showLearn(idx) {
   renderStars();
 }
 
+function showNumber(idx) {
+  numberIndex = idx;
+  const n = numbers[idx];
+  document.getElementById('letter-display').textContent = n.n;
+  document.getElementById('letter-display').style.color = n.color;
+  document.getElementById('letter-display').style.fontSize = '130px';
+  document.getElementById('picture').textContent = n.pic;
+  document.getElementById('word-display').textContent = n.word;
+  document.getElementById('mode-label').textContent = 'מספרים - למידה';
+  document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
+  document.getElementById('word-chips').innerHTML = '';
+
+  renderBtns([
+    { label: '➡ הקודם', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
+    { label: '🎮 חידון מספרים', fn: () => { setGameType('numbers'); switchTab('quiz'); }, accent: true },
+    { label: 'הבא ⬅', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); else switchTab('quiz'); } },
+  ]);
+  speak(n.n + ' ' + n.word, 0.8, 1.2);
+  renderStars();
+}
+
+function startVowels() {
+  vowelIndex = 0;
+  vowelScore = 0;
+  showVowel(vowelIndex);
+}
+
+function showVowel(idx) {
+  const v = vowelExercises[idx];
+  document.getElementById('letter-display').textContent = v.word;
+  document.getElementById('letter-display').style.color = '#5d4037';
+  document.getElementById('letter-display').style.fontSize = '120px';
+  document.getElementById('picture').textContent = '🔡';
+  document.getElementById('word-display').textContent = 'בחרו את המילה עם הניקוד הנכון';
+  document.getElementById('mode-label').textContent = 'ניקוד למילים';
+  document.getElementById('prompt').textContent = '';
+
+  const chips = document.getElementById('word-chips');
+  chips.innerHTML = '';
+  v.options.forEach(option => {
+    const c = document.createElement('button');
+    c.className = 'chip';
+    c.textContent = option;
+    c.onclick = () => checkVowelAnswer(option);
+    chips.appendChild(c);
+  });
+  renderBtns([]);
+  renderStars();
+}
+
+function checkVowelAnswer(choice) {
+  if (choice === vowelExercises[vowelIndex].correct) {
+    vowelScore++;
+    document.getElementById('prompt').textContent = '👍 נכון!';
+    speak('נכון!', 0.85, 1.3);
+    if (vowelIndex < vowelExercises.length - 1) {
+      setTimeout(() => { vowelIndex++; showVowel(vowelIndex); }, 1000);
+    } else {
+      setTimeout(() => {
+        document.getElementById('letter-display').textContent = '🎉';
+        document.getElementById('word-display').textContent = 'כל הכבוד! סיימת תרגיל ניקוד';
+        document.getElementById('prompt').textContent = '';
+        renderBtns([{ label: '🔄 התחל שוב', fn: startVowels }]);
+      }, 1000);
+    }
+  } else {
+    document.getElementById('prompt').textContent = '❌ נסה שוב!';
+    speak('נסה שוב', 0.8, 1.1);
+    setTimeout(() => { document.getElementById('prompt').textContent = ''; }, 900);
+  }
+  renderStars();
+}
+
+function startWordPlay() {
+  wordplayIndex = 0;
+  wordplayScore = 0;
+  showCountChallenge();
+}
+
+function showCountChallenge() {
+  const challenge = countChallenges[wordplayIndex];
+  document.getElementById('letter-display').textContent = challenge.icons;
+  document.getElementById('letter-display').style.color = '#3f51b5';
+  document.getElementById('letter-display').style.fontSize = '90px';
+  document.getElementById('picture').textContent = '';
+  document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
+  document.getElementById('mode-label').textContent = 'משחק כמות (3+)';
+  document.getElementById('prompt').textContent = '';
+
+  const options = shuffle([challenge.answer, challenge.answer+1, challenge.answer-1, challenge.answer+2].map(n => Math.max(1, Math.min(10,n)))).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
+  const chips = document.getElementById('word-chips');
+  chips.innerHTML = '';
+  options.forEach(opt => {
+    const c = document.createElement('button');
+    c.className = 'chip';
+    c.textContent = opt;
+    c.onclick = () => checkCountAnswer(opt);
+    chips.appendChild(c);
+  });
+
+  renderBtns([
+    { label: '🔁 אתחול', fn: startWordPlay },
+    { label: '🎮 חזרה ללמידה', fn: () => switchTab('learn'), accent: true }
+  ]);
+  renderStars();
+}
+
+function checkCountAnswer(choice) {
+  const challenge = countChallenges[wordplayIndex];
+  if (choice === challenge.answer) {
+    wordplayScore++;
+    document.getElementById('prompt').textContent = '🎉 נכון!';
+    speak('נכון!', 0.85, 1.3);
+    if (wordplayIndex < countChallenges.length - 1) {
+      wordplayIndex++;
+      setTimeout(showCountChallenge, 900);
+    } else {
+      setTimeout(() => {
+        document.getElementById('letter-display').textContent = '🏆';
+        document.getElementById('word-display').textContent = 'יופי! סיימת את משחק הכמות';
+        document.getElementById('prompt').textContent = '';
+        renderBtns([{ label: '🔄 התחלה מחדש', fn: startWordPlay }]);
+      }, 1000);
+    }
+  } else {
+    document.getElementById('prompt').textContent = 'נסה שוב 😉';
+    speak('נסה שוב', 0.8, 1.1);
+    setTimeout(() => { document.getElementById('prompt').textContent = ''; }, 800);
+  }
+  renderStars();
+}
+
 function startQuiz() {
+  if (gameType === 'numbers') {
+    numberQuizOrder = shuffle(numbers.map((_,i) => i));
+    numberQuizIdx = 0; answered = false;
+    nextNumberQuiz();
+    return;
+  }
+
   quizOrder = shuffle(letters.map((_,i) => i));
   quizIdx = 0; answered = false;
   document.getElementById('word-chips').innerHTML = '';
   nextQuiz();
 }
 
+function nextNumberQuiz() {
+  if (numberQuizIdx >= numberQuizOrder.length) { showCelebration('numbers'); return; }
+  answered = false;
+  numberIndex = numberQuizOrder[numberQuizIdx];
+  const item = numbers[numberIndex];
+
+  document.getElementById('letter-display').textContent = item.n;
+  document.getElementById('letter-display').style.color = item.color;
+  document.getElementById('picture').textContent = item.pic;
+  document.getElementById('word-display').textContent = item.word;
+  document.getElementById('mode-label').textContent = '⁉️ חידון מספרים';
+  document.getElementById('prompt').textContent = 'בחר את המספר המתאים';
+  document.getElementById('word-chips').innerHTML = '';
+
+  const pool = shuffle(numbers.filter((_,i) => i !== numberIndex)).slice(0,3).map(x => x.n);
+  const choices = shuffle([item.n, ...pool]);
+  renderBtns(choices.map(n => ({ label: String(n), fn: () => checkNumberAnswer(n, item), big: true })));
+  speak('איזה מספר מתאים למה שרואים?', 0.8, 1.2);
+  renderStars();
+}
+
+function checkNumberAnswer(chosen, item) {
+  if (answered) return;
+  answered = true;
+  if (chosen === item.n) {
+    numberScore++;
+    document.getElementById('prompt').textContent = '🎉 מצוין!';
+    speak('כל הכבוד!', 0.85, 1.4);
+    setTimeout(() => { numberQuizIdx++; nextNumberQuiz(); }, 1500);
+  } else {
+    document.getElementById('prompt').textContent = '🤔 לא בדיוק, נסה שוב.';
+    speak('נסו שוב', 0.8, 1.1);
+    setTimeout(() => { answered = false; }, 800);
+  }
+}
+
 function nextQuiz() {
-  if (quizIdx >= quizOrder.length) { showCelebration(); return; }
+  if (quizIdx >= quizOrder.length) { showCelebration('letters'); return; }
   answered = false;
   current = quizOrder[quizIdx];
   const d = letters[current];
@@ -316,17 +612,24 @@ function checkAnswer(chosen, correct, ex) {
   }
 }
 
-function showCelebration() {
+function showCelebration(mode='letters') {
   document.getElementById('letter-display').textContent = '🏆';
   document.getElementById('letter-display').style.color = '#FFD700';
   document.getElementById('letter-display').style.fontSize = '100px';
   document.getElementById('picture').textContent = '🎉🎊🌟';
-  document.getElementById('word-display').textContent = 'עשית עבודה מעולה!';
+
+  if (mode === 'numbers') {
+    document.getElementById('word-display').textContent = 'כל הכבוד! סיימת חידון מספרים!';
+    document.getElementById('prompt').textContent = 'צברת ' + numberScore + ' נקודות';
+    speak('איזה יופי! סיימת את כל שאלות המספרים!', 0.8, 1.4);
+    renderBtns([{ label: '🔄 שוב', fn: () => { numberScore = 0; startQuiz(); } }]);
+  } else {
+    document.getElementById('word-display').textContent = 'עשית עבודה מעולה!';
+    document.getElementById('prompt').textContent = 'למדת את כל האותיות!';
+    speak('כל הכבוד! למדת את כל האותיות! אתה כל כך חכם!', 0.8, 1.4);
+    renderBtns([{ label: '🔄 משחק חדש!', fn: () => { score = 0; switchTab('learn'); showLearn(0); } }]);
+  }
   document.getElementById('mode-label').textContent = 'סיימתם!';
-  document.getElementById('prompt').textContent = 'למדתם את כל האותיות!';
-  document.getElementById('word-chips').innerHTML = '';
-  speak('כל הכבוד! למדת את כל האותיות! אתה כל כך חכם!', 0.8, 1.4);
-  renderBtns([{ label: '🔄 משחק חדש!', fn: () => { score=0; switchTab('learn'); showLearn(0); } }]);
 }
 
 function renderBtns(defs) {
@@ -337,7 +640,10 @@ function renderBtns(defs) {
     b.className = 'tap-btn';
     b.textContent = d.label;
     if (d.big) { b.style.fontSize = '28px'; b.style.minWidth = '64px'; b.style.padding = '14px 18px'; }
-    if (d.accent) b.style.background = letters[current].color + '22';
+    if (d.accent) {
+      const color = (tab === 'numbers' ? (numbers[numberIndex] && numbers[numberIndex].color) : (letters[current] && letters[current].color)) || '#90caf9';
+      b.style.background = color + '22';
+    }
     b.onclick = d.fn;
     row.appendChild(b);
   });
@@ -462,7 +768,7 @@ function flipCard(i) {
   }
 }
 
-showLearn(0);
+switchTab('learn');
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
