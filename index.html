@@ -94,10 +94,7 @@
 <body>
 <div id="app">
   <h1>לומדים עברית 📖</h1>
-  <div id="status-bar">
-    <span id="progress-text">טעינה...</span>
-    <button id="sound-toggle" class="tab-btn" style="font-size:13px; padding:5px 10px;">🔊 קול</button>
-  </div>
+  <button id="sound-toggle" class="tab-btn" style="position:fixed; top:10px; right:10px; z-index:1000; width:46px; height:46px; padding:0; font-size:20px; border-radius:50%;">🔊</button>
   <div id="update-banner" style="display:none; background:#ffeb3b; color:#333; border:1px solid #fbc02d; border-radius:10px; padding:8px 10px; margin:8px auto; max-width:500px; text-align:center;">
     גרסה חדשה זמינה. <button id="refresh-btn" class="tab-btn" style="font-size:13px; padding:5px 10px;">טען מחדש</button>
   </div>
@@ -258,16 +255,9 @@ function saveAppState() {
   localStorage.setItem('learn-hebrew-app-state', JSON.stringify(appState));
 }
 
-function updateStatusText() {
-  const textEl = document.getElementById('progress-text');
-  if (!textEl) return;
-  textEl.textContent = 'מצב: ' + (tab === 'learn' ? 'לומדים אותיות' : tab) + ' | ציון חידון מקסימלי: ' + appState.bestQuizScore + ' | קול: ' + (appState.soundEnabled ? 'פעיל' : 'כבוי');
-}
-
 function setSoundEnabled(enabled) {
   appState.soundEnabled = enabled;
-  document.getElementById('sound-toggle').textContent = enabled ? '🔊 קול (כבוי)' : '🔇 קול (הפעל)';
-  updateStatusText();
+  document.getElementById('sound-toggle').textContent = enabled ? '🔊' : '🔇';
   saveAppState();
 }
 let traceIdx = 0, traceColor = '#2196F3';
@@ -333,7 +323,6 @@ function switchTab(t) {
     startMemory();
   }
 
-  updateStatusText();
   saveAppState();
   renderStars();
 }
@@ -702,7 +691,6 @@ function showCelebration(mode='mixed') {
   document.getElementById('prompt').textContent = 'צברת ' + quizScore + ' נקודות מתוך ' + quizItems.length;
   appState.bestQuizScore = Math.max(appState.bestQuizScore, quizScore);
   saveAppState();
-  updateStatusText();
   speak('איזה יופי! סיימת את כל השאלות!', 0.8, 1.4);
   renderBtns([{ label: '🔄 שוב', fn: () => { quizScore = 0; startQuiz(); } }]);
   document.getElementById('mode-label').textContent = 'סיימתם!';
