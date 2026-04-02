@@ -103,13 +103,6 @@
     <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
   </div>
 
-  <div class="tabs" id="data-tabs" style="margin-bottom:0.55rem;">
-    <button class="tab-btn active" data-type="letters" onclick="setGameType('letters')">אותיות</button>
-    <button class="tab-btn" data-type="numbers" onclick="setGameType('numbers')">מספרים</button>
-    <button class="tab-btn" data-type="vowels" onclick="setGameType('vowels')">ניקוד</button>
-    <button class="tab-btn" data-type="wordplay" onclick="setGameType('wordplay')">כמות</button>
-  </div>
-
   <div id="mode-label"></div>
   <div class="star-row" id="stars"></div>
   <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
@@ -243,9 +236,6 @@ function switchTab(t) {
   document.querySelectorAll('#main-tabs .tab-btn').forEach((b) => {
     b.classList.toggle('active', b.dataset.target === t);
   });
-  document.querySelectorAll('#data-tabs .tab-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.type === gameType);
-  });
 
   const mainDisplay = document.getElementById('main-display');
   mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'vowels' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
@@ -253,16 +243,12 @@ function switchTab(t) {
   document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
 
   if (t === 'numbers') {
-    setGameType('numbers');
     showNumber(numberIndex);
   } else if (t === 'vowels') {
-    setGameType('vowels');
     startVowels();
   } else if (t === 'wordplay') {
-    setGameType('wordplay');
     startWordPlay();
   } else if (t === 'learn') {
-    setGameType('letters');
     showLearn(current);
   } else if (t === 'quiz') {
     startQuiz();
@@ -275,9 +261,6 @@ function switchTab(t) {
 
 function setGameType(type) {
   gameType = type;
-  document.querySelectorAll('#data-tabs .tab-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.type === type);
-  });
 
   if (type === 'letters') {
     showLearn(current);
@@ -289,7 +272,6 @@ function setGameType(type) {
     startWordPlay();
   }
 }
-
 function renderStars() {
   const row = document.getElementById('stars');
   row.innerHTML = '';
