@@ -315,7 +315,7 @@ function switchTab(t) {
   const mainDisplay = document.getElementById('main-display');
   const btnRow = document.getElementById('btn-row');
   mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
-  btnRow.style.display = (t === 'learn' || t === 'numbers' || t === 'quiz') ? 'flex' : 'none';
+  btnRow.style.display = (t === 'learn' || t === 'numbers' || t === 'wordplay' || t === 'quiz') ? 'flex' : 'none';
 
   document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
   document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
@@ -474,7 +474,6 @@ function showNumber(idx) {
   document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
   document.getElementById('word-chips').innerHTML = '';
 
-  // אין כפתורי קיצור בסרגל התחתון לפי בקשה.
   renderBtns([
     { label: 'קודם ➡', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
     { label: '⬅ הבא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
@@ -490,8 +489,7 @@ function startWordPlay() {
   wordplayChallenges = [];
   const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
   
-  // Mixed challenges: 5 math, 5 counting
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 15; i++) {
     const isAddition = Math.random() > 0.5;
     let a, b, answer, expr;
     if (isAddition) {
@@ -505,14 +503,7 @@ function startWordPlay() {
       answer = a - b;
       expr = `${a} - ${b}`;
     }
-    wordplayChallenges.push({ expr, answer, type: 'math' });
-  }
-  
-  for (let i = 0; i < 5; i++) {
-    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-    const answer = Math.floor(Math.random() * 10) + 1;
-    const icons = emoji.repeat(answer);
-    wordplayChallenges.push({ icons, answer, type: 'count' });
+    wordplayChallenges.push({ expr, answer });
   }
   
   wordplayChallenges = shuffle(wordplayChallenges);
@@ -523,49 +514,83 @@ function startWordPlay() {
 function showCountChallenge() {
   const challenge = wordplayChallenges[wordplayIndex];
   
-  if (challenge.type === 'math') {
-    // Use innerHTML with LTR direction for math expressions
-    document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + challenge.expr + ' = ?</span>';
-    document.getElementById('letter-display').style.fontSize = '60px';
-    document.getElementById('picture').textContent = '';
-    document.getElementById('word-display').textContent = 'כמה זה?';
+  // Use innerHTML with LTR direction for math expressions
+  document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + challenge.expr + ' = ' + challenge.answer + '</span>';
+  document.getElementById('letter-display').style.fontSize = '60px';
+  
+  // Create visual emoji representation
+  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
+  const parts = challenge.expr.split(' ');
+  const num1 = parseInt(parts[0]);
+  const operator = parts[1];
+  const num2 = parseInt(parts[2]);
+  const emoji = emojis[wordplayIndex % emojis.length];
+  
+  // Helper function to display emojis in a grid pattern (like dice/squares)
+  function wrapEmojis(count, emojiChar) {
+    if (count === 0) return '<span style="font-size:28px;">&nbsp;</span>';
     
-    // Speak the equation in Hebrew
-    const parts = challenge.expr.split(' ');
-    const num1 = parts[0];
-    const operator = parts[1];
-    const num2 = parts[2];
-    const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
-    speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה?', 0.8, 1.2);
-  } else {
-    document.getElementById('letter-display').textContent = challenge.icons;
-    document.getElementById('letter-display').style.fontSize = '40px';
-    document.getElementById('picture').textContent = '';
-    document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
-    speak('כמה פריטים יש כאן?', 0.8, 1.2);
+    // Calculate grid dimensions
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    
+    let html = '<div style="display:inline-grid;grid-template-columns:repeat(' + cols + ',28px);grid-template-rows:repeat(' + rows + ',28px);gap:2px;">';
+    
+    for (let i = 0; i < count; i++) {
+      html += '<span style="font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center;">' + emojiChar + '</span>';
+    }
+    
+    // Fill empty cells with invisible placeholders to maintain grid shape
+    for (let i = count; i < cols * rows; i++) {
+      html += '<span style="font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center;">&nbsp;</span>';
+    }
+    
+    html += '</div>';
+    return html;
   }
+  
+  let visualHTML = '<div class="math-expression" style="display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0;">';
+  
+  if (operator === '+') {
+    visualHTML += '<div>' + wrapEmojis(num1, emoji) + '</div>';
+    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">+</div>';
+    visualHTML += '<div>' + wrapEmojis(num2, emoji) + '</div>';
+    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">=</div>';
+    visualHTML += '<div>' + wrapEmojis(challenge.answer, emoji) + '</div>';
+  } else {
+    // For subtraction, show all numbers with emojis
+    const remaining = challenge.answer;
+    visualHTML += '<div>' + wrapEmojis(num1, emoji) + '</div>';
+    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">-</div>';
+    visualHTML += '<div>' + wrapEmojis(num2, emoji) + '</div>';
+    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">=</div>';
+    visualHTML += '<div>' + wrapEmojis(remaining, emoji) + '</div>';
+  }
+  
+  visualHTML += '</div>';
+  document.getElementById('picture').innerHTML = visualHTML;
+  document.getElementById('picture').style.fontSize = '28px';
+  
+  document.getElementById('word-display').textContent = '';
+  
+  // Speak the equation in Hebrew
+  const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
+  speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה ' + challenge.answer, 0.8, 1.2);
   
   document.getElementById('letter-display').style.color = '#3f51b5';
   document.getElementById('mode-label').textContent = 'חשבון וכמויות';
   document.getElementById('prompt').textContent = '';
 
-  const options = shuffle([challenge.answer, challenge.answer+1, challenge.answer-1, challenge.answer+2].map(n => Math.max(0, Math.min(20,n)))).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
-  const chips = document.getElementById('word-chips');
-  chips.innerHTML = '';
-  options.forEach(opt => {
-    const c = document.createElement('button');
-    c.className = 'chip';
-    c.textContent = opt;
-    c.onclick = () => checkCountAnswer(opt);
-    chips.appendChild(c);
-  });
+  renderBtns([
+    { label: 'קודם ➡', fn: () => { if(wordplayIndex>0) { wordplayIndex--; showCountChallenge(); } } },
+    { label: '⬅ הבא', fn: () => { if(wordplayIndex<wordplayChallenges.length-1) { wordplayIndex++; showCountChallenge(); } } },
+  ]);
 }
 
 function checkCountAnswer(choice) {
   const challenge = wordplayChallenges[wordplayIndex];
-  const correctAnswer = challenge.type === 'math' ? challenge.answer : challenge.answer;
   
-  if (choice === correctAnswer) {
+  if (choice === challenge.answer) {
     document.getElementById('prompt').textContent = '🎉 נכון!';
     speak('נכון!', 0.85, 1.3);
     setTimeout(() => {
