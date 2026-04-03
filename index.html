@@ -804,6 +804,9 @@ function nextMixedQuiz() {
     const ex = pickExample(currentQuizItem.idx);
     document.getElementById('letter-display').textContent = ex.pic;
     document.getElementById('letter-display').style.fontSize = '130px';
+    document.getElementById('letter-display').onclick = () => {
+      speak(ex.word, 0.75, 1.3);
+    };
     document.getElementById('picture').textContent = '';
     document.getElementById('word-display').textContent = 'באיזו אות מתחילה המילה?';
     document.getElementById('mode-label').textContent = '⁉️ חידון אותיות';
