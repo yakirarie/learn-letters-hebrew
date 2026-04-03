@@ -644,9 +644,9 @@ function nextMixedQuiz() {
     document.getElementById('letter-display').style.color = '#bbb';
     document.getElementById('letter-display').style.fontSize = '130px';
     document.getElementById('picture').textContent = ex.pic;
-    document.getElementById('word-display').textContent = ex.word;
+    document.getElementById('word-display').textContent = 'באיזו אות מתחילה המילה?';
     document.getElementById('mode-label').textContent = '⁉️ חידון אותיות';
-    document.getElementById('prompt').textContent = 'באיזו אות מתחילה המילה ' + ex.word + '?';
+    document.getElementById('prompt').textContent = '';
 
     const pool = shuffle(letters.filter((_, i) => i !== currentQuizItem.idx)).slice(0, 3).map(x => x.l);
     const choices = shuffle([d.l, ...pool]);
@@ -656,10 +656,10 @@ function nextMixedQuiz() {
   } else if (currentQuizItem.type === 'number') {
     const c = wordplayChallenges[currentQuizItem.idx];
     // Show emojis and ask how many items
-    document.getElementById('letter-display').textContent = c.icons;
-    document.getElementById('letter-display').style.color = '#3f51b5';
-    document.getElementById('letter-display').style.fontSize = '40px';
-    document.getElementById('picture').textContent = '';
+    document.getElementById('picture').textContent = c.icons;
+    document.getElementById('picture').style.color = '#3f51b5';
+    document.getElementById('picture').style.fontSize = '40px';
+    document.getElementById('letter-display').textContent = '';
     document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
     document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
     document.getElementById('prompt').textContent = '';
@@ -670,27 +670,12 @@ function nextMixedQuiz() {
     renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
     speak('כמה פריטים יש כאן?', 0.8, 1.2);
 
-  } else if (currentQuizItem.type === 'count') {
-    const c = wordplayChallenges[currentQuizItem.idx];
-    document.getElementById('letter-display').textContent = c.icons;
-    document.getElementById('letter-display').style.color = '#3f51b5';
-    document.getElementById('letter-display').style.fontSize = '40px';
-    document.getElementById('picture').textContent = '';
-    document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
-    document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
-    document.getElementById('prompt').textContent = '';
-
-    const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
-      .map(n => Math.max(1, Math.min(30, n)))
-      .filter((v, i, a) => a.indexOf(v) === i));
-    renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
-    speak('כמה פריטים יש כאן?', 0.8, 1.2);
   } else if (currentQuizItem.type === 'math') {
     const c = wordplayChallenges[currentQuizItem.idx];
-    document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + c.expr + ' = ?</span>';
-    document.getElementById('letter-display').style.color = '#3f51b5';
-    document.getElementById('letter-display').style.fontSize = '50px';
-    document.getElementById('picture').textContent = '';
+    document.getElementById('picture').innerHTML = '<span class="math-expression">' + c.expr + ' = ?</span>';
+    document.getElementById('picture').style.color = '#3f51b5';
+    document.getElementById('picture').style.fontSize = '50px';
+    document.getElementById('letter-display').textContent = '';
     document.getElementById('word-display').textContent = 'כמה זה?';
     document.getElementById('mode-label').textContent = '⁉️ חידון חשבון';
     document.getElementById('prompt').textContent = '';
