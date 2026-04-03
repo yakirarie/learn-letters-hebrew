@@ -24,11 +24,16 @@
     .tab-btn.active { background: #222; color: #fff; border-color: #222; }
 
     #letter-display {
-      font-size: 130px; font-weight: 700; line-height: 1; margin: 0.1rem 0;
+      font-size: 130px; font-weight: 700; line-height: 1; margin: 0.05rem 0;
       transition: transform 0.15s; cursor: pointer; display: inline-block; user-select: none;
     }
+    /* Math expressions should be LTR even in RTL layout */
+    .math-expression {
+      direction: ltr;
+      unicode-bidi: embed;
+    }
     #letter-display:active { transform: scale(0.88); }
-    #word-display { font-size: 28px; font-weight: 600; color: #222; margin: 0.1rem 0; min-height: 40px; }
+    #word-display { font-size: 28px; font-weight: 600; color: #222; margin: 0.05rem 0; min-height: 40px; }
     #picture { font-size: 72px; margin: 0.2rem 0; min-height: 80px; }
     #prompt { font-size: 15px; color: #555; margin-bottom: 0.5rem; min-height: 26px; }
     #mode-label { font-size: 12px; color: #aaa; margin-bottom: 0.1rem; letter-spacing: 0.04em; }
@@ -102,7 +107,7 @@
   <div class="tabs learning-tabs" id="learning-tabs">
     <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
     <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מספרים</button>
-    <button class="tab-btn" data-target="wordplay" onclick="switchTab('wordplay')">🧩 כמות וחיבור</button>
+    <button class="tab-btn" data-target="wordplay" onclick="switchTab('wordplay')">➕➖ חשבון</button>
     <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
     <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
   </div>
@@ -260,8 +265,9 @@ function loadAppState() {
     console.warn('State load failed', err);
   }
   if (appState.lastTab) tab = appState.lastTab;
-  current = appState.currentLetter || 0;
-  numberIndex = appState.currentNumber || 0;
+  current = 0; // Always start from the beginning
+  numberIndex = 0; // Always start from the beginning
+  saveAppState();
 }
 
 function saveAppState() {
@@ -320,8 +326,8 @@ function switchTab(t) {
     document.getElementById('mode-label').textContent = 'מספרים - למידה';
     showNumber(numberIndex);
   } else if (t === 'wordplay') {
-    pageTitle.textContent = 'תרגול כמות 🧩';
-    document.getElementById('mode-label').textContent = 'תרגול כמות';
+    pageTitle.textContent = 'חשבון פשוט ➕➖';
+    document.getElementById('mode-label').textContent = 'חשבון פשוט';
     startWordPlay();
   } else if (t === 'learn') {
     pageTitle.textContent = 'לומדים אותיות 📖';
@@ -456,7 +462,13 @@ function showNumber(idx) {
   // Adjust font size based on number to fit better
   const fontSize = n.n <= 10 ? '130px' : n.n <= 20 ? '100px' : '80px';
   document.getElementById('letter-display').style.fontSize = fontSize;
-  document.getElementById('picture').textContent = '';
+  
+  // Show visual representation
+  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟'];
+  const emoji = emojis[numberIndex % emojis.length];
+  document.getElementById('picture').textContent = emoji.repeat(Math.min(n.n, 50));
+  document.getElementById('picture').style.fontSize = n.n > 20 ? '24px' : '40px';
+  
   document.getElementById('word-display').textContent = n.word;
   document.getElementById('mode-label').textContent = 'מספרים - למידה';
   document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
@@ -475,29 +487,69 @@ function showNumber(idx) {
 let wordplayChallenges = [];
 
 function startWordPlay() {
-  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍', '🥝', '🍉', '🍒', '🍊', '🥭', '🍋', '🍐', '🥥', '🥑', '🌶️'];
   wordplayChallenges = [];
-  for (let i = 0; i < 10; i++) {
-    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-    const answer = Math.floor(Math.random() * 30) + 1;
-    const icons = emoji.repeat(answer);
-    wordplayChallenges.push({ icons, answer });
+  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
+  
+  // Mixed challenges: 5 math, 5 counting
+  for (let i = 0; i < 5; i++) {
+    const isAddition = Math.random() > 0.5;
+    let a, b, answer, expr;
+    if (isAddition) {
+      a = Math.floor(Math.random() * 5) + 1;
+      b = Math.floor(Math.random() * 5) + 1;
+      answer = a + b;
+      expr = `${a} + ${b}`;
+    } else {
+      a = Math.floor(Math.random() * 5) + 6;
+      b = Math.floor(Math.random() * 5) + 1;
+      answer = a - b;
+      expr = `${a} - ${b}`;
+    }
+    wordplayChallenges.push({ expr, answer, type: 'math' });
   }
+  
+  for (let i = 0; i < 5; i++) {
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const answer = Math.floor(Math.random() * 10) + 1;
+    const icons = emoji.repeat(answer);
+    wordplayChallenges.push({ icons, answer, type: 'count' });
+  }
+  
+  wordplayChallenges = shuffle(wordplayChallenges);
   wordplayIndex = 0;
   showCountChallenge();
 }
 
 function showCountChallenge() {
   const challenge = wordplayChallenges[wordplayIndex];
-  document.getElementById('letter-display').textContent = challenge.icons;
+  
+  if (challenge.type === 'math') {
+    // Use innerHTML with LTR direction for math expressions
+    document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + challenge.expr + ' = ?</span>';
+    document.getElementById('letter-display').style.fontSize = '60px';
+    document.getElementById('picture').textContent = '';
+    document.getElementById('word-display').textContent = 'כמה זה?';
+    
+    // Speak the equation in Hebrew
+    const parts = challenge.expr.split(' ');
+    const num1 = parts[0];
+    const operator = parts[1];
+    const num2 = parts[2];
+    const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
+    speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה?', 0.8, 1.2);
+  } else {
+    document.getElementById('letter-display').textContent = challenge.icons;
+    document.getElementById('letter-display').style.fontSize = '40px';
+    document.getElementById('picture').textContent = '';
+    document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
+    speak('כמה פריטים יש כאן?', 0.8, 1.2);
+  }
+  
   document.getElementById('letter-display').style.color = '#3f51b5';
-  document.getElementById('letter-display').style.fontSize = '60px'; // Smaller for many items
-  document.getElementById('picture').textContent = '';
-  document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
-  document.getElementById('mode-label').textContent = 'תרגול כמות';
+  document.getElementById('mode-label').textContent = 'חשבון וכמויות';
   document.getElementById('prompt').textContent = '';
 
-  const options = shuffle([challenge.answer, challenge.answer+1, challenge.answer-1, challenge.answer+2].map(n => Math.max(1, Math.min(30,n)))).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
+  const options = shuffle([challenge.answer, challenge.answer+1, challenge.answer-1, challenge.answer+2].map(n => Math.max(0, Math.min(20,n)))).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4);
   const chips = document.getElementById('word-chips');
   chips.innerHTML = '';
   options.forEach(opt => {
@@ -507,13 +559,13 @@ function showCountChallenge() {
     c.onclick = () => checkCountAnswer(opt);
     chips.appendChild(c);
   });
-
-  // אין כפתורי קיצור בסרגל התחתון בסשן כמות/חיבור.
 }
 
 function checkCountAnswer(choice) {
   const challenge = wordplayChallenges[wordplayIndex];
-  if (choice === challenge.answer) {
+  const correctAnswer = challenge.type === 'math' ? challenge.answer : challenge.answer;
+  
+  if (choice === correctAnswer) {
     document.getElementById('prompt').textContent = '🎉 נכון!';
     speak('נכון!', 0.85, 1.3);
     setTimeout(() => {
@@ -531,22 +583,50 @@ function startQuiz() {
   quizScore = 0;
   quizIdx = 0;
   answered = false;
+  wordplayChallenges = []; // Clear previous challenges
 
-  // Generate random wordplay challenges for quiz
+  // Generate equal distribution: 33% letters, 33% numbers/counting, 33% math
+  const itemsPerType = 8; // 8 items per type = 24 total questions
+  
+  // Letters - pick random letters
+  const letterIndices = shuffle([...Array(letters.length).keys()]).slice(0, itemsPerType);
+  const letterItems = letterIndices.map(idx => ({ type: 'letter', idx }));
+  
+  // Numbers - show emojis and ask "כמה פריטים יש כאן?" (same as counting)
   const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍', '🥝', '🍉', '🍒', '🍊', '🥭', '🍋', '🍐', '🥥', '🥑', '🌶️'];
-  wordplayChallenges = [];
-  for (let i = 0; i < 5; i++) { // Fewer for quiz
-    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-    const answer = Math.floor(Math.random() * 30) + 1;
-    const icons = emoji.repeat(answer);
-    wordplayChallenges.push({ icons, answer });
+  const numberItems = [];
+  const numberIndices = shuffle([...Array(numbers.length).keys()]).slice(0, itemsPerType);
+  for (let i = 0; i < itemsPerType; i++) {
+    const numIdx = numberIndices[i];
+    const num = numbers[numIdx];
+    const emoji = emojis[numIdx % emojis.length];
+    const icons = emoji.repeat(num.n);
+    numberItems.push({ type: 'number', idx: wordplayChallenges.length });
+    wordplayChallenges.push({ icons, answer: num.n, type: 'number' });
   }
-
-  const letterItems = letters.map((_, i) => ({ type: 'letter', idx: i }));
-  const numberItems = numbers.map((_, i) => ({ type: 'number', idx: i }));
-  const wordplayItems = wordplayChallenges.map((_, i) => ({ type: 'count', idx: i }));
-
-  quizItems = shuffle([...letterItems, ...numberItems, ...wordplayItems]);
+  
+  // Math challenges (addition and subtraction)
+  const mathItems = [];
+  for (let i = 0; i < itemsPerType; i++) {
+    const isAddition = Math.random() > 0.5;
+    let a, b, answer, expr;
+    if (isAddition) {
+      a = Math.floor(Math.random() * 5) + 1;
+      b = Math.floor(Math.random() * 5) + 1;
+      answer = a + b;
+      expr = `${a} + ${b}`;
+    } else {
+      a = Math.floor(Math.random() * 5) + 6;
+      b = Math.floor(Math.random() * 5) + 1;
+      answer = a - b;
+      expr = `${a} - ${b}`;
+    }
+    mathItems.push({ type: 'math', idx: wordplayChallenges.length });
+    wordplayChallenges.push({ expr, answer, type: 'math' });
+  }
+  
+  // Combine all items and shuffle
+  quizItems = shuffle([...letterItems, ...numberItems, ...mathItems]);
   document.getElementById('word-chips').innerHTML = '';
   nextMixedQuiz();
 }
@@ -574,25 +654,11 @@ function nextMixedQuiz() {
     speak('באיזו אות מתחילה המילה ' + ex.word + '?', 0.8, 1.2);
 
   } else if (currentQuizItem.type === 'number') {
-    const item = numbers[currentQuizItem.idx];
-    document.getElementById('letter-display').textContent = item.word;
-    document.getElementById('letter-display').style.color = item.color;
-    document.getElementById('letter-display').style.fontSize = '80px'; // Smaller for words
-    document.getElementById('picture').textContent = '';
-    document.getElementById('word-display').textContent = 'איזה מספר זה?';
-    document.getElementById('mode-label').textContent = '⁉️ חידון מספרים';
-    document.getElementById('prompt').textContent = '';
-
-    const pool = shuffle(numbers.filter((_, i) => i !== currentQuizItem.idx)).slice(0, 3).map(x => x.n);
-    const choices = shuffle([item.n, ...pool]);
-    renderBtns(choices.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
-    speak('איזה מספר זה?', 0.8, 1.2);
-
-  } else {
     const c = wordplayChallenges[currentQuizItem.idx];
+    // Show emojis and ask how many items
     document.getElementById('letter-display').textContent = c.icons;
     document.getElementById('letter-display').style.color = '#3f51b5';
-    document.getElementById('letter-display').style.fontSize = '60px';
+    document.getElementById('letter-display').style.fontSize = '40px';
     document.getElementById('picture').textContent = '';
     document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
     document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
@@ -603,6 +669,44 @@ function nextMixedQuiz() {
       .filter((v, i, a) => a.indexOf(v) === i));
     renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
     speak('כמה פריטים יש כאן?', 0.8, 1.2);
+
+  } else if (currentQuizItem.type === 'count') {
+    const c = wordplayChallenges[currentQuizItem.idx];
+    document.getElementById('letter-display').textContent = c.icons;
+    document.getElementById('letter-display').style.color = '#3f51b5';
+    document.getElementById('letter-display').style.fontSize = '40px';
+    document.getElementById('picture').textContent = '';
+    document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
+    document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
+    document.getElementById('prompt').textContent = '';
+
+    const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
+      .map(n => Math.max(1, Math.min(30, n)))
+      .filter((v, i, a) => a.indexOf(v) === i));
+    renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
+    speak('כמה פריטים יש כאן?', 0.8, 1.2);
+  } else if (currentQuizItem.type === 'math') {
+    const c = wordplayChallenges[currentQuizItem.idx];
+    document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + c.expr + ' = ?</span>';
+    document.getElementById('letter-display').style.color = '#3f51b5';
+    document.getElementById('letter-display').style.fontSize = '50px';
+    document.getElementById('picture').textContent = '';
+    document.getElementById('word-display').textContent = 'כמה זה?';
+    document.getElementById('mode-label').textContent = '⁉️ חידון חשבון';
+    document.getElementById('prompt').textContent = '';
+
+    const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
+      .map(n => Math.max(0, Math.min(20, n)))
+      .filter((v, i, a) => a.indexOf(v) === i));
+    renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
+    
+    // Speak the equation in Hebrew
+    const parts = c.expr.split(' ');
+    const num1 = parts[0];
+    const operator = parts[1];
+    const num2 = parts[2];
+    const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
+    speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה?', 0.8, 1.2);
   }
 
   renderStars();
@@ -834,41 +938,66 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
       .then(reg => {
-        console.log('Service Worker registered!');
+        console.log('Service Worker registered!', reg.scope);
 
         function showUpdateBanner() {
           const banner = document.getElementById('update-banner');
           const refreshBtn = document.getElementById('refresh-btn');
           if (!banner || !refreshBtn) return;
           banner.style.display = 'block';
+          console.log('Update available - showing banner');
           refreshBtn.onclick = () => {
             if (reg.waiting) {
               reg.waiting.postMessage({ action: 'skipWaiting' });
+            } else if (reg.installing) {
+              reg.installing.postMessage({ action: 'skipWaiting' });
             }
           };
         }
 
+        // Check if there's already a waiting service worker
         if (reg.waiting) {
           showUpdateBanner();
         }
 
+        // Listen for updates to the service worker
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          if (!newWorker) return;
+          
+          console.log('New service worker installing...', newWorker.state);
+          
+          newWorker.addEventListener('statechange', () => {
+            console.log('Service worker state change:', newWorker.state);
+            
+            if (newWorker.state === 'installed') {
+              // New service worker is installed and waiting
+              if (navigator.serviceWorker.controller) {
+                // There's an active service worker controlling the page, so this is an update
                 showUpdateBanner();
+              } else {
+                // No controller yet, this is the first install
+                console.log('Service worker installed (first time)');
               }
-            });
-          }
+            } else if (newWorker.state === 'activating') {
+              console.log('Service worker activating...');
+            }
+          });
         });
 
+        // Handle when the active service worker changes
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           if (refreshing) return;
           refreshing = true;
-  window.location.reload();
+          console.log('Service worker changed, reloading page...');
+          window.location.reload();
         });
+
+        // Periodically check for updates (every 5 minutes)
+        setInterval(() => {
+          reg.update();
+        }, 5 * 60 * 1000);
       })
       .catch(err => console.log('SW registration failed:', err));
   });
