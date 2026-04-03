@@ -107,12 +107,12 @@
   <div class="tabs learning-tabs" id="learning-tabs">
     <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
     <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מספרים</button>
-    <button class="tab-btn" data-target="wordplay" onclick="switchTab('wordplay')">➕➖ חשבון</button>
-    <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
-    <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
+    <button class="tab-btn" data-target="math" onclick="switchTab('math')">➕➖ חשבון</button>
   </div>
   <div class="tabs games-tabs" id="games-tabs">
     <button class="tab-btn" data-target="quiz" onclick="switchTab('quiz')">🎮 חידון</button>
+    <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
+    <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
   </div>
 
   <div id="mode-label"></div>
@@ -178,7 +178,7 @@ const letters = [
   { l:'ד', examples:[{word:'דָּג',pic:'🐟'},{word:'דֹּב',pic:'🐻'},{word:'דֶּלֶת',pic:'🚪'},{word:'דְּבַשׁ',pic:'🍯'}], color:'#00BCD4' },
   { l:'ה', examples:[{word:'הַר',pic:'⛰️'},{word:'הֲדַס',pic:'🌿'},{word:'הֶלִיקוֹפְּטֶר',pic:'🚁'}], color:'#795548' },
   { l:'ו', examples:[{word:'וֶרֶד',pic:'🌹'},{word:'וִילוֹן',pic:'🪟'},{word:'וָרֹד',pic:'🩷'}], color:'#E91E63' },
-  { l:'ז', examples:[{word:'זְאֵב',pic:'🐺'},{word:'זַיִת',pic:'🫒'},{word:'זֶבְּרָה',pic:'🦓'},{word:'זָהָב',pic:'🌟'}], color:'#607D8B' },
+  { l:'ז', examples:[{word:'זְאֵב',pic:'🐺'},{word:'זַיִת',pic:'🫒'},{word:'זֶבְּרָה',pic:'🦓'},{word:'זְרוּעַ',pic:'💪'}], color:'#607D8B' },
   { l:'ח', examples:[{word:'חָתוּל',pic:'🐱'},{word:'חֲמוֹר',pic:'🫏'},{word:'חָלָב',pic:'🥛'},{word:'חַמָּנִיָּה',pic:'🌻'}], color:'#FF7043' },
   { l:'ט', examples:[{word:'טָלֶה',pic:'🐑'},{word:'טִיגְרִיס',pic:'🐯'},{word:'טֶלֶפוֹן',pic:'📱'},{word:'טַוָּס',pic:'🦚'}], color:'#9C27B0' },
   { l:'י', examples:[{word:'יָרֵחַ',pic:'🌙'},{word:'יָם',pic:'🌊'},{word:'יוֹנָה',pic:'🕊️'},{word:'יֶלֶד',pic:'👦'}], color:'#3F51B5' },
@@ -241,7 +241,7 @@ const countChallenges = [
 let tab = 'learn';
 let current = 0;
 let numberIndex = 0;
-let wordplayIndex = 0;
+let mathIndex = 0;
 let quizItems = [];
 let currentQuizItem = null;
 let quizIdx = 0;
@@ -314,8 +314,8 @@ function switchTab(t) {
 
   const mainDisplay = document.getElementById('main-display');
   const btnRow = document.getElementById('btn-row');
-  mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'numbers' || t === 'wordplay') ? 'block' : 'none';
-  btnRow.style.display = (t === 'learn' || t === 'numbers' || t === 'wordplay' || t === 'quiz') ? 'flex' : 'none';
+  mainDisplay.style.display = (t === 'learn' || t === 'quiz' || t === 'numbers' || t === 'math') ? 'block' : 'none';
+  btnRow.style.display = (t === 'learn' || t === 'numbers' || t === 'math' || t === 'quiz') ? 'flex' : 'none';
 
   document.getElementById('trace-section').className = t === 'trace' ? 'visible' : '';
   document.getElementById('memory-section').className = t === 'memory' ? 'visible' : '';
@@ -325,13 +325,13 @@ function switchTab(t) {
     pageTitle.textContent = 'לומדים מספרים 🔢';
     document.getElementById('mode-label').textContent = 'מספרים - למידה';
     showNumber(numberIndex);
-  } else if (t === 'wordplay') {
+  } else if (t === 'math') {
     pageTitle.textContent = 'חשבון פשוט ➕➖';
     document.getElementById('mode-label').textContent = 'חשבון פשוט';
     startWordPlay();
   } else if (t === 'learn') {
     pageTitle.textContent = 'לומדים אותיות 📖';
-    document.getElementById('mode-label').textContent = 'לחץ על האות כדי לשמוע אותה!';
+    document.getElementById('mode-label').textContent = 'אותיות - למידה';
     showLearn(current);
   } else if (t === 'quiz') {
     pageTitle.textContent = 'חידון 🎯';
@@ -358,7 +358,7 @@ function setGameType(type) {
     showLearn(current);
   } else if (type === 'numbers') {
     showNumber(numberIndex);
-  } else if (type === 'wordplay') {
+  } else if (type === 'math') {
     startWordPlay();
   }
 }
@@ -395,12 +395,12 @@ function renderStars() {
 function onLetterTap() {
   if (tab === 'learn') sayLetter();
   else if (tab === 'numbers') sayNumber();
+  else if (tab === 'math') speakEquation();
 }
 
 function sayLetter() {
   const d = letters[current];
-  const ex = pickExample(current);
-  speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
+  speak(d.l + ' ! ', 0.75, 1.3);
   const el = document.getElementById('letter-display');
   el.style.transform = 'scale(1.15)';
   setTimeout(() => el.style.transform = '', 200);
@@ -409,7 +409,7 @@ function sayLetter() {
 function sayNumber() {
   const n = numbers[numberIndex];
   if (!n) return;
-  speak(n.n + ' - ' + n.word, 0.8, 1.2);
+  speak(n.n + ' ! ', 0.8, 1.2);
   const el = document.getElementById('letter-display');
   el.style.transform = 'scale(1.15)';
   setTimeout(() => el.style.transform = '', 200);
@@ -420,12 +420,19 @@ function showLearn(idx) {
   const d = letters[idx];
   const ex = pickExample(idx);
 
-  document.getElementById('letter-display').textContent = d.l;
-  document.getElementById('letter-display').style.color = d.color;
-  document.getElementById('letter-display').style.fontSize = '130px';
+  // Reset letter-display to default styles for letters tab
+  const letterDisplay = document.getElementById('letter-display');
+  letterDisplay.textContent = d.l;
+  letterDisplay.style.color = d.color;
+  letterDisplay.style.fontSize = '130px';
+  letterDisplay.style.cursor = 'pointer';
+  letterDisplay.style.pointerEvents = '';
+  
   document.getElementById('picture').textContent = ex.pic;
+  document.getElementById('picture').style.fontSize = '';
+  document.getElementById('picture').style.color = '';
   document.getElementById('word-display').textContent = ex.word;
-  document.getElementById('mode-label').textContent = 'לחץ על האות כדי לשמוע אותה!';
+  document.getElementById('mode-label').textContent = '';
   document.getElementById('prompt').textContent = '';
 
   const chips = document.getElementById('word-chips');
@@ -434,7 +441,8 @@ function showLearn(idx) {
     const c = document.createElement('button');
     c.className = 'chip' + (e.word === ex.word ? ' active' : '');
     if (e.word === ex.word) c.style.background = d.color;
-    c.textContent = e.pic + ' ' + e.word;
+    c.textContent = e.pic;
+    c.style.fontSize = '24px';
     c.onclick = () => {
       document.getElementById('picture').textContent = e.pic;
       document.getElementById('word-display').textContent = e.word;
@@ -445,13 +453,11 @@ function showLearn(idx) {
     chips.appendChild(c);
   });
 
-  // אין כפתורי קיצור בסרגל התחתון לפי בקשה.
   renderBtns([
     { label: 'קודם ➡', fn: () => { if(current>0) showLearn(current-1); } },
     { label: '⬅ הבא', fn: () => { if(current<letters.length-1) showLearn(current+1); } },
   ]);
   speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
-  renderStars();
 }
 
 function showNumber(idx) {
@@ -471,22 +477,21 @@ function showNumber(idx) {
   
   document.getElementById('word-display').textContent = n.word;
   document.getElementById('mode-label').textContent = 'מספרים - למידה';
-  document.getElementById('prompt').textContent = 'לחץ על המספר כדי לשמוע אותו';
+  document.getElementById('prompt').textContent = '';
   document.getElementById('word-chips').innerHTML = '';
 
   renderBtns([
     { label: 'קודם ➡', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
     { label: '⬅ הבא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
   ]);
-  speak(n.n + ' ' + n.word, 0.8, 1.2);
-  renderStars();
++ sayNumber();
 }
 
 
 let wordplayChallenges = [];
 
 function startWordPlay() {
-  wordplayChallenges = [];
+  mathChallenges = [];
   const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
   
   for (let i = 0; i < 15; i++) {
@@ -503,20 +508,39 @@ function startWordPlay() {
       answer = a - b;
       expr = `${a} - ${b}`;
     }
-    wordplayChallenges.push({ expr, answer });
+    mathChallenges.push({ expr, answer });
   }
   
-  wordplayChallenges = shuffle(wordplayChallenges);
-  wordplayIndex = 0;
+  mathChallenges = shuffle(mathChallenges);
+  mathIndex = 0;
   showCountChallenge();
 }
 
+function speakEquation() {
+  if (mathChallenges.length == 0 || mathIndex >= mathChallenges.length) {
+    return;
+  }
+  const challenge = mathChallenges[mathIndex];
+  const parts = challenge.expr.split(' ');
+  const num1 = parts[0];
+  const operator = parts[1];
+  const num2 = parts[2];
+  const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
+  speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה ' + challenge.answer, 0.8, 1.2);
+}
+
 function showCountChallenge() {
-  const challenge = wordplayChallenges[wordplayIndex];
+  const challenge = mathChallenges[mathIndex];
   
   // Use innerHTML with LTR direction for math expressions
   document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + challenge.expr + ' = ' + challenge.answer + '</span>';
   document.getElementById('letter-display').style.fontSize = '60px';
+  
+  // Clear any leftover content from other tabs
+  document.getElementById('word-display').textContent = '';
+  document.getElementById('word-chips').innerHTML = '';
+  document.getElementById('picture').innerHTML = '';
+  document.getElementById('picture').textContent = '';
   
   // Create visual emoji representation
   const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
@@ -524,7 +548,7 @@ function showCountChallenge() {
   const num1 = parseInt(parts[0]);
   const operator = parts[1];
   const num2 = parseInt(parts[2]);
-  const emoji = emojis[wordplayIndex % emojis.length];
+  const emoji = emojis[mathIndex % emojis.length];
   
   // Helper function to display emojis in a grid pattern (like dice/squares)
   function wrapEmojis(count, emojiChar) {
@@ -573,28 +597,27 @@ function showCountChallenge() {
   
   document.getElementById('word-display').textContent = '';
   
-  // Speak the equation in Hebrew
-  const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
-  speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה ' + challenge.answer, 0.8, 1.2);
-  
   document.getElementById('letter-display').style.color = '#3f51b5';
   document.getElementById('mode-label').textContent = 'חשבון וכמויות';
   document.getElementById('prompt').textContent = '';
 
   renderBtns([
-    { label: 'קודם ➡', fn: () => { if(wordplayIndex>0) { wordplayIndex--; showCountChallenge(); } } },
-    { label: '⬅ הבא', fn: () => { if(wordplayIndex<wordplayChallenges.length-1) { wordplayIndex++; showCountChallenge(); } } },
+    { label: 'קודם ➡', fn: () => { if(mathIndex>0) { mathIndex--; showCountChallenge(); } } },
+    { label: '⬅ הבא', fn: () => { if(mathIndex<mathChallenges.length-1) { mathIndex++; showCountChallenge(); } } },
   ]);
+  
+  // Speak the equation automatically when showing it
+  speakEquation();
 }
 
 function checkCountAnswer(choice) {
-  const challenge = wordplayChallenges[wordplayIndex];
+  const challenge = mathChallenges[mathIndex];
   
   if (choice === challenge.answer) {
     document.getElementById('prompt').textContent = '🎉 נכון!';
     speak('נכון!', 0.85, 1.3);
     setTimeout(() => {
-      wordplayIndex = (wordplayIndex + 1) % wordplayChallenges.length;
+      mathIndex = (mathIndex + 1) % mathChallenges.length;
       showCountChallenge();
     }, 900);
   } else {
@@ -608,7 +631,7 @@ function startQuiz() {
   quizScore = 0;
   quizIdx = 0;
   answered = false;
-  wordplayChallenges = []; // Clear previous challenges
+  mathChallenges = []; // Clear previous challenges
 
   // Generate equal distribution: 33% letters, 33% numbers/counting, 33% math
   const itemsPerType = 8; // 8 items per type = 24 total questions
@@ -626,8 +649,8 @@ function startQuiz() {
     const num = numbers[numIdx];
     const emoji = emojis[numIdx % emojis.length];
     const icons = emoji.repeat(num.n);
-    numberItems.push({ type: 'number', idx: wordplayChallenges.length });
-    wordplayChallenges.push({ icons, answer: num.n, type: 'number' });
+    numberItems.push({ type: 'number', idx: mathChallenges.length });
+    mathChallenges.push({ icons, answer: num.n, type: 'number' });
   }
   
   // Math challenges (addition and subtraction)
@@ -646,8 +669,8 @@ function startQuiz() {
       answer = a - b;
       expr = `${a} - ${b}`;
     }
-    mathItems.push({ type: 'math', idx: wordplayChallenges.length });
-    wordplayChallenges.push({ expr, answer, type: 'math' });
+    mathItems.push({ type: 'math', idx: mathChallenges.length });
+    mathChallenges.push({ expr, answer, type: 'math' });
   }
   
   // Combine all items and shuffle
@@ -665,10 +688,9 @@ function nextMixedQuiz() {
   if (currentQuizItem.type === 'letter') {
     const d = letters[currentQuizItem.idx];
     const ex = pickExample(currentQuizItem.idx);
-    document.getElementById('letter-display').textContent = '?';
-    document.getElementById('letter-display').style.color = '#bbb';
+    document.getElementById('letter-display').textContent = ex.pic;
     document.getElementById('letter-display').style.fontSize = '130px';
-    document.getElementById('picture').textContent = ex.pic;
+    document.getElementById('picture').textContent = '';
     document.getElementById('word-display').textContent = 'באיזו אות מתחילה המילה?';
     document.getElementById('mode-label').textContent = '⁉️ חידון אותיות';
     document.getElementById('prompt').textContent = '';
@@ -679,7 +701,7 @@ function nextMixedQuiz() {
     speak('באיזו אות מתחילה המילה ' + ex.word + '?', 0.8, 1.2);
 
   } else if (currentQuizItem.type === 'number') {
-    const c = wordplayChallenges[currentQuizItem.idx];
+    const c = mathChallenges[currentQuizItem.idx];
     // Show emojis and ask how many items
     document.getElementById('picture').textContent = c.icons;
     document.getElementById('picture').style.color = '#3f51b5';
@@ -696,7 +718,7 @@ function nextMixedQuiz() {
     speak('כמה פריטים יש כאן?', 0.8, 1.2);
 
   } else if (currentQuizItem.type === 'math') {
-    const c = wordplayChallenges[currentQuizItem.idx];
+    const c = mathChallenges[currentQuizItem.idx];
     document.getElementById('picture').innerHTML = '<span class="math-expression">' + c.expr + ' = ?</span>';
     document.getElementById('picture').style.color = '#3f51b5';
     document.getElementById('picture').style.fontSize = '50px';
@@ -733,11 +755,11 @@ function checkQuizAnswer(chosen) {
     correctAnswer = letters[currentQuizItem.idx].l;
     confirmationText = 'כמו ' + pickExample(currentQuizItem.idx).word;
   } else if (currentQuizItem.type === 'number' || currentQuizItem.type === 'count') {
-    const c = wordplayChallenges[currentQuizItem.idx];
+    const c = mathChallenges[currentQuizItem.idx];
     correctAnswer = c.answer;
     confirmationText = 'התשובה נכונה היא ' + correctAnswer;
   } else {
-    const c = wordplayChallenges[currentQuizItem.idx];
+    const c = mathChallenges[currentQuizItem.idx];
     correctAnswer = c.answer;
     confirmationText = 'התשובה נכונה היא ' + correctAnswer;
   }
