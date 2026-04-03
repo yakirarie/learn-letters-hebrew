@@ -722,11 +722,13 @@ function checkQuizAnswer(chosen) {
   if (currentQuizItem.type === 'letter') {
     correctAnswer = letters[currentQuizItem.idx].l;
     confirmationText = 'כמו ' + pickExample(currentQuizItem.idx).word;
-  } else if (currentQuizItem.type === 'number') {
-    correctAnswer = numbers[currentQuizItem.idx].n;
-    confirmationText = numbers[currentQuizItem.idx].word;
+  } else if (currentQuizItem.type === 'number' || currentQuizItem.type === 'count') {
+    const c = wordplayChallenges[currentQuizItem.idx];
+    correctAnswer = c.answer;
+    confirmationText = 'התשובה נכונה היא ' + correctAnswer;
   } else {
-    correctAnswer = wordplayChallenges[currentQuizItem.idx].answer;
+    const c = wordplayChallenges[currentQuizItem.idx];
+    correctAnswer = c.answer;
     confirmationText = 'התשובה נכונה היא ' + correctAnswer;
   }
 
