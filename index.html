@@ -534,13 +534,14 @@ function showLearn(idx) {
   const d = letters[idx];
   const ex = pickExample(idx);
 
-  // Reset letter-display to default styles for letters tab
+  // Reset letter-display to default styles and onclick for letters tab
   const letterDisplay = document.getElementById('letter-display');
   letterDisplay.textContent = d.l;
   letterDisplay.style.color = d.color;
   letterDisplay.style.fontSize = '130px';
   letterDisplay.style.cursor = 'pointer';
   letterDisplay.style.pointerEvents = '';
+  letterDisplay.onclick = onLetterTap;
   
   document.getElementById('picture').textContent = ex.pic;
   document.getElementById('picture').style.fontSize = '';
@@ -577,11 +578,13 @@ function showLearn(idx) {
 function showNumber(idx) {
   numberIndex = idx;
   const n = numbers[idx];
-  document.getElementById('letter-display').textContent = n.n;
-  document.getElementById('letter-display').style.color = n.color;
+  const letterDisplay = document.getElementById('letter-display');
+  letterDisplay.textContent = n.n;
+  letterDisplay.style.color = n.color;
+  letterDisplay.onclick = onLetterTap;
   // Adjust font size based on number to fit better
   const fontSize = n.n <= 10 ? '130px' : n.n <= 20 ? '100px' : '80px';
-  document.getElementById('letter-display').style.fontSize = fontSize;
+  letterDisplay.style.fontSize = fontSize;
   
   // Show visual representation
   const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟'];
@@ -598,7 +601,7 @@ function showNumber(idx) {
     { label: 'קודם ➡', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
     { label: '⬅ הבא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
   ]);
-  sayNumber();
+  speak(n.n + ' ! ', 0.8, 1.2);
 }
 
 
@@ -647,8 +650,10 @@ function showCountChallenge() {
   const challenge = mathChallenges[mathIndex];
   
   // Use innerHTML with LTR direction for math expressions
-  document.getElementById('letter-display').innerHTML = '<span class="math-expression">' + challenge.expr + ' = ' + challenge.answer + '</span>';
-  document.getElementById('letter-display').style.fontSize = '60px';
+  const letterDisplay = document.getElementById('letter-display');
+  letterDisplay.innerHTML = '<span class="math-expression">' + challenge.expr + ' = ' + challenge.answer + '</span>';
+  letterDisplay.style.fontSize = '60px';
+  letterDisplay.onclick = onLetterTap;
   
   // Clear any leftover content from other tabs
   document.getElementById('word-display').textContent = '';
