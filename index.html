@@ -452,7 +452,7 @@ function switchTab(t) {
   } else if (t === 'math') {
     pageTitle.textContent = 'חשבון פשוט ➕➖';
     document.getElementById('mode-label').textContent = 'חשבון פשוט';
-    startWordPlay();
+    startMathPlay();
   } else if (t === 'learn') {
     pageTitle.textContent = 'לומדים אותיות 📖';
     document.getElementById('mode-label').textContent = 'אותיות - למידה';
@@ -483,7 +483,7 @@ function setGameType(type) {
   } else if (type === 'numbers') {
     showNumber(numberIndex);
   } else if (type === 'math') {
-    startWordPlay();
+    startMathPlay();
   }
 }
 function renderStars() {
@@ -641,7 +641,7 @@ function showNumber(idx) {
 
 let wordplayChallenges = [];
 
-function startWordPlay() {
+function startMathPlay() {
   mathChallenges = [];
   const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
   
@@ -682,108 +682,94 @@ function speakEquation() {
 
 function showCountChallenge() {
   const challenge = mathChallenges[mathIndex];
-  
-  // Use innerHTML with LTR direction for math expressions
-  const letterDisplay = document.getElementById('letter-display');
-  letterDisplay.innerHTML = '<span class="math-expression">' + challenge.expr + ' = ' + challenge.answer + '</span>';
-  letterDisplay.style.fontSize = '60px';
-  letterDisplay.onclick = onLetterTap;
-  
-  // Clear any leftover content from other tabs
-  document.getElementById('word-display').textContent = '';
-  document.getElementById('word-chips').innerHTML = '';
-  document.getElementById('picture').innerHTML = '';
-  document.getElementById('picture').textContent = '';
-  
-  // Create visual emoji representation
-  const emojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓', '🍑', '🍍'];
-  const parts = challenge.expr.split(' ');
-  const num1 = parseInt(parts[0]);
+  const parts    = challenge.expr.split(' ');
+  const num1     = parseInt(parts[0]);
   const operator = parts[1];
-  const num2 = parseInt(parts[2]);
-  const emoji = emojis[mathIndex % emojis.length];
-  
-  // Helper function to display emojis in a grid pattern (like dice/squares)
-  function wrapEmojis(count, emojiChar) {
-    if (count === 0) return '<span style="font-size:28px;">&nbsp;</span>';
-    
-    // Calculate grid dimensions
-    const cols = Math.ceil(Math.sqrt(count));
-    const rows = Math.ceil(count / cols);
-    
-    let html = '<div style="display:inline-grid;grid-template-columns:repeat(' + cols + ',28px);grid-template-rows:repeat(' + rows + ',28px);gap:2px;">';
-    
-    for (let i = 0; i < count; i++) {
-      html += '<span style="font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center;">' + emojiChar + '</span>';
-    }
-    
-    // Fill empty cells with invisible placeholders to maintain grid shape
-    for (let i = count; i < cols * rows; i++) {
-      html += '<span style="font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center;">&nbsp;</span>';
-    }
-    
-    html += '</div>';
-    return html;
-  }
-  
-  let visualHTML = '<div class="math-expression" style="display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0;">';
-  
-  if (operator === '+') {
-    visualHTML += '<div>' + wrapEmojis(num1, emoji) + '</div>';
-    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">+</div>';
-    visualHTML += '<div>' + wrapEmojis(num2, emoji) + '</div>';
-    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">→</div>';
-    visualHTML += '<div>' + wrapEmojis(challenge.answer, emoji) + '</div>';
-  } else {
-    // For subtraction: show original amount with crossed out items, arrow, then result
-    const remaining = challenge.answer;
-    const crossedOut = num2;
-    
-    // Create visual for subtraction: show all items, remaining ones are normal, subtracted ones are faded
-    function wrapSubtractionEmojis(total, crossed, emojiChar) {
-      if (total === 0) return '<span style="font-size:28px;">&nbsp;</span>';
-      
-      const cols = Math.ceil(Math.sqrt(total));
-      const rows = Math.ceil(total / cols);
-      const remaining = total - crossed;
-      
-      let html = '<div style="display:inline-grid;grid-template-columns:repeat(' + cols + ',28px);grid-template-rows:repeat(' + rows + ',28px);gap:2px;">';
-      
-      for (let i = 0; i < total; i++) {
-        if (i < remaining) {
-          // Remaining items - normal (shown first)
-          html += '<span style="font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center;">' + emojiChar + '</span>';
-        } else {
-          // Crossed out items - faded (shown last)
-          html += '<span style="font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center;opacity:0.2;">' + emojiChar + '</span>';
-        }
-      }
-      
-      html += '</div>';
-      return html;
-    }
-    
-    visualHTML += '<div>' + wrapSubtractionEmojis(num1, crossedOut, emoji) + '</div>';
-    visualHTML += '<div style="font-size:24px;color:#999;display:flex;align-items:center;">→</div>';
-    visualHTML += '<div>' + wrapEmojis(remaining, emoji) + '</div>';
-  }
-  
-  visualHTML += '</div>';
-  document.getElementById('picture').innerHTML = visualHTML;
-  document.getElementById('picture').style.fontSize = '28px';
-  
-  document.getElementById('word-display').textContent = '';
-  
-  document.getElementById('letter-display').style.color = '#3f51b5';
-  document.getElementById('mode-label').textContent = 'חשבון וכמויות';
-  document.getElementById('prompt').textContent = '';
+  const num2     = parseInt(parts[2]);
+  const answer   = challenge.answer;
 
+  // ── your existing DOM setup (unchanged) ──────────────────
+  const letterDisplay = document.getElementById('letter-display');
+  letterDisplay.innerHTML = `<span class="math-expression">${challenge.expr} = ${answer}</span>`;
+  letterDisplay.style.fontSize = '60px';
+  letterDisplay.style.color    = '#3f51b5';
+  letterDisplay.onclick        = onLetterTap;
+
+  document.getElementById('word-display').textContent = '';
+  document.getElementById('word-chips').innerHTML   = '';
+  document.getElementById('mode-label').textContent  = 'חשבון וכמויות';
+  document.getElementById('prompt').textContent       = '';
+
+  // ── new visual ───────────────────────────────────────────
+  const EMOJIS = ['🍎','⚽','🌟','🐱','🐸','🍌','🦋','🍓','🐠','🌈'];
+  const emoji = EMOJIS[mathIndex % EMOJIS.length];
+  const pic   = document.getElementById('picture');
+
+  // inject keyframes once
+  if (!document.getElementById('math-anim-style')) {
+    const s = document.createElement('style');
+    s.id = 'math-anim-style';
+    s.textContent = `
+      @keyframes popIn    { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }
+      @keyframes fadeOut  { 0%{transform:scale(1);opacity:1} 100%{transform:scale(0);opacity:0} }
+      @keyframes slideIn  { 0%{transform:translateX(60px);opacity:0} 100%{transform:translateX(0);opacity:1} }
+      .math-item { font-size:36px; display:inline-block; animation: popIn .6s ease both; }`;
+    document.head.appendChild(s);
+  }
+
+  // cancel any pending timeouts from previous run
+  if (window._mathTimers) window._mathTimers.forEach(clearTimeout);
+  window._mathTimers = [];
+  const later = (fn, ms) => { const t = setTimeout(fn, ms); window._mathTimers.push(t); };
+
+  // build an emoji row, each item delayed so they appear one-by-one
+  function makeRow(count, delayOffset = 0) {
+    return Array.from({length: count}, (_, i) =>
+      `<span class="math-item" style="animation-delay:${(delayOffset + i) * 0.15}s">${emoji}</span>`
+    ).join('');
+  }
+
+  // restart animation when child taps the picture area
+  pic.onclick = showCountChallenge;
+  pic.innerHTML = '';
+
+  if (operator === '+') {
+        // Phase 1: two groups with + and a gap between them
+    pic.innerHTML = `
+      <div id="scene" style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:8px 0;transition:gap .8s ease;">
+        <div id="groupA" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:180px;">${makeRow(num1)}</div>
+        <div id="groupSep" style="font-size:32px;color:#aaa;">+</div>
+        <div id="groupB" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:180px;">${makeRow(num2, num1)}</div>
+      </div>`;
+
+    // Phase 2: remove + and collapse gap so the two groups slide together
+    later(() => {
+      document.getElementById('groupSep').remove();
+      document.getElementById('scene').style.gap = '4px';
+    }, 2000);
+
+  } else {
+    // Phase 1: show full group, subtracted items last (so they have higher indexes)
+    pic.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:300px;margin:8px auto;">
+        ${makeRow(answer)}${makeRow(num2, answer)}</div>`;
+
+    // Phase 2: fade out the subtracted items in place — no reload needed
+    later(() => {
+      const items = pic.querySelectorAll('.math-item');
+      for (let i = answer; i < num1; i++) {
+        items[i].style.animationDelay = `${(i - answer) * 0.3}s`;
+        items[i].style.animation      = 'fadeOut .7s ease forwards';
+      }
+    }, 2000);
+  }
+
+  // ── your existing nav + speech (unchanged) ───────────────
   renderBtns([
-    { label: 'קודם ➡', fn: () => { if(mathIndex>0) { mathIndex--; showCountChallenge(); } } },
-    { label: '⬅ הבא', fn: () => { if(mathIndex<mathChallenges.length-1) { mathIndex++; showCountChallenge(); } } },
+    { label: 'קודם ➡', fn: () => { if (mathIndex > 0)                        { mathIndex--; showCountChallenge(); } } },
+    { label: '⬅ הבא', fn: () => { if (mathIndex < mathChallenges.length - 1) { mathIndex++; showCountChallenge(); } } },
   ]);
-  
-  // Speak the equation automatically when showing it
+
   speakEquation();
 }
 
