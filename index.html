@@ -242,17 +242,18 @@
     <div class="btn-row" id="btn-row"></div>
   </div>
 
-  <div id="trace-section">
-    <div id="trace-letter-label" style="font-size:20px;font-weight:700;color:#333;margin:0.3rem 0;"></div>
-    <div id="trace-wrap">
-      <div id="trace-ghost"></div>
-      <canvas id="traceCanvas" width="300" height="300"></canvas>
-    </div>
-    <div class="trace-controls">
-      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
-      <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;">📚 אותיות</button>
-      <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;">🔢 מספרים</button>
-    </div>
+    <div id="trace-section">
+      <div id="trace-letter-label" style="font-size:20px;font-weight:700;color:#333;margin:0.3rem 0;"></div>
+      <div id="trace-wrap">
+        <div id="trace-ghost"></div>
+        <canvas id="traceCanvas" width="300" height="300"></canvas>
+      </div>
+      <div class="trace-controls">
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
+        <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;">📚 אותיות</button>
+        <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;">🔢 מספרים</button>
+        <button class="tap-btn" onclick="setTraceMode('pictures')" style="padding:6px 16px;font-size:14px;">🖼️ תמונות</button>
+      </div>
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
       <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)"></div>
       <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)"></div>
@@ -975,22 +976,44 @@ function renderBtns(defs) {
   });
 }
 
+// Collect all unique pictures from letters examples
+const allPictures = [];
+letters.forEach(l => {
+  l.examples.forEach(ex => {
+    if (!allPictures.find(p => p.pic === ex.pic)) {
+      allPictures.push({ pic: ex.pic, word: ex.word, letter: l.l, color: l.color });
+    }
+  });
+});
+
+let tracePictureIdx = 0;
+
 // ── TRACE ─────────────────────────────────────────────────────────────
 function showTrace(idx) {
   traceIdx = idx;
-  document.getElementById('mode-label').textContent = 'כתיבה בתרגול';
+  document.getElementById('mode-label').textContent = 'תרגול בכתיבה';
   let item, label, speakText;
   if (traceMode === 'letters') {
     item = letters[idx];
-    label = 'תצייר את האות: ' + item.l;
+    label = 'צייר את האות: ' + item.l;
     speakText = 'צייר את האות ' + item.l;
-  } else {
+    document.getElementById('trace-ghost').textContent = item.l;
+    document.getElementById('trace-ghost').style.color = item.color;
+  } else if (traceMode === 'numbers') {
     item = numbers[idx];
-    label = 'תצייר את המספר: ' + item.n;
+    label = 'צייר את המספר: ' + item.n;
     speakText = 'צייר את המספר ' + item.n;
+    document.getElementById('trace-ghost').textContent = item.n;
+    document.getElementById('trace-ghost').style.color = item.color;
+  } else {
+    // Pictures mode
+    item = allPictures[idx];
+    label = 'צייר את התמונה: ' + item.pic + ' (' + item.word + ')';
+    speakText = 'צייר את ' + item.word;
+    document.getElementById('trace-ghost').textContent = item.pic;
+    document.getElementById('trace-ghost').style.fontSize = 'clamp(120px, 40vw, 190px)';
+    document.getElementById('trace-ghost').style.color = item.color || '#333';
   }
-  document.getElementById('trace-ghost').textContent = item.l || item.n;
-  document.getElementById('trace-ghost').style.color = item.color;
   document.getElementById('trace-letter-label').textContent = label;
   clearTrace();
   speak(speakText, 0.8, 1.2);
@@ -1002,13 +1025,19 @@ function clearTrace() {
 }
 
 function tracePrev() {
-  const arr = traceMode === 'letters' ? letters : numbers;
+  let arr;
+  if (traceMode === 'letters') arr = letters;
+  else if (traceMode === 'numbers') arr = numbers;
+  else arr = allPictures;
   traceIdx = (traceIdx - 1 + arr.length) % arr.length;
   showTrace(traceIdx);
 }
 
 function traceNext() {
-  const arr = traceMode === 'letters' ? letters : numbers;
+  let arr;
+  if (traceMode === 'letters') arr = letters;
+  else if (traceMode === 'numbers') arr = numbers;
+  else arr = allPictures;
   traceIdx = (traceIdx + 1) % arr.length;
   showTrace(traceIdx);
 }
