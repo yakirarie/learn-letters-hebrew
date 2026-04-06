@@ -1180,7 +1180,7 @@ function startMemory() {
   });
 
   memCards = shuffle(pairs).map((c, i) => ({ ...c, idx: i, flipped: false, matched: false }));
-  document.getElementById('mem-score').textContent = 'מִצְאוּ אֶת כָּל הַזּוּגוֹת! 🔍 (12 זוּגוֹת)';
+  document.getElementById('mem-score').textContent = 'מִצְאוּ אֶת כָּל הַזּוּגוֹת! 🔍';
   renderMemory();
 }
 
