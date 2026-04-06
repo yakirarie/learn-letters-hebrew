@@ -10,17 +10,17 @@
   <style>
     /* CSS Custom Properties for responsive design */
     :root {
-      --app-max-width: 500px;
-      --letter-size: clamp(80px, 20vw, 130px);
-      --word-size: clamp(20px, 5vw, 28px);
-      --picture-size: clamp(48px, 12vw, 72px);
-      --btn-font-size: clamp(13px, 3.5vw, 15px);
-      --tab-font-size: clamp(11px, 2.8vw, 13px);
-      --tab-padding: clamp(6px 10px, 1.5vw 2vw, 7px 14px);
-      --app-padding: clamp(0.5rem, 3vw, 0.75rem);
-      --gap-sm: clamp(4px, 1.5vw, 8px);
-      --gap-md: clamp(6px, 2vw, 10px);
-      --gap-lg: clamp(8px, 2.5vw, 14px);
+      --app-max-width: 100%;
+      --letter-size: clamp(80px, 18vw, 220px);
+      --word-size: clamp(18px, 3.5vw, 42px);
+      --picture-size: clamp(36px, 8vw, 48px);
+      --btn-font-size: clamp(13px, 2.5vw, 18px);
+      --tab-font-size: clamp(11px, 2vw, 15px);
+      --tab-padding: clamp(6px 10px, 1.5vw 2.5vw, 10px 20px);
+      --app-padding: clamp(0.5rem, 2vw, 1rem);
+      --gap-sm: clamp(4px, 1vw, 10px);
+      --gap-md: clamp(6px, 1.5vw, 14px);
+      --gap-lg: clamp(8px, 2vw, 16px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -83,7 +83,7 @@
 
     #trace-section { display: none; }
     #trace-section.visible { display: block; }
-    #trace-wrap { position: relative; display: inline-block; margin: 0.4rem 0; width: 100%; max-width: 300px; }
+    #trace-wrap { position: relative; display: inline-block; margin: 0.4rem 0; width: 100%; max-width: min(300px, 80vw); }
     #trace-ghost {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
@@ -93,7 +93,7 @@
     canvas#traceCanvas {
       border-radius: 16px; border: 2px dashed #ccc; background: #fffdf8;
       touch-action: none; cursor: crosshair; display: block;
-      width: 100%; max-width: 300px; aspect-ratio: 1;
+      width: 100%; max-width: min(300px, 80vw); aspect-ratio: 1;
     }
     .trace-controls { display: flex; gap: var(--gap-md); justify-content: center; margin-top: 0.4rem; flex-wrap: wrap; align-items: center; }
     .color-dot {
@@ -104,10 +104,10 @@
 
     #memory-section { display: none; }
     #memory-section.visible { display: block; }
-    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-sm); margin: 0.5rem 0; }
+    .memory-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--gap-sm); margin: 0.5rem auto; max-width: min(500px, 90vw); }
     .mem-card {
       aspect-ratio: 1; border-radius: 12px; border: 2px solid #ddd; background: #fff;
-      display: flex; align-items: center; justify-content: center; font-size: clamp(20px, 6vw, 28px); font-weight: 700;
+      display: flex; align-items: center; justify-content: center; font-size: clamp(20px, 5vw, 32px); font-weight: 700;
       cursor: pointer; transition: all 0.2s; user-select: none;
       min-height: 50px;
     }
@@ -119,8 +119,8 @@
 
     /* Sound toggle button - responsive positioning */
     #sound-toggle {
-      position: fixed; top: 10px; right: 10px; z-index: 1000;
-      width: 44px; height: 44px; padding: 0; font-size: 20px; border-radius: 50%;
+      position: fixed; top: clamp(8px, 2vw, 16px); right: clamp(8px, 2vw, 16px); z-index: 1000;
+      width: clamp(40px, 8vw, 52px); height: clamp(40px, 8vw, 52px); padding: 0; font-size: clamp(18px, 4vw, 24px); border-radius: 50%;
     }
 
     #update-banner {
@@ -143,7 +143,7 @@
 
     /* Small phones in portrait */
     @media (max-width: 320px) {
-      .memory-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+      .memory-grid { grid-template-columns: repeat(5, 1fr); gap: 3px; }
       .mem-card { min-height: 40px; font-size: 20px; border-radius: 8px; }
       .color-dot { width: 26px; height: 26px; }
     }
@@ -151,20 +151,24 @@
     /* Tablet and larger screens */
     @media (min-width: 768px) {
       :root {
-        --app-max-width: 600px;
+        --app-max-width: 100%;
       }
-      #app { padding: 1rem; }
-      .memory-grid { gap: 12px; max-width: 400px; margin: 0.5rem auto; }
-      canvas#traceCanvas { max-width: 350px; }
-      #trace-ghost { font-size: 200px; }
+      #app { padding: 1rem 2rem; }
+      .memory-grid { gap: 14px; max-width: min(700px, 85vw); margin: 0.5rem auto; }
+      .mem-card { min-height: 70px; font-size: clamp(24px, 4vw, 36px); }
+      canvas#traceCanvas { max-width: min(400px, 70vw); }
+      #trace-ghost { font-size: clamp(150px, 30vw, 220px); }
     }
 
     /* Desktop screens */
     @media (min-width: 1024px) {
       :root {
-        --app-max-width: 500px;
+        --app-max-width: 100%;
       }
       body { display: flex; justify-content: center; align-items: flex-start; padding-top: 2rem; }
+      #app { max-width: 800px; }
+      .memory-grid { max-width: 700px; }
+      canvas#traceCanvas { max-width: 500px; }
     }
 
     /* Landscape orientation adjustments - phones */
@@ -187,20 +191,21 @@
 
     /* Landscape orientation - tablets */
     @media (min-width: 768px) and (orientation: landscape) {
-      #app { padding: 0.5rem 1rem; max-width: 700px; }
-      h1 { font-size: 18px; }
-      #letter-display { font-size: clamp(70px, 12vw, 110px); }
-      #picture { font-size: clamp(40px, 8vw, 60px); }
-      #word-display { font-size: clamp(18px, 3vw, 24px); }
-      canvas#traceCanvas { max-width: 280px; height: 280px; }
-      #trace-ghost { font-size: 170px; }
-      .memory-grid { max-width: 450px; gap: 10px; }
+      #app { padding: 0.5rem 1.5rem; max-width: 900px; }
+      h1 { font-size: clamp(16px, 2vw, 22px); }
+      #letter-display { font-size: clamp(80px, 12vw, 140px); }
+      #picture { font-size: clamp(36px, 6vw, 56px); }
+      #word-display { font-size: clamp(18px, 2.5vw, 32px); }
+      canvas#traceCanvas { max-width: min(350px, 50vw); height: auto; }
+      #trace-ghost { font-size: clamp(140px, 25vw, 200px); }
+      .memory-grid { max-width: min(600px, 80vw); gap: 12px; }
+      .mem-card { min-height: 60px; font-size: clamp(22px, 3.5vw, 30px); }
     }
 
     /* Portrait orientation optimizations */
     @media (orientation: portrait) {
       #app { padding-bottom: 1rem; }
-      .memory-grid { max-width: 350px; margin: 0.5rem auto; }
+      .memory-grid { max-width: min(550px, 90vw); margin: 0.5rem auto; }
     }
 
     /* Ensure touch targets are at least 44px for accessibility */
@@ -212,21 +217,21 @@
 </head>
 <body>
 <div id="app">
-  <h1>לומדים עברית 📖</h1>
+  <h1>לוֹמְדִים עִבְרִית 📖</h1>
   <button id="sound-toggle" class="tab-btn">🔊</button>
   <div id="update-banner" style="display:none; background:#ffeb3b; color:#333; border:1px solid #fbc02d; border-radius:10px; padding:8px 10px; margin:8px auto; max-width:500px; text-align:center;">
-    גרסה חדשה זמינה. <button id="refresh-btn" class="tab-btn" style="font-size:13px; padding:5px 10px;">טען מחדש</button>
+    גִּרְסָה חֲדָשָׁה זְמִינָה. <button id="refresh-btn" class="tab-btn" style="font-size:13px; padding:5px 10px;">טְעַן מֵחָדָשׁ</button>
   </div>
 
   <div class="tabs learning-tabs" id="learning-tabs">
-    <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אותיות</button>
-    <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מספרים</button>
-    <button class="tab-btn" data-target="math" onclick="switchTab('math')">חשבון ➕➖</button>
+    <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')">📚 אוֹתִיּוֹת</button>
+    <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')">🔢 מִסְפָּרִים</button>
+    <button class="tab-btn" data-target="math" onclick="switchTab('math')">חֶשְׁבּוֹן ➕➖</button>
   </div>
   <div class="tabs games-tabs" id="games-tabs">
-    <button class="tab-btn" data-target="quiz" onclick="switchTab('quiz')">🎮 חידון</button>
-    <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כתיבה</button>
-    <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זיכרון</button>
+    <button class="tab-btn" data-target="quiz" onclick="switchTab('quiz')">🎮 חִידּוֹן</button>
+    <button class="tab-btn" data-target="trace" onclick="switchTab('trace')">✏️ כְּתִיבָה</button>
+    <button class="tab-btn" data-target="memory" onclick="switchTab('memory')">🃏 זִכָּרוֹן</button>
   </div>
 
   <div id="mode-label"></div>
@@ -244,43 +249,45 @@
 
     <div id="trace-section">
       <div id="trace-letter-label" style="font-size:20px;font-weight:700;color:#333;margin:0.3rem 0;"></div>
+      <!-- Mode selection buttons (top) -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
+        <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;">📚 אוֹתִיּוֹת</button>
+        <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;">🔢 מִסְפָּרִים</button>
+        <button class="tap-btn" onclick="setTraceMode('pictures')" style="padding:6px 16px;font-size:14px;">🖼️ תְמוּנוֹת</button>
+      </div>
+      <!-- Canvas -->
       <div id="trace-wrap">
         <div id="trace-ghost"></div>
         <canvas id="traceCanvas" width="300" height="300"></canvas>
       </div>
-      <div class="trace-controls">
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
-        <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;">📚 אותיות</button>
-        <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;">🔢 מספרים</button>
-        <button class="tap-btn" onclick="setTraceMode('pictures')" style="padding:6px 16px;font-size:14px;">🖼️ תמונות</button>
+      <!-- Color palette -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin:8px 0;">
+        <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)"></div>
+        <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)"></div>
+        <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)"></div>
+        <div class="color-dot" style="background:#FF9800" onclick="setColor('#FF9800',this)"></div>
+        <div class="color-dot" style="background:#9C27B0" onclick="setColor('#9C27B0',this)"></div>
+        <div class="color-dot" style="background:#E91E63" onclick="setColor('#E91E63',this)"></div>
+        <div class="color-dot" style="background:#00BCD4" onclick="setColor('#00BCD4',this)"></div>
+        <div class="color-dot" style="background:#FFD600" onclick="setColor('#FFD600',this)"></div>
+        <div class="color-dot" style="background:#795548" onclick="setColor('#795548',this)"></div>
+        <div class="color-dot" style="background:#607D8B" onclick="setColor('#607D8B',this)"></div>
+        <div class="color-dot" style="background:#FF7043" onclick="setColor('#FF7043',this)"></div>
+        <div class="color-dot" style="background:#222222" onclick="setColor('#222222',this)"></div>
       </div>
-    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;">
-      <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)"></div>
-      <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)"></div>
-      <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)"></div>
-      <div class="color-dot" style="background:#FF9800" onclick="setColor('#FF9800',this)"></div>
-      <div class="color-dot" style="background:#9C27B0" onclick="setColor('#9C27B0',this)"></div>
-      <div class="color-dot" style="background:#E91E63" onclick="setColor('#E91E63',this)"></div>
-      <div class="color-dot" style="background:#00BCD4" onclick="setColor('#00BCD4',this)"></div>
-      <div class="color-dot" style="background:#FFD600" onclick="setColor('#FFD600',this)"></div>
-      <div class="color-dot" style="background:#795548" onclick="setColor('#795548',this)"></div>
-      <div class="color-dot" style="background:#607D8B" onclick="setColor('#607D8B',this)"></div>
-      <div class="color-dot" style="background:#FF7043" onclick="setColor('#FF7043',this)"></div>
-      <div class="color-dot" style="background:#222222" onclick="setColor('#222222',this)"></div>
-    </div>
-    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-      <button class="tap-btn" onclick="clearTrace()" style="padding:6px 16px;font-size:14px;">🗑️ נקה</button>
-      <button class="tap-btn" onclick="tracePrev()" style="padding:6px 16px;font-size:14px;">קודם ➡</button>
-      <button class="tap-btn" onclick="traceNext()" style="padding:6px 16px;font-size:14px;">⬅ הבא</button>
-    </div>
-    </div>
+      <!-- Navigation buttons -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button class="tap-btn" onclick="clearTrace()" style="padding:6px 16px;font-size:14px;">🗑️ נַקֵּה</button>
+        <button class="tap-btn" onclick="tracePrev()" style="padding:6px 16px;font-size:14px;">קוֹדֵם ➡</button>
+        <button class="tap-btn" onclick="traceNext()" style="padding:6px 16px;font-size:14px;">⬅ הַבָּא</button>
+      </div>
   </div>
 
   <div id="memory-section">
     <div id="mem-score"></div>
     <div class="memory-grid" id="memory-grid"></div>
     <div class="btn-row" style="margin-top:0.5rem;">
-      <button class="tap-btn" onclick="startMemory()">🔄 משחק חדש</button>
+      <button class="tap-btn" onclick="startMemory()">🔄 מִשְׂחָק חָדָשׁ</button>
     </div>
   </div>
 </div>
@@ -447,28 +454,28 @@ function switchTab(t) {
 
   const pageTitle = document.querySelector('#app h1');
   if (t === 'numbers') {
-    pageTitle.textContent = 'לומדים מספרים 🔢';
-    document.getElementById('mode-label').textContent = 'מספרים - למידה';
+    pageTitle.textContent = 'לוֹמְדִים מִסְפָּרִים 🔢';
+    document.getElementById('mode-label').textContent = 'מִסְפָּרִים - לְמִידָה';
     showNumber(numberIndex);
   } else if (t === 'math') {
-    pageTitle.textContent = 'חשבון פשוט ➕➖';
-    document.getElementById('mode-label').textContent = 'חשבון פשוט';
+    pageTitle.textContent = 'חֶשְׁבּוֹן פָּשׁוּט ➕➖';
+    document.getElementById('mode-label').textContent = 'חֶשְׁבּוֹן פָּשׁוּט';
     startMathPlay();
   } else if (t === 'learn') {
-    pageTitle.textContent = 'לומדים אותיות 📖';
-    document.getElementById('mode-label').textContent = 'אותיות - למידה';
+    pageTitle.textContent = 'לוֹמְדִים אוֹתִיּוֹת 📖';
+    document.getElementById('mode-label').textContent = 'אוֹתִיּוֹת - לְמִידָה';
     showLearn(current);
   } else if (t === 'quiz') {
-    pageTitle.textContent = 'חידון 🎯';
-    document.getElementById('mode-label').textContent = 'חידון מעורב';
+    pageTitle.textContent = 'חִידּוֹן 🎯';
+    document.getElementById('mode-label').textContent = 'חִידּוֹן מְעֹרָב';
     startQuiz();
   } else if (t === 'trace') {
-    pageTitle.textContent = 'כתיבה ✏️';
-    document.getElementById('mode-label').textContent = 'המשך לצייר על הלוח';
+    pageTitle.textContent = 'כְּתִיבָה ✏️';
+    document.getElementById('mode-label').textContent = 'הַמְשֵׁךְ לְצַיֵּר עַל הַלּוּחַ';
     showTrace(traceIdx);
   } else if (t === 'memory') {
-    pageTitle.textContent = 'זיכרון 🃏';
-    document.getElementById('mode-label').textContent = 'מצא זוגות תואמים';
+    pageTitle.textContent = 'זִכָּרוֹן 🃏';
+    document.getElementById('mode-label').textContent = 'מְצָא זוּגוֹת תּוֹאֲמִים';
     startMemory();
   }
 
@@ -520,7 +527,7 @@ function renderStars() {
 function onLetterTap() {
   if (tab === 'learn') sayLetter();
   else if (tab === 'numbers') sayNumber();
-  else if (tab === 'math') speakEquation();
+  else if (tab === 'math') showCountChallenge();
 }
 
 function sayLetter() {
@@ -574,16 +581,16 @@ function showLearn(idx) {
       document.getElementById('word-display').textContent = e.word;
       chips.querySelectorAll('.chip').forEach(x => { x.classList.remove('active'); x.style.background = ''; });
       c.classList.add('active'); c.style.background = d.color;
-      speak(d.l + ' כמו ' + e.word, 0.75, 1.3);
+      speak(d.l + ' כְּמוֹ ' + e.word, 0.75, 1.3);
     };
     chips.appendChild(c);
   });
 
   renderBtns([
-    { label: 'קודם ➡', fn: () => { if(current>0) showLearn(current-1); } },
-    { label: '⬅ הבא', fn: () => { if(current<letters.length-1) showLearn(current+1); } },
+    { label: 'קוֹדֵם ➡', fn: () => { if(current>0) showLearn(current-1); } },
+    { label: '⬅ הַבָּא', fn: () => { if(current<letters.length-1) showLearn(current+1); } },
   ]);
-  speak(d.l + '! ' + d.l + ' כמו ' + ex.word, 0.75, 1.3);
+  speak(d.l + '! ' + d.l + ' כְּמוֹ ' + ex.word, 0.75, 1.3);
 }
 
 // Helper function to get the Hebrew text for a number with object name
@@ -627,13 +634,13 @@ function showNumber(idx) {
   // Display the number with the object name (e.g., "שלושה פרחים", "תפוח אחד", "שני כדורים")
   const displayText = getNumberWithObject(emoji, n.n, n.word);
   document.getElementById('word-display').textContent = displayText;
-  document.getElementById('mode-label').textContent = 'מספרים - למידה';
+  document.getElementById('mode-label').textContent = 'מִסְפָּרִים - לְמִידָה';
   document.getElementById('prompt').textContent = '';
   document.getElementById('word-chips').innerHTML = '';
 
   renderBtns([
-    { label: 'קודם ➡', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
-    { label: '⬅ הבא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
+    { label: 'קוֹדֵם ➡', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
+    { label: '⬅ hַבָּא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
   ]);
   // Speak the number with the object name
   speak(n.n + '. ' + displayText + ' ! ', 0.8, 1.2);
@@ -677,8 +684,8 @@ function speakEquation() {
   const num1 = parts[0];
   const operator = parts[1];
   const num2 = parts[2];
-  const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
-  speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה ' + challenge.answer, 0.8, 1.2);
+  const operatorWord = operator === '+' ? 'וְעוֹד' : 'פָּחוֹת';
+  speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שָׁוֶה ' + challenge.answer, 0.8, 1.2);
 }
 
 function showCountChallenge() {
@@ -698,7 +705,7 @@ function showCountChallenge() {
 
   document.getElementById('word-display').textContent = '';
   document.getElementById('word-chips').innerHTML   = '';
-  document.getElementById('mode-label').textContent  = 'חשבון וכמויות';
+  document.getElementById('mode-label').textContent  = 'חֶשְׁבּוֹן וְכַמּוּיוֹת';
   document.getElementById('prompt').textContent       = '';
 
   // ── new visual ───────────────────────────────────────────
@@ -729,10 +736,6 @@ function showCountChallenge() {
       `<span class="math-item" style="animation-delay:${(delayOffset + i) * 0.15}s">${emoji}</span>`
     ).join('');
   }
-
-  // restart animation when child taps the picture area
-  pic.onclick = showCountChallenge;
-  pic.innerHTML = '';
 
   if (operator === '+') {
         // Phase 1: two groups with + and a gap between them
@@ -767,8 +770,8 @@ function showCountChallenge() {
 
   // ── your existing nav + speech (unchanged) ───────────────
   renderBtns([
-    { label: 'קודם ➡', fn: () => { if (mathIndex > 0)                        { mathIndex--; showCountChallenge(); } } },
-    { label: '⬅ הבא', fn: () => { if (mathIndex < mathChallenges.length - 1) { mathIndex++; showCountChallenge(); } } },
+    { label: 'קוֹדֵם ➡', fn: () => { if (mathIndex > 0)                        { mathIndex--; showCountChallenge(); } } },
+    { label: '⬅ hַבָּא', fn: () => { if (mathIndex < mathChallenges.length - 1) { mathIndex++; showCountChallenge(); } } },
   ]);
 
   speakEquation();
@@ -778,15 +781,15 @@ function checkCountAnswer(choice) {
   const challenge = mathChallenges[mathIndex];
   
   if (choice === challenge.answer) {
-    document.getElementById('prompt').textContent = '🎉 נכון!';
-    speak('נכון!', 0.85, 1.3);
+    document.getElementById('prompt').textContent = '🎉 נָכוֹן!';
+    speak('נָכוֹן!', 0.85, 1.3);
     setTimeout(() => {
       mathIndex = (mathIndex + 1) % mathChallenges.length;
       showCountChallenge();
     }, 900);
   } else {
-    document.getElementById('prompt').textContent = 'נסה שוב 😉';
-    speak('נסה שוב', 0.8, 1.1);
+    document.getElementById('prompt').textContent = 'נַסֶּה שׁוּב 😉';
+    speak('נַסֶּה שׁוּב', 0.8, 1.1);
     setTimeout(() => { document.getElementById('prompt').textContent = ''; }, 800);
   }
 }
@@ -858,8 +861,8 @@ function nextMixedQuiz() {
       speak(ex.word, 0.75, 1.3);
     };
     document.getElementById('picture').textContent = '';
-    document.getElementById('word-display').textContent = 'באיזו אות מתחילה המילה?';
-    document.getElementById('mode-label').textContent = '⁉️ חידון אותיות';
+    document.getElementById('word-display').textContent = 'בְּאֵיזוֹ אוֹת מַתְחִילָה הַמִּלָּה?';
+    document.getElementById('mode-label').textContent = 'חִידּוֹן אוֹתִיּוֹת';
     document.getElementById('prompt').textContent = '';
 
     const pool = shuffle(letters.filter((_, i) => i !== currentQuizItem.idx)).slice(0, 3).map(x => x.l);
@@ -874,8 +877,8 @@ function nextMixedQuiz() {
     document.getElementById('picture').style.color = '#3f51b5';
     document.getElementById('picture').style.fontSize = '40px';
     document.getElementById('letter-display').textContent = '';
-    document.getElementById('word-display').textContent = 'כמה פריטים יש כאן?';
-    document.getElementById('mode-label').textContent = '⁉️ חידון כמות';
+    document.getElementById('word-display').textContent = 'כַּמָּה פְּרִיטִים יֵשׁ כָּאן?';
+    document.getElementById('mode-label').textContent = 'חִידּוֹן כַּמּוּת';
     document.getElementById('prompt').textContent = '';
 
     const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
@@ -890,8 +893,8 @@ function nextMixedQuiz() {
     document.getElementById('picture').style.color = '#3f51b5';
     document.getElementById('picture').style.fontSize = '50px';
     document.getElementById('letter-display').textContent = '';
-    document.getElementById('word-display').textContent = 'כמה זה?';
-    document.getElementById('mode-label').textContent = '⁉️ חידון חשבון';
+    document.getElementById('word-display').textContent = 'כַּמָּה זֶה?';
+    document.getElementById('mode-label').textContent = 'חִידּוֹן חֶשְׁבּוֹן';
     document.getElementById('prompt').textContent = '';
 
     const options = shuffle([c.answer, c.answer + 1, c.answer - 1, c.answer + 2]
@@ -904,8 +907,8 @@ function nextMixedQuiz() {
     const num1 = parts[0];
     const operator = parts[1];
     const num2 = parts[2];
-    const operatorWord = operator === '+' ? 'ועוד' : 'פחות';
-    speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שווה?', 0.8, 1.2);
+  const operatorWord = operator === '+' ? 'וְעוֹד' : 'פָּחוֹת';
+  speak(num1 + ' ' + operatorWord + ' ' + num2 + ' שָׁוֶה?', 0.8, 1.2);
   }
 
   renderStars();
@@ -920,26 +923,26 @@ function checkQuizAnswer(chosen) {
 
   if (currentQuizItem.type === 'letter') {
     correctAnswer = letters[currentQuizItem.idx].l;
-    confirmationText = 'כמו ' + pickExample(currentQuizItem.idx).word;
+    confirmationText = 'כְּמוֹ ' + pickExample(currentQuizItem.idx).word;
   } else if (currentQuizItem.type === 'number' || currentQuizItem.type === 'count') {
     const c = mathChallenges[currentQuizItem.idx];
     correctAnswer = c.answer;
-    confirmationText = 'התשובה נכונה היא ' + correctAnswer;
+    confirmationText = 'הַתְּשׁוּבָה נְכוֹנָה הִיא ' + correctAnswer;
   } else {
     const c = mathChallenges[currentQuizItem.idx];
     correctAnswer = c.answer;
-    confirmationText = 'התשובה נכונה היא ' + correctAnswer;
+    confirmationText = 'הַתְּשׁוּבָה נְכוֹנָה הִיא ' + correctAnswer;
   }
 
   if (String(chosen) === String(correctAnswer)) {
     quizScore++;
-    document.getElementById('prompt').textContent = '🎉 מצוין! ' + confirmationText;
-    speak('כל הכבוד!', 0.85, 1.4);
+    document.getElementById('prompt').textContent = '🎉 מְצֻיָּן! ' + confirmationText;
+    speak('כָּל הַכָּבוֹד!', 0.85, 1.4);
     renderStars();
     setTimeout(() => { quizIdx++; nextMixedQuiz(); }, 1400);
   } else {
-    document.getElementById('prompt').textContent = '🤔 לא בדיוק, נסה שוב.';
-    speak('נסו שוב', 0.8, 1.1);
+    document.getElementById('prompt').textContent = '🤔 לֹא בְּדִיּוּק, נַסּוּ שׁוּב.';
+    speak('נַסּוּ שׁוּב', 0.8, 1.1);
     setTimeout(() => { answered = false; document.getElementById('prompt').textContent = ''; }, 1000);
   }
 }
@@ -950,13 +953,13 @@ function showCelebration(mode='mixed') {
   document.getElementById('letter-display').style.fontSize = '100px';
   document.getElementById('picture').textContent = '🎉🎊🌟';
 
-  document.getElementById('word-display').textContent = 'כל הכבוד! סיימת חידון מעורב!';
+  document.getElementById('word-display').textContent = 'כָּל הַכָּבוֹד! סִיַּמְתָּ חִידּוֹן מְעֹרָב!';
   document.getElementById('prompt').textContent = 'צברת ' + quizScore + ' נקודות מתוך ' + quizItems.length;
   appState.bestQuizScore = Math.max(appState.bestQuizScore, quizScore);
   saveAppState();
-  speak('איזה יופי! סיימת את כל השאלות!', 0.8, 1.4);
-  renderBtns([{ label: '🔄 שוב', fn: () => { quizScore = 0; startQuiz(); } }]);
-  document.getElementById('mode-label').textContent = 'סיימתם!';
+  speak('אֵיזֶה יֹפִי! סִיַּמְתָּ אֶת כָּל הַשְּׁאֵלוֹת!', 0.8, 1.4);
+  renderBtns([{ label: '🔄 עוֹד פַּעַם', fn: () => { quizScore = 0; startQuiz(); } }]);
+  document.getElementById('mode-label').textContent = 'סִיַּמְתֶּם!';
 }
 
 function renderBtns(defs) {
@@ -991,25 +994,25 @@ let tracePictureIdx = 0;
 // ── TRACE ─────────────────────────────────────────────────────────────
 function showTrace(idx) {
   traceIdx = idx;
-  document.getElementById('mode-label').textContent = 'תרגול בכתיבה';
+  document.getElementById('mode-label').textContent = 'תַּרְגּוּל בִּכְתִיבָה';
   let item, label, speakText;
   if (traceMode === 'letters') {
     item = letters[idx];
-    label = 'צייר את האות: ' + item.l;
-    speakText = 'צייר את האות ' + item.l;
+    label = 'צַיֵּר אֶת הָאוֹת: ' + item.l;
+    speakText = 'צַיֵּר אֶת הָאוֹת ' + item.l;
     document.getElementById('trace-ghost').textContent = item.l;
     document.getElementById('trace-ghost').style.color = item.color;
   } else if (traceMode === 'numbers') {
     item = numbers[idx];
-    label = 'צייר את המספר: ' + item.n;
-    speakText = 'צייר את המספר ' + item.n;
+    label = 'צַיֵּר אֶת הַמִּסְפָּר: ' + item.n;
+    speakText = 'צַיֵּר אֶת הַמִּסְפָּר ' + item.n;
     document.getElementById('trace-ghost').textContent = item.n;
     document.getElementById('trace-ghost').style.color = item.color;
   } else {
     // Pictures mode
     item = allPictures[idx];
-    label = 'צייר את התמונה: ' + item.pic + ' (' + item.word + ')';
-    speakText = 'צייר את ' + item.word;
+    label = 'צַיֵּר אֶת הַתְּמוּנָה: ' + item.pic + ' (' + item.word + ')';
+    speakText = 'צַיֵּר אֶת ' + item.word;
     document.getElementById('trace-ghost').textContent = item.pic;
     document.getElementById('trace-ghost').style.fontSize = 'clamp(120px, 40vw, 190px)';
     document.getElementById('trace-ghost').style.color = item.color || '#333';
@@ -1136,24 +1139,54 @@ function setTraceMode(mode) {
 
 // ── MEMORY GAME ───────────────────────────────────────────────────────
 function startMemory() {
-  document.getElementById('mode-label').textContent = 'משחק הזיכרון התחיל';
+  document.getElementById('mode-label').textContent = 'מִשְׂחָק הַזִּכָּרוֹן הִתְחִיל';
   memFlipped = []; memPairs = 0; memMoves = 0; memLock = false;
 
-  const allItems = letters.map(l => {
-    const ex = pickExample(letters.indexOf(l));
-    return { kind: 'letter', id: l.l, display: l.l, color: l.color, pic: ex.pic, word: ex.word };
+  // Create pool of items: letters, numbers, and pictures (emojis)
+  const itemPool = [];
+  
+  // Add some letters
+  const letterIndices = shuffle([...Array(letters.length).keys()]).slice(0, 5);
+  letterIndices.forEach(i => {
+    itemPool.push({ id: 'l_' + letters[i].l, display: letters[i].l, color: letters[i].color, category: 'letter' });
   });
+  
+  // Add some numbers
+  const numberIndices = shuffle([...Array(numbers.length).keys()]).slice(0, 5);
+  numberIndices.forEach(i => {
+    itemPool.push({ id: 'n_' + numbers[i].n, display: numbers[i].n, color: numbers[i].color, category: 'number' });
+  });
+  
+  // Add some pictures (emojis from letters examples)
+  const usedPics = new Set();
+  const shuffledLetters = shuffle([...letters]);
+  for (const l of shuffledLetters) {
+    if (itemPool.length >= 13) break;
+    const ex = l.examples[0];
+    if (!usedPics.has(ex.pic)) {
+      usedPics.add(ex.pic);
+      itemPool.push({ id: 'p_' + ex.pic, display: ex.pic, color: l.color, category: 'picture' });
+    }
+  }
 
-  const chosen = shuffle(allItems).slice(0, 8);
+  // For 5x5 grid we need 12 pairs + 1 single card = 25 cards
+  // Select 12 items and create pairs, plus 1 extra single card
+  const chosen = shuffle(itemPool).slice(0, 12);
   const pairs = [];
-
+  
   chosen.forEach(item => {
-    pairs.push({ id: item.id, display: item.display, color: item.color, type: 'letter', word: item.word });
-    pairs.push({ id: item.id, display: item.pic, color: item.color, type: 'pic', word: item.word });
+    pairs.push({ id: item.id, display: item.display, color: item.color, category: item.category });
+    pairs.push({ id: item.id, display: item.display, color: item.color, category: item.category });
   });
+  
+  // Add 1 more single card to make it 25 (5x5)
+  const extraItem = shuffle(itemPool.filter(it => !chosen.includes(it))).slice(0, 1)[0];
+  if (extraItem) {
+    pairs.push({ id: extraItem.id, display: extraItem.display, color: extraItem.color, category: extraItem.category });
+  }
 
   memCards = shuffle(pairs).map((c, i) => ({ ...c, idx: i, flipped: false, matched: false }));
-  document.getElementById('mem-score').textContent = 'מצאו את כל הזוגות! 🔍 (8 זוגות)';
+  document.getElementById('mem-score').textContent = 'מִצְאוּ אֶת כָּל הַזּוּגוֹת! 🔍 (12 זוּגוֹת)';
   renderMemory();
 }
 
@@ -1163,10 +1196,17 @@ function renderMemory() {
   memCards.forEach((c, i) => {
     const div = document.createElement('div');
     div.className = 'mem-card' + (c.flipped||c.matched ? ' flipped' : '') + (c.matched ? ' matched' : '');
-    div.style.fontSize = c.type === 'letter' ? '32px' : '34px';
+    // Adjust font size based on content type
+    if (c.category === 'letter') {
+      div.style.fontSize = 'clamp(24px, 5vw, 36px)';
+    } else if (c.category === 'number') {
+      div.style.fontSize = 'clamp(28px, 6vw, 40px)';
+    } else {
+      div.style.fontSize = 'clamp(28px, 6vw, 40px)';
+    }
     if (c.flipped || c.matched) {
       div.textContent = c.display;
-      if (c.type === 'letter') div.style.color = c.color;
+      div.style.color = c.color;
     } else {
       div.textContent = '?';
       div.style.color = '#ccc';
@@ -1181,10 +1221,20 @@ function flipCard(i) {
   memCards[i].flipped = true;
   memFlipped.push(i);
   renderMemory();
-  if (memCards[i].type === 'letter') {
-    speak(memCards[i].id, 0.8, 1.3);
-  } else { // It's a pic
-    speak(memCards[i].word, 0.8, 1.3);
+  
+  // Speak the content
+  const card = memCards[i];
+  if (card.category === 'letter') {
+    speak(card.display, 0.8, 1.3);
+  } else if (card.category === 'number') {
+    speak(String(card.display), 0.8, 1.2);
+  } else {
+    // For pictures, find the Hebrew word
+    const letter = letters.find(l => l.examples.some(e => e.pic === card.display));
+    if (letter) {
+      const ex = letter.examples.find(e => e.pic === card.display);
+      if (ex) speak(ex.word, 0.8, 1.3);
+    }
   }
 
   if (memFlipped.length === 2) {
@@ -1194,18 +1244,18 @@ function flipCard(i) {
       memCards[a].matched = memCards[b].matched = true;
       memPairs++;
       memFlipped = []; memLock = false;
-      speak('כל הכבוד! זוג!', 0.85, 1.4);
-      document.getElementById('mem-score').textContent = 'זוגות: ' + memPairs + '/8 | מהלכים: ' + memMoves;
+      speak('כָּל הַכָּבוֹד! זוּג!', 0.85, 1.4);
+      document.getElementById('mem-score').textContent = 'זוּגוֹת: ' + memPairs + '/12 | מַהֲלָכִים: ' + memMoves;
       renderMemory();
-      if (memPairs === 8) setTimeout(() => {
-        speak('מדהים! מצאת את כל הזוגות!', 0.8, 1.4);
-        document.getElementById('mem-score').textContent = '🏆 מעולה! ' + memMoves + ' מהלכים בסך הכל!';
+      if (memPairs === 12) setTimeout(() => {
+        speak('מַדְהִים! מָצָאתָ אֶת כָּל הַזּוּגוֹת!', 0.8, 1.4);
+        document.getElementById('mem-score').textContent = '🏆 מְעֻלֶּה! ' + memMoves + ' מַהֲלָכִים בְּסֵךְ הַכֹּל!';
       }, 400);
     } else {
       setTimeout(() => {
         memCards[a].flipped = memCards[b].flipped = false;
         memFlipped = []; memLock = false;
-        document.getElementById('mem-score').textContent = 'נסו שוב! מהלכים: ' + memMoves;
+        document.getElementById('mem-score').textContent = 'נַסּוּ שׁוּב! מַהֲלָכִים: ' + memMoves;
         renderMemory();
       }, 900);
     }
