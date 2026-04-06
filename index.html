@@ -640,7 +640,7 @@ function showNumber(idx) {
 
   renderBtns([
     { label: 'קוֹדֵם ➡', fn: () => { if(numberIndex>0) showNumber(numberIndex-1); } },
-    { label: '⬅ hַבָּא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
+    { label: '⬅ הַבָּא', fn: () => { if(numberIndex<numbers.length-1) showNumber(numberIndex+1); } },
   ]);
   // Speak the number with the object name
   speak(n.n + '. ' + displayText + ' ! ', 0.8, 1.2);
@@ -771,7 +771,7 @@ function showCountChallenge() {
   // ── your existing nav + speech (unchanged) ───────────────
   renderBtns([
     { label: 'קוֹדֵם ➡', fn: () => { if (mathIndex > 0)                        { mathIndex--; showCountChallenge(); } } },
-    { label: '⬅ hַבָּא', fn: () => { if (mathIndex < mathChallenges.length - 1) { mathIndex++; showCountChallenge(); } } },
+    { label: '⬅ הַבָּא', fn: () => { if (mathIndex < mathChallenges.length - 1) { mathIndex++; showCountChallenge(); } } },
   ]);
 
   speakEquation();
@@ -868,7 +868,7 @@ function nextMixedQuiz() {
     const pool = shuffle(letters.filter((_, i) => i !== currentQuizItem.idx)).slice(0, 3).map(x => x.l);
     const choices = shuffle([d.l, ...pool]);
     renderBtns(choices.map(ch => ({ label: ch, fn: () => checkQuizAnswer(ch), big: true })));
-    speak('באיזו אות מתחילה המילה ' + ex.word + '?', 0.8, 1.2);
+    speak('בְּאֵיזוֹ אוֹת מַתְחִילָה הַמִּלָּה ' + ex.word + '?', 0.8, 1.2);
 
   } else if (currentQuizItem.type === 'number') {
     const c = mathChallenges[currentQuizItem.idx];
@@ -885,7 +885,7 @@ function nextMixedQuiz() {
       .map(n => Math.max(1, Math.min(30, n)))
       .filter((v, i, a) => a.indexOf(v) === i));
     renderBtns(options.map(n => ({ label: String(n), fn: () => checkQuizAnswer(n), big: true })));
-    speak('כמה פריטים יש כאן?', 0.8, 1.2);
+    speak('כַּמָּה פְּרִיטִים יֵשׁ כָּאן?', 0.8, 1.2);
 
   } else if (currentQuizItem.type === 'math') {
     const c = mathChallenges[currentQuizItem.idx];
@@ -937,7 +937,7 @@ function checkQuizAnswer(chosen) {
   if (String(chosen) === String(correctAnswer)) {
     quizScore++;
     document.getElementById('prompt').textContent = '🎉 מְצֻיָּן! ' + confirmationText;
-    speak('כָּל הַכָּבוֹד!', 0.85, 1.4);
+    speak('כֹּל הַכָּבוֹד!', 0.85, 1.4);
     renderStars();
     setTimeout(() => { quizIdx++; nextMixedQuiz(); }, 1400);
   } else {
