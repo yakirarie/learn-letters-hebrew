@@ -104,7 +104,7 @@
 
     #memory-section { display: none; }
     #memory-section.visible { display: block; }
-    .memory-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--gap-sm); margin: 0.5rem auto; max-width: min(500px, 90vw); }
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-sm); margin: 0.5rem auto; max-width: min(500px, 90vw); }
     .mem-card {
       aspect-ratio: 1; border-radius: 12px; border: 2px solid #ddd; background: #fff;
       display: flex; align-items: center; justify-content: center; font-size: clamp(20px, 5vw, 32px); font-weight: 700;
@@ -143,7 +143,7 @@
 
     /* Small phones in portrait */
     @media (max-width: 320px) {
-      .memory-grid { grid-template-columns: repeat(5, 1fr); gap: 3px; }
+      .memory-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; }
       .mem-card { min-height: 40px; font-size: 20px; border-radius: 8px; }
       .color-dot { width: 26px; height: 26px; }
     }
@@ -1169,21 +1169,15 @@ function startMemory() {
     }
   }
 
-  // For 5x5 grid we need 12 pairs + 1 single card = 25 cards
-  // Select 12 items and create pairs, plus 1 extra single card
-  const chosen = shuffle(itemPool).slice(0, 12);
+  // For 4x5 grid we need 10 pairs = 20 cards
+  // Select 10 items and create pairs
+  const chosen = shuffle(itemPool).slice(0, 10);
   const pairs = [];
   
   chosen.forEach(item => {
     pairs.push({ id: item.id, display: item.display, color: item.color, category: item.category });
     pairs.push({ id: item.id, display: item.display, color: item.color, category: item.category });
   });
-  
-  // Add 1 more single card to make it 25 (5x5)
-  const extraItem = shuffle(itemPool.filter(it => !chosen.includes(it))).slice(0, 1)[0];
-  if (extraItem) {
-    pairs.push({ id: extraItem.id, display: extraItem.display, color: extraItem.color, category: extraItem.category });
-  }
 
   memCards = shuffle(pairs).map((c, i) => ({ ...c, idx: i, flipped: false, matched: false }));
   document.getElementById('mem-score').textContent = 'מִצְאוּ אֶת כָּל הַזּוּגוֹת! 🔍 (12 זוּגוֹת)';
@@ -1244,11 +1238,11 @@ function flipCard(i) {
       memCards[a].matched = memCards[b].matched = true;
       memPairs++;
       memFlipped = []; memLock = false;
-      speak('כָּל הַכָּבוֹד! זוּג!', 0.85, 1.4);
-      document.getElementById('mem-score').textContent = 'זוּגוֹת: ' + memPairs + '/12 | מַהֲלָכִים: ' + memMoves;
+      speak('כֹּל הַכָּבוֹד! זוּג!', 0.85, 1.4);
+      document.getElementById('mem-score').textContent = 'זוּגוֹת: ' + memPairs + '/10 | מַהֲלָכִים: ' + memMoves;
       renderMemory();
-      if (memPairs === 12) setTimeout(() => {
-        speak('מַדְהִים! מָצָאתָ אֶת כָּל הַזּוּגוֹת!', 0.8, 1.4);
+      if (memPairs === 10) setTimeout(() => {
+        speak('מַדְהִים! מָצָאתָ אֶת כֹּל הַזּוּגוֹת!', 0.8, 1.4);
         document.getElementById('mem-score').textContent = '🏆 מְעֻלֶּה! ' + memMoves + ' מַהֲלָכִים בְּסֵךְ הַכֹּל!';
       }, 400);
     } else {
