@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>לומדים עברית</title>
+  <link rel="manifest" href="/learn-letters-hebrew/assets/manifest-swBYS_cG.json">
+  <meta name="theme-color" content="#2196F3">
+  <link rel="apple-touch-icon" href="/learn-letters-hebrew/assets/icon-CJ_z1t0r.png">
+  <script type="module" crossorigin src="/learn-letters-hebrew/assets/main-CQRaI62_.js"></script>
+  <link rel="stylesheet" crossorigin href="/learn-letters-hebrew/assets/main-D0L_LPrr.css">
+</head>
+<body>
+<div id="app">
+  <h1>לוֹמְדִים עִבְרִית 📖</h1>
+  <button id="sound-toggle" class="tab-btn" aria-label="Toggle sound" aria-pressed="true">🔊</button>
+  <div id="update-banner" style="display:none;">
+    גִּרְסָה חֲדָשָׁה זְמִינָה. <button id="refresh-btn" class="tab-btn" style="font-size:13px; padding:5px 10px;">טְעַן מֵחָדָשׁ</button>
+  </div>
+
+  <div class="tabs learning-tabs" id="learning-tabs" role="tablist" aria-label="Learning modes">
+    <button class="tab-btn active" data-target="learn" onclick="switchTab('learn')" role="tab" aria-selected="true" aria-controls="main-display">📚 אוֹתִיּוֹת</button>
+    <button class="tab-btn" data-target="numbers" onclick="switchTab('numbers')" role="tab" aria-selected="false" aria-controls="main-display">🔢 מִסְפָּרִים</button>
+    <button class="tab-btn" data-target="math" onclick="switchTab('math')" role="tab" aria-selected="false" aria-controls="main-display">חֶשְׁבּוֹן ➕➖</button>
+  </div>
+  <div class="tabs games-tabs" id="games-tabs" role="tablist" aria-label="Game modes">
+    <button class="tab-btn" data-target="quiz" onclick="switchTab('quiz')" role="tab" aria-selected="false" aria-controls="main-display">🎮 חִידּוֹן</button>
+    <button class="tab-btn" data-target="trace" onclick="switchTab('trace')" role="tab" aria-selected="false" aria-controls="trace-section">✏️ כְּתִיבָה</button>
+    <button class="tab-btn" data-target="memory" onclick="switchTab('memory')" role="tab" aria-selected="false" aria-controls="memory-section">🃏 זִכָּרוֹן</button>
+  </div>
+
+  <div id="mode-label"></div>
+  <div class="star-row" id="stars"></div>
+  <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+  <div id="main-display" role="region" aria-live="polite">
+    <div id="letter-display" onclick="onLetterTap()" tabindex="0" role="button" aria-label="Tap to hear pronunciation"></div>
+    <div id="picture" aria-hidden="true"></div>
+    <div id="word-display" aria-live="polite"></div>
+    <div class="word-chips" id="word-chips" role="group" aria-label="Example words"></div>
+    <div id="prompt" role="status" aria-live="polite"></div>
+    <div class="btn-row" id="btn-row" role="group" aria-label="Navigation buttons"></div>
+  </div>
+
+    <div id="trace-section" role="region" aria-label="Tracing practice">
+      <div id="trace-letter-label" style="font-size:20px;font-weight:700;color:#333;margin:0.3rem 0;" aria-live="polite"></div>
+      <!-- Mode selection buttons (top) -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom:8px;" role="group" aria-label="Tracing mode">
+        <button class="tap-btn" onclick="setTraceMode('letters')" style="padding:6px 16px;font-size:14px;" aria-pressed="true">📚 אוֹתִיּוֹת</button>
+        <button class="tap-btn" onclick="setTraceMode('numbers')" style="padding:6px 16px;font-size:14px;" aria-pressed="false">🔢 מִסְפָּרִים</button>
+        <button class="tap-btn" onclick="setTraceMode('pictures')" style="padding:6px 16px;font-size:14px;" aria-pressed="false">🖼️ תְמוּנוֹת</button>
+      </div>
+      <!-- Canvas -->
+      <div id="trace-wrap">
+        <div id="trace-ghost" aria-hidden="true"></div>
+        <canvas id="traceCanvas" aria-label="Drawing canvas for tracing practice" tabindex="0"></canvas>
+      </div>
+      <!-- Color palette -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin:8px 0;" role="group" aria-label="Color palette">
+        <div class="color-dot selected" style="background:#2196F3" onclick="setColor('#2196F3',this)" role="button" tabindex="0" aria-label="Blue color selected"></div>
+        <div class="color-dot" style="background:#E84040" onclick="setColor('#E84040',this)" role="button" tabindex="0" aria-label="Red color"></div>
+        <div class="color-dot" style="background:#4CAF50" onclick="setColor('#4CAF50',this)" role="button" tabindex="0" aria-label="Green color"></div>
+        <div class="color-dot" style="background:#FF9800" onclick="setColor('#FF9800',this)" role="button" tabindex="0" aria-label="Orange color"></div>
+        <div class="color-dot" style="background:#9C27B0" onclick="setColor('#9C27B0',this)" role="button" tabindex="0" aria-label="Purple color"></div>
+        <div class="color-dot" style="background:#E91E63" onclick="setColor('#E91E63',this)" role="button" tabindex="0" aria-label="Pink color"></div>
+        <div class="color-dot" style="background:#00BCD4" onclick="setColor('#00BCD4',this)" role="button" tabindex="0" aria-label="Cyan color"></div>
+        <div class="color-dot" style="background:#FFD600" onclick="setColor('#FFD600',this)" role="button" tabindex="0" aria-label="Yellow color"></div>
+        <div class="color-dot" style="background:#795548" onclick="setColor('#795548',this)" role="button" tabindex="0" aria-label="Brown color"></div>
+        <div class="color-dot" style="background:#607D8B" onclick="setColor('#607D8B',this)" role="button" tabindex="0" aria-label="Blue gray color"></div>
+        <div class="color-dot" style="background:#FF7043" onclick="setColor('#FF7043',this)" role="button" tabindex="0" aria-label="Deep orange color"></div>
+        <div class="color-dot" style="background:#222222" onclick="setColor('#222222',this)" role="button" tabindex="0" aria-label="Black color"></div>
+      </div>
+      <!-- Navigation buttons -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" role="group" aria-label="Canvas controls">
+        <button class="tap-btn" onclick="clearTrace()" style="padding:6px 16px;font-size:14px;">🗑️ נַקֵּה</button>
+        <button class="tap-btn" onclick="tracePrev()" style="padding:6px 16px;font-size:14px;">קוֹדֵם ➡</button>
+        <button class="tap-btn" onclick="traceNext()" style="padding:6px 16px;font-size:14px;">⬅ הַבָּא</button>
+      </div>
+  </div>
+
+  <div id="memory-section" role="region" aria-label="Memory game">
+    <div id="mem-score" aria-live="polite"></div>
+    <div class="memory-grid" id="memory-grid" role="grid" aria-label="Memory cards"></div>
+    <div class="btn-row" style="margin-top:0.5rem;">
+      <button class="tap-btn" onclick="startMemory()">🔄 מִשְׂחָק חָדָשׁ</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
