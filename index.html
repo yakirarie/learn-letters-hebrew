@@ -8,40 +8,41 @@
   <meta name="theme-color" content="#2196F3">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3409/3409040.png">
   <style>
-    /* CSS Custom Properties for responsive design */
+    /* CSS Custom Properties - toddler-friendly sizes */
     :root {
       --app-max-width: 100%;
-      --letter-size: clamp(80px, 18vw, 220px);
-      --word-size: clamp(18px, 3.5vw, 42px);
-      --picture-size: clamp(36px, 8vw, 48px);
-      --btn-font-size: clamp(13px, 2.5vw, 18px);
-      --tab-font-size: clamp(11px, 2vw, 15px);
-      --tab-padding: 6px 10px;
+      --letter-size: clamp(100px, 22vw, 260px);
+      --word-size: clamp(22px, 4vw, 48px);
+      --picture-size: clamp(44px, 10vw, 60px);
+      --btn-font-size: clamp(16px, 3vw, 22px);
+      --tab-font-size: clamp(14px, 2.8vw, 18px);
+      --tab-padding: 10px 16px;
       --app-padding: clamp(0.5rem, 2vw, 1rem);
-      --gap-sm: clamp(4px, 1vw, 10px);
-      --gap-md: clamp(6px, 1.5vw, 14px);
-      --gap-lg: clamp(8px, 2vw, 16px);
+      --gap-sm: clamp(6px, 1.5vw, 12px);
+      --gap-md: clamp(10px, 2vw, 18px);
+      --gap-lg: clamp(12px, 2.5vw, 20px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; -webkit-text-size-adjust: 100%; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff9f0; direction: rtl; -webkit-tap-highlight-color: transparent; min-height: 100vh; overflow-x: hidden; }
     #app { padding: var(--app-padding); text-align: center; max-width: var(--app-max-width); margin: 0 auto; width: 100%; }
-    h1 { font-size: clamp(16px, 4vw, 20px); font-weight: 700; color: #333; margin-bottom: 0.2rem; line-height: 1.3; }
+    h1 { font-size: clamp(20px, 5vw, 28px); font-weight: 700; color: #333; margin-bottom: 0.3rem; line-height: 1.2; }
 
-    .tabs { display: flex; gap: var(--gap-sm); justify-content: center; margin: 0.5rem 0; flex-wrap: wrap; }
-    .learning-tabs { margin-bottom: 0.3rem; }
-    .games-tabs { margin-top: 0.3rem; border-top: 1px solid #eee; padding-top: 0.5rem; }
+    .tabs { display: flex; gap: var(--gap-sm); justify-content: center; margin: 0.3rem 0; flex-wrap: wrap; }
+    .learning-tabs { margin-bottom: 0.2rem; }
+    .games-tabs { margin-top: 0.2rem; border-top: 1px solid #eee; padding-top: 0.3rem; }
     .tab-btn {
-      font-size: var(--tab-font-size); font-weight: 600; padding: var(--tab-padding); border-radius: 20px;
-      border: 1.5px solid #ddd; background: #fff; color: #666; cursor: pointer;
+      font-size: var(--tab-font-size); font-weight: 600; padding: var(--tab-padding); border-radius: 24px;
+      border: 2px solid #ddd; background: #fff; color: #666; cursor: pointer;
       transition: all 0.15s; font-family: inherit; white-space: nowrap;
-      min-height: 36px; display: flex; align-items: center; justify-content: center;
+      min-height: 52px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     .tab-btn.active { background: #222; color: #fff; border-color: #222; }
 
     #letter-display {
-      font-size: var(--letter-size); font-weight: 700; line-height: 1; margin: 0.05rem 0;
+      font-size: var(--letter-size); font-weight: 700; line-height: 1; margin: 0.1rem 0;
       transition: transform 0.15s; cursor: pointer; display: inline-block; user-select: none;
       word-break: break-all;
     }
@@ -51,167 +52,178 @@
       unicode-bidi: embed;
     }
     #letter-display:active { transform: scale(0.88); }
-    #word-display { font-size: var(--word-size); font-weight: 600; color: #222; margin: 0.05rem 0; min-height: 40px; line-height: 1.4; }
-    #picture { font-size: var(--picture-size); margin: 0.2rem 0; min-height: 80px; line-height: 1.2; word-break: break-all; }
-    #prompt { font-size: clamp(13px, 3vw, 15px); color: #555; margin-bottom: 0.5rem; min-height: 26px; }
-    #mode-label { font-size: clamp(10px, 2.5vw, 12px); color: #aaa; margin-bottom: 0.1rem; letter-spacing: 0.04em; }
+    #word-display { font-size: var(--word-size); font-weight: 600; color: #222; margin: 0.1rem 0; min-height: 30px; line-height: 1.4; }
+    #picture { font-size: var(--picture-size); margin: 0.15rem 0; min-height: 50px; line-height: 1.2; word-break: break-all; }
+    #prompt { font-size: clamp(16px, 3.5vw, 20px); color: #555; margin-bottom: 0.4rem; min-height: 28px; font-weight: 500; }
+    #mode-label { font-size: clamp(12px, 3vw, 14px); color: #888; margin-bottom: 0.15rem; letter-spacing: 0.04em; font-weight: 600; }
 
-    .word-chips { display: flex; gap: var(--gap-sm); flex-wrap: wrap; justify-content: center; margin: 0.3rem 0; }
+    .word-chips { display: flex; gap: var(--gap-sm); flex-wrap: wrap; justify-content: center; margin: 0.25rem 0; }
     .chip {
-      font-size: clamp(13px, 3.5vw, 15px); padding: 5px 14px; border-radius: 20px; border: 1.5px solid #ddd;
-      background: #fff; cursor: pointer; transition: all 0.12s; font-family: inherit; font-weight: 500;
-      min-height: 36px; display: flex; align-items: center; justify-content: center;
+      font-size: clamp(18px, 4vw, 22px); padding: 8px 18px; border-radius: 24px; border: 2px solid #ddd;
+      background: #fff; cursor: pointer; transition: all 0.12s; font-family: inherit; font-weight: 600;
+      min-height: 52px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     .chip:hover { background: #f5f5f5; }
     .chip.active { color: #fff; border-color: transparent; }
 
-    .btn-row { display: flex; gap: var(--gap-md); justify-content: center; flex-wrap: wrap; margin-top: 0.4rem; }
+    .btn-row { display: flex; gap: var(--gap-md); justify-content: center; flex-wrap: wrap; margin-top: 0.3rem; }
     .tap-btn {
-      font-size: var(--btn-font-size); font-weight: 500; padding: 11px 20px; border-radius: 14px;
-      border: 1.5px solid #ddd; background: #fff; color: #222; cursor: pointer;
+      font-size: var(--btn-font-size); font-weight: 600; padding: 14px 28px; border-radius: 18px;
+      border: 2px solid #ddd; background: #fff; color: #222; cursor: pointer;
       transition: background 0.12s, transform 0.1s; font-family: inherit;
-      min-height: 44px; display: flex; align-items: center; justify-content: center;
+      min-height: 56px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
     .tap-btn:hover { background: #f0f0f0; }
     .tap-btn:active { transform: scale(0.96); }
 
-    .star-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 2px; margin: 0.2rem 0; }
-    .star { font-size: clamp(14px, 3.5vw, 16px); transition: transform 0.2s; }
+    .star-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; margin: 0.25rem 0; }
+    .star { font-size: clamp(18px, 4vw, 22px); transition: transform 0.2s; }
     .star.lit { transform: scale(1.3); }
-    #progress-bar-wrap { background: #eee; border-radius: 8px; height: 7px; margin: 0.4rem auto; max-width: 280px; overflow: hidden; width: 90%; }
-    #progress-bar { height: 100%; border-radius: 8px; transition: width 0.4s; }
+    #progress-bar-wrap { background: #eee; border-radius: 10px; height: 12px; margin: 0.4rem auto; max-width: 320px; overflow: hidden; width: 95%; }
+    #progress-bar { height: 100%; border-radius: 10px; transition: width 0.4s; }
 
     #trace-section { display: none; }
     #trace-section.visible { display: block; }
-    #trace-wrap { position: relative; display: inline-block; margin: 0.4rem 0; width: 100%; max-width: min(300px, 80vw); }
+    #trace-wrap { position: relative; display: inline-block; margin: 0.3rem 0; width: 100%; max-width: min(380px, 85vw); }
     #trace-ghost {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
-      font-size: clamp(120px, 40vw, 190px); font-weight: 700; opacity: 0.07; pointer-events: none;
+      font-size: clamp(140px, 45vw, 220px); font-weight: 700; opacity: 0.07; pointer-events: none;
       line-height: 1; user-select: none;
     }
     canvas#traceCanvas {
-      border-radius: 16px; border: 2px dashed #ccc; background: #fffdf8;
+      border-radius: 20px; border: 3px dashed #ccc; background: #fffdf8;
       touch-action: none; cursor: crosshair; display: block;
-      width: 100%; max-width: min(300px, 80vw); aspect-ratio: 1;
+      width: 100%; max-width: min(380px, 85vw); aspect-ratio: 1;
     }
-    .trace-controls { display: flex; gap: var(--gap-md); justify-content: center; margin-top: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .trace-controls { display: flex; gap: var(--gap-md); justify-content: center; margin-top: 0.3rem; flex-wrap: wrap; align-items: center; }
     .color-dot {
-      width: clamp(24px, 6vw, 28px); height: clamp(24px, 6vw, 28px); border-radius: 50%; border: 2px solid transparent;
+      width: clamp(36px, 8vw, 44px); height: clamp(36px, 8vw, 44px); border-radius: 50%; border: 3px solid transparent;
       cursor: pointer; transition: transform 0.12s; flex-shrink: 0;
     }
     .color-dot.selected { border-color: #333; transform: scale(1.25); }
 
     #memory-section { display: none; }
     #memory-section.visible { display: block; }
-    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-sm); margin: 0.5rem auto; max-width: min(500px, 90vw); }
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-sm); margin: 0.4rem auto; max-width: min(600px, 95vw); }
     .mem-card {
-      aspect-ratio: 1; border-radius: 12px; border: 2px solid #ddd; background: #fff;
-      display: flex; align-items: center; justify-content: center; font-size: clamp(20px, 5vw, 32px); font-weight: 700;
+      aspect-ratio: 1; border-radius: 16px; border: 3px solid #ddd; background: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: clamp(28px, 7vw, 42px); font-weight: 700;
       cursor: pointer; transition: all 0.2s; user-select: none;
-      min-height: 50px;
+      min-height: 64px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
     .mem-card.flipped { background: #e8f4ff; border-color: #90caf9; }
     .mem-card.matched { background: #e8f5e9; border-color: #81c784; opacity: 0.75; }
     .mem-card.shake { animation: shake 0.4s; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-    #mem-score { font-size: clamp(13px, 3vw, 15px); color: #555; margin: 0.4rem 0; font-weight: 500; }
+    #mem-score { font-size: clamp(16px, 3.5vw, 20px); color: #555; margin: 0.3rem 0; font-weight: 600; }
 
-    /* Sound toggle button - responsive positioning */
+    /* Sound toggle button - big and reachable for toddlers */
     #sound-toggle {
-      position: fixed; top: clamp(8px, 2vw, 16px); right: clamp(8px, 2vw, 16px); z-index: 1000;
-      width: clamp(40px, 8vw, 52px); height: clamp(40px, 8vw, 52px); padding: 0; font-size: clamp(18px, 4vw, 24px); border-radius: 50%;
+      position: fixed; top: 12px; right: 12px; z-index: 1000;
+      width: 56px; height: 56px; padding: 0; font-size: 28px; border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
     #update-banner {
-      background: #ffeb3b; color: #333; border: 1px solid #fbc02d; border-radius: 10px;
-      padding: 8px 10px; margin: 8px auto; max-width: var(--app-max-width); text-align: center;
+      background: #ffeb3b; color: #333; border: 2px solid #fbc02d; border-radius: 12px;
+      padding: 10px 14px; margin: 8px auto; max-width: var(--app-max-width); text-align: center;
+      font-size: clamp(14px, 3vw, 16px); font-weight: 500;
     }
 
-    /* Responsive adjustments for very small screens */
+    /* Very small phones */
     @media (max-width: 360px) {
-      :root {
-        --app-padding: 0.4rem;
-      }
+      :root { --app-padding: 0.4rem; }
       .tabs { gap: 4px; }
-      .tab-btn { font-size: 10px; padding: 5px 8px; min-height: 32px; }
-      #sound-toggle { width: 38px; height: 38px; top: 6px; right: 6px; font-size: 16px; }
-      h1 { font-size: 14px; }
-      .memory-grid { gap: 4px; grid-template-columns: repeat(4, 1fr); }
-      .mem-card { min-height: 45px; font-size: 24px; }
+      .tab-btn { font-size: 12px; padding: 6px 10px; min-height: 44px; }
+      #sound-toggle { width: 48px; height: 48px; top: 8px; right: 8px; font-size: 22px; }
+      h1 { font-size: 18px; }
+      .memory-grid { gap: 5px; grid-template-columns: repeat(4, 1fr); }
+      .mem-card { min-height: 56px; font-size: 26px; }
+      .color-dot { width: 32px; height: 32px; }
     }
 
-    /* Small phones in portrait */
-    @media (max-width: 320px) {
-      .memory-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; }
-      .mem-card { min-height: 40px; font-size: 20px; border-radius: 8px; }
-      .color-dot { width: 26px; height: 26px; }
+    /* Toddler tablet breakpoint - the sweet spot for kids */
+    @media (min-width: 600px) {
+      :root {
+        --letter-size: clamp(120px, 20vw, 280px);
+        --word-size: clamp(26px, 4vw, 52px);
+        --picture-size: clamp(52px, 9vw, 72px);
+        --btn-font-size: clamp(20px, 3vw, 26px);
+        --tab-font-size: clamp(18px, 2.5vw, 22px);
+      }
+      .tab-btn { min-height: 64px; padding: 12px 22px; border-radius: 28px; }
+      .tap-btn { min-height: 68px; padding: 16px 32px; border-radius: 20px; }
+      .chip { min-height: 64px; padding: 10px 22px; font-size: clamp(22px, 4vw, 28px); }
+      .memory-grid { grid-template-columns: repeat(5, 1fr); gap: 14px; max-width: min(700px, 90vw); }
+      .mem-card { min-height: 90px; font-size: clamp(32px, 6vw, 48px); border-radius: 18px; border-width: 3px; }
+      #sound-toggle { width: 68px; height: 68px; font-size: 32px; top: 14px; right: 14px; }
+      canvas#traceCanvas { max-width: min(420px, 60vw); }
+      #trace-wrap { max-width: min(420px, 60vw); }
+      #trace-ghost { font-size: clamp(160px, 35vw, 240px); }
+      .color-dot { width: 48px; height: 48px; }
     }
 
-    /* Tablet and larger screens */
+    /* Large tablets and desktops */
     @media (min-width: 768px) {
-      :root {
-        --app-max-width: 100%;
-      }
+      :root { --app-max-width: 100%; }
       #app { padding: 1rem 2rem; }
-      .memory-grid { gap: 14px; max-width: min(700px, 85vw); margin: 0.5rem auto; }
-      .mem-card { min-height: 70px; font-size: clamp(24px, 4vw, 36px); }
-      canvas#traceCanvas { max-width: min(400px, 70vw); }
-      #trace-ghost { font-size: clamp(150px, 30vw, 220px); }
+      .memory-grid { gap: 16px; max-width: min(800px, 85vw); }
+      .mem-card { min-height: 100px; font-size: clamp(36px, 5vw, 52px); }
+      canvas#traceCanvas { max-width: min(450px, 55vw); }
+      #trace-wrap { max-width: min(450px, 55vw); }
+      #trace-ghost { font-size: clamp(180px, 30vw, 260px); }
     }
 
-    /* Desktop screens */
     @media (min-width: 1024px) {
-      :root {
-        --app-max-width: 100%;
-      }
-      body { display: flex; justify-content: center; align-items: flex-start; padding-top: 2rem; }
-      #app { max-width: 800px; }
-      .memory-grid { max-width: 700px; }
+      :root { --app-max-width: 100%; }
+      body { display: flex; justify-content: center; align-items: flex-start; padding-top: 1rem; }
+      #app { max-width: 900px; }
+      .memory-grid { max-width: 800px; }
       canvas#traceCanvas { max-width: 500px; }
+      #trace-wrap { max-width: 500px; }
     }
 
-    /* Landscape orientation adjustments - phones */
-    @media (max-height: 500px) and (orientation: landscape) {
-      #app { padding: 0.3rem 0.5rem; }
-      h1 { margin-bottom: 0.1rem; font-size: 14px; }
-      #letter-display { font-size: clamp(50px, 12vw, 80px); margin: 0.02rem 0; }
-      #picture { font-size: clamp(30px, 7vw, 45px); margin: 0.05rem 0; min-height: 40px; }
-      #word-display { font-size: clamp(14px, 3.5vw, 20px); margin: 0.02rem 0; min-height: 26px; }
-      .tabs { margin: 0.2rem 0; gap: 3px; }
-      .learning-tabs { margin-bottom: 0.15rem; }
-      .games-tabs { margin-top: 0.15rem; padding-top: 0.2rem; }
-      .tab-btn { font-size: 10px; padding: 4px 8px; min-height: 28px; }
-      canvas#traceCanvas { max-width: 200px; }
-      #trace-ghost { font-size: 130px; }
-      .memory-grid { gap: 4px; }
-      .mem-card { min-height: 40px; font-size: 22px; }
-      #sound-toggle { width: 36px; height: 36px; top: 5px; right: 5px; font-size: 16px; }
+    /* Landscape on any device - proper support */
+    @media (orientation: landscape) and (max-height: 600px) {
+      #app { padding: 0.4rem 1rem; }
+      h1 { margin-bottom: 0.1rem; font-size: clamp(16px, 3vw, 20px); }
+      #letter-display { font-size: clamp(60px, 14vw, 100px); margin: 0.05rem 0; }
+      #picture { font-size: clamp(36px, 8vw, 52px); margin: 0.1rem 0; min-height: 40px; }
+      #word-display { font-size: clamp(16px, 4vw, 24px); margin: 0.05rem 0; min-height: 28px; }
+      .tabs { margin: 0.2rem 0; gap: 6px; }
+      .learning-tabs { margin-bottom: 0.1rem; }
+      .games-tabs { margin-top: 0.1rem; padding-top: 0.2rem; }
+      .tab-btn { font-size: clamp(12px, 2.5vw, 14px); padding: 6px 12px; min-height: 44px; }
+      .tap-btn { min-height: 48px; padding: 10px 20px; }
+      .chip { min-height: 48px; padding: 6px 14px; }
+      canvas#traceCanvas { max-width: min(260px, 45vh); }
+      #trace-wrap { max-width: min(260px, 45vh); }
+      #trace-ghost { font-size: clamp(120px, 30vh, 160px); }
+      .memory-grid { gap: 6px; max-width: min(500px, 70vw); }
+      .mem-card { min-height: 52px; font-size: clamp(22px, 5vw, 30px); }
+      #sound-toggle { width: 48px; height: 48px; top: 8px; right: 8px; font-size: 22px; }
     }
 
-    /* Landscape orientation - tablets */
-    @media (min-width: 768px) and (orientation: landscape) {
-      #app { padding: 0.5rem 1.5rem; max-width: 900px; }
-      h1 { font-size: clamp(16px, 2vw, 22px); }
-      #letter-display { font-size: clamp(80px, 12vw, 140px); }
-      #picture { font-size: clamp(36px, 6vw, 56px); }
-      #word-display { font-size: clamp(18px, 2.5vw, 32px); }
-      canvas#traceCanvas { max-width: min(350px, 50vw); height: auto; }
-      #trace-ghost { font-size: clamp(140px, 25vw, 200px); }
-      .memory-grid { max-width: min(600px, 80vw); gap: 12px; }
-      .mem-card { min-height: 60px; font-size: clamp(22px, 3.5vw, 30px); }
+    /* Landscape on tablets - keep 5 columns so 20 cards fill evenly (4 rows × 5) */
+    @media (orientation: landscape) and (min-width: 600px) {
+      .memory-grid { grid-template-columns: repeat(5, 1fr); }
     }
 
     /* Portrait orientation optimizations */
     @media (orientation: portrait) {
       #app { padding-bottom: 1rem; }
-      .memory-grid { max-width: min(550px, 90vw); margin: 0.5rem auto; }
+      .memory-grid { max-width: min(600px, 95vw); margin: 0.4rem auto; }
     }
 
-    /* Ensure touch targets are at least 44px for accessibility */
+    /* Coarse pointer (touch screens) - always big targets */
     @media (pointer: coarse) {
-      .tab-btn, .tap-btn, .chip { min-height: 44px; }
-      .color-dot { width: 32px; height: 32px; }
+      .tab-btn, .tap-btn, .chip { min-height: 56px; }
+      .color-dot { width: 44px; height: 44px; }
+      #sound-toggle { width: 60px; height: 60px; }
     }
   </style>
 </head>
@@ -258,7 +270,7 @@
       <!-- Canvas -->
       <div id="trace-wrap">
         <div id="trace-ghost"></div>
-        <canvas id="traceCanvas" width="300" height="300"></canvas>
+        <canvas id="traceCanvas"></canvas>
       </div>
       <!-- Color palette -->
       <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin:8px 0;">
@@ -1036,34 +1048,31 @@ function setTraceMode(mode) {
   const ctx = canvas.getContext('2d');
   let drawing = false, lx = 0, ly = 0;
 
-  // Set fixed canvas size that matches the HTML attributes
-  // The canvas has width="300" height="300" in HTML, so we use that as base
-  function initCanvas() {
-    // Ensure canvas has proper size
-    if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = 300;
-      canvas.height = 300;
-    }
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    // Set internal canvas resolution to match CSS size × DPR for crisp drawing
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.scale(dpr, dpr);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = traceColor;
     ctx.lineWidth = 11;
   }
 
-  initCanvas();
+  // Initial sizing
+  resizeCanvas();
+  // Re-size on rotation / resize so drawing stays crisp
+  window.addEventListener('resize', resizeCanvas);
 
-  // Get position relative to canvas, accounting for CSS scaling
+  // Get position relative to canvas in CSS pixels (drawing is scaled via ctx.scale)
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     const src = e.touches ? e.touches[0] : e;
-
-    // Calculate the scale between CSS pixels and canvas pixels
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
     return {
-      x: (src.clientX - rect.left) * scaleX,
-      y: (src.clientY - rect.top) * scaleY
+      x: src.clientX - rect.left,
+      y: src.clientY - rect.top
     };
   }
 
@@ -1091,8 +1100,6 @@ function setTraceMode(mode) {
     ctx.lineTo(p.x, p.y);
     ctx.strokeStyle = traceColor;
     ctx.lineWidth = 11;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
     ctx.stroke();
 
     lx = p.x;
@@ -1235,6 +1242,20 @@ function flipCard(i) {
     }
   }
 }
+
+// Handle screen rotation / resize by re-rendering the active tab
+let _resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimeout);
+  _resizeTimeout = setTimeout(() => {
+    if (tab === 'learn') showLearn(current);
+    else if (tab === 'numbers') showNumber(numberIndex);
+    else if (tab === 'math') showCountChallenge();
+    else if (tab === 'quiz') nextMixedQuiz();
+    else if (tab === 'trace') showTrace(traceIdx);
+    else if (tab === 'memory') renderMemory();
+  }, 150);
+});
 
 loadAppState();
 setSoundEnabled(appState.soundEnabled);

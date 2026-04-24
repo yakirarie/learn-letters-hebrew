@@ -4,6 +4,7 @@
   "description": "An interactive app to learn Hebrew letters, numbers, and games.",
   "start_url": "index.html",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#fff9f0",
   "theme_color": "#2196F3",
   "icons": [
