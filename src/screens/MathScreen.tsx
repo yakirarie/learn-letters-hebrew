@@ -12,6 +12,17 @@ type Challenge = {
 }
 
 const CHALLENGE_COUNT = 15
+
+/**
+ * How long the two groups sit apart before the `+` collapses (addition) or the
+ * subtracted items fade (subtraction).
+ *
+ * The pre-migration app waited 2000ms. For the age this is built for that is a
+ * long stare at a static picture before anything happens; 1400ms still lets a
+ * child read "two groups" without losing them. Change this one constant to
+ * retune - the 700ms transition that follows is separate and unchanged.
+ */
+const SETTLE_DELAY_MS = 1400
 const EMOJIS = ['🍎', '⚽', '🌟', '🐱', '🐸', '🍌', '🦋', '🍓', '🐠', '🌈']
 
 function shuffle<T>(items: readonly T[]): T[] {
@@ -51,10 +62,17 @@ export function MathScreen() {
   const { speak } = useAppState()
   const [challenges] = useState(makeChallenges)
   const [index, setIndex] = useState(0)
-  // The second half of the animation: the "+" collapses, or the subtracted
-  // items fade away. Driven by a timer that is cleaned up on navigation - the
-  // pre-migration version pushed every timeout onto a global array.
-  const [settled, setSettled] = useState(false)
+  /**
+   * Which challenge has finished animating.
+   *
+   * Tracking the index rather than a bare boolean matters: resetting a boolean
+   * inside the effect leaves one painted frame in which the new challenge is
+   * already shown settled - the subtracted items appear faded before they fade.
+   * Deriving from the index resets during the same render that swaps the
+   * challenge, so the stale frame never exists.
+   */
+  const [settledIndex, setSettledIndex] = useState<number | null>(null)
+  const settled = settledIndex === index
 
   const challenge = challenges[index]
   const { a, b, op, answer } = challenge
@@ -64,14 +82,13 @@ export function MathScreen() {
   speakRef.current = speak
 
   useEffect(() => {
-    setSettled(false)
-    const timer = setTimeout(() => setSettled(true), 2000)
+    const timer = setTimeout(() => setSettledIndex(index), SETTLE_DELAY_MS)
     speakRef.current(`${a} ${operatorWord(op)} ${b} שָׁוֶה ${answer}`, {
       rate: 0.8,
       pitch: 1.2,
     })
     return () => clearTimeout(timer)
-  }, [a, b, op, answer])
+  }, [index, a, b, op, answer])
 
   const sayEquation = () =>
     speak(`${a} ${operatorWord(op)} ${b} שָׁוֶה ${answer}`, {
@@ -103,7 +120,14 @@ export function MathScreen() {
           </MathExpr>
         </p>
 
+        {/*
+          Keyed by index so the node remounts when the challenge changes. Without
+          this, React reuses the elements and the CSS opacity transition runs
+          backwards from the previous challenge's faded state, so the new items
+          visibly fade in instead of simply appearing.
+        */}
         <div
+          key={index}
           className={`flex flex-wrap items-center justify-center transition-[gap] duration-700 ${
             settled && op === '+' ? 'gap-1' : 'gap-4'
           }`}

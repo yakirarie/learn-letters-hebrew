@@ -30,8 +30,11 @@ export function NumbersScreen() {
   const repeat = () =>
     speak(`${datum.n}. ${phrase}`, { rate: 0.8, pitch: 1.2 })
 
-  // Above ~20 the glyphs must shrink or the row overflows its card.
-  const emojiSize = datum.n > 20 ? 'text-base' : datum.n > 10 ? 'text-2xl' : 'text-3xl'
+  // Emoji grow toward the sizes the pre-migration app used (40px / 24px), because
+  // counting is easier when each item is large. Sized down only as far as the
+  // count actually requires: 10 items at 36px wrap to two rows on a phone.
+  const emojiSize =
+    datum.n > 20 ? 'text-xl' : datum.n > 10 ? 'text-2xl' : 'text-4xl'
 
   return (
     <section

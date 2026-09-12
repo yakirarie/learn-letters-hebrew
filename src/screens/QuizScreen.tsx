@@ -123,26 +123,31 @@ export function QuizScreen() {
   const [items, setItems] = useState<QuizItem[]>(buildQuiz)
   const [index, setIndex] = useState(0)
   const [score, setScore] = useState(0)
+  /**
+   * Both of these carry the question index they belong to.
+   *
+   * They used to be plain values reset inside an effect, which left one painted
+   * frame where the next question already showed the previous question's
+   * "well done" message and had its options disabled. Keying them to the index
+   * means they expire during the same render that advances the quiz.
+   */
   const [feedback, setFeedback] = useState<{
+    index: number
     kind: 'correct' | 'wrong'
     text: string
   } | null>(null)
-  /**
-   * Replaces the old mutable `answered` flag. While true the options are
-   * disabled, so a fast double-tap cannot score the same question twice.
-   */
-  const [locked, setLocked] = useState(false)
+  const [lockedIndex, setLockedIndex] = useState<number | null>(null)
 
   const item = items[index]
   const finished = index >= items.length
+  const locked = lockedIndex === index
+  const shownFeedback = feedback?.index === index ? feedback : null
 
   const speakRef = useRef(speak)
   speakRef.current = speak
 
   useEffect(() => {
     if (finished || !item) return
-    setFeedback(null)
-    setLocked(false)
     speakRef.current(item.speech, { rate: 0.8, pitch: 1.2 })
   }, [item, finished])
 
@@ -153,25 +158,24 @@ export function QuizScreen() {
   const answer = useCallback(
     (choice: string) => {
       if (locked || !item) return
-      setLocked(true)
+      setLockedIndex(index)
 
       if (choice === item.answer) {
-        const next = score + 1
-        setScore(next)
-        setFeedback({ kind: 'correct', text: '🎉 מְצֻיָּן!' })
+        setScore((s) => s + 1)
+        setFeedback({ index, kind: 'correct', text: '🎉 מְצֻיָּן!' })
         speakRef.current('כָּל הַכָּבוֹד!', { rate: 0.85, pitch: 1.4 })
         window.setTimeout(() => setIndex((i) => i + 1), 1200)
       } else {
-        setFeedback({ kind: 'wrong', text: '🤔 נַסּוּ שׁוּב' })
+        setFeedback({ index, kind: 'wrong', text: '🤔 נַסּוּ שׁוּב' })
         speakRef.current('נַסּוּ שׁוּב', { rate: 0.8, pitch: 1.1 })
         // Unlock without advancing: the child retries the same question.
         window.setTimeout(() => {
           setFeedback(null)
-          setLocked(false)
+          setLockedIndex(null)
         }, 1100)
       }
     },
-    [locked, item, score],
+    [locked, item, index],
   )
 
   const restart = () => {
@@ -179,7 +183,7 @@ export function QuizScreen() {
     setIndex(0)
     setScore(0)
     setFeedback(null)
-    setLocked(false)
+    setLockedIndex(null)
   }
 
   if (finished) {
@@ -254,7 +258,7 @@ export function QuizScreen() {
           role="status"
           aria-live="polite"
         >
-          {feedback?.text ?? ''}
+          {shownFeedback?.text ?? ''}
         </p>
       </div>
 
