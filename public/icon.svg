@@ -1,0 +1,40 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+  role="img"
+  aria-label="א"
+>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD166" />
+      <stop offset="1" stop-color="#FF9800" />
+    </linearGradient>
+  </defs>
+
+  <!--
+    Full-bleed background, no rounded corners: Android crops `maskable` icons to
+    a circle/rounded square and iOS applies its own rounding, so a rounded rect
+    here would show transparent notches. A square background is correct for both.
+  -->
+  <rect width="512" height="512" fill="url(#bg)" />
+
+  <!--
+    Glyph occupies ~59% of the canvas, comfortably inside the maskable safe zone
+    (the inner 80% circle). Font stack is explicit because this is rasterised by
+    libvips/fontconfig: if the build host has no Hebrew-capable font the glyph
+    silently becomes a tofu box, which is why scripts/generate-icons.mjs can
+    print an ASCII preview of the result.
+  -->
+  <text
+    x="256"
+    y="256"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="Arial, 'DejaVu Sans', 'Noto Sans Hebrew', 'Liberation Sans', sans-serif"
+    font-size="300"
+    font-weight="700"
+    fill="#4E342E"
+  >א</text>
+</svg>

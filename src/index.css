@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+
+/*
+  Phone/tablet held sideways. The app is designed to fill the viewport with no
+  scrolling, but a landscape phone is only ~390px tall, which cannot fit a hero
+  card plus a row of controls stacked vertically. Screens therefore switch to a
+  side-by-side layout here rather than clipping their content.
+  The pre-migration app had equivalent @media (orientation: landscape) rules.
+*/
+@custom-variant short-landscape (@media (orientation: landscape) and (max-height: 600px));
+
+/*
+  Design tokens (Tailwind v4 `@theme`).
+  Every `--color-*`, `--shadow-*`, `--animate-*` entry below generates matching
+  utilities: --color-bubbly-red-500 -> bg-bubbly-red-500 / text- / ring- / border-.
+*/
+@theme {
+  /*
+    System font stack only - deliberately no webfont. Nikud (vowel point)
+    positioning is font-dependent and many Hebrew webfonts place the points
+    poorly. Revisit only after a visual check on real devices.
+  */
+  --font-sans: 'Segoe UI', Arial, 'DejaVu Sans', 'Noto Sans Hebrew',
+    'Liberation Sans', sans-serif;
+
+  --color-cream: #fff9f0;
+  --color-ink: #2a2118;
+
+  /*
+    14 hues. `500` carries the exact hex the app already used per letter and
+    number, so no item silently changes colour. `100` is the card tint and `700`
+    is the glyph colour: the original painted each item's 500 hex straight onto
+    cream, which put shin (1.56:1) and dalet (2.19:1) far below the 3:1 large-text
+    floor. 500-on-100 fails the same way (yellow 1.52:1), so glyphs use 700.
+  */
+  --color-bubbly-red-100: #ffe3e0;
+  --color-bubbly-red-500: #e84040;
+  --color-bubbly-red-700: #b31616;
+  --color-bubbly-coral-100: #ffe6dc;
+  --color-bubbly-coral-500: #ff7043;
+  --color-bubbly-coral-700: #c44a20;
+  --color-bubbly-orange-100: #ffedd6;
+  --color-bubbly-orange-500: #ff9800;
+  --color-bubbly-orange-700: #b25e00;
+  --color-bubbly-gold-100: #f6ecd0;
+  --color-bubbly-gold-500: #8b6914;
+  --color-bubbly-gold-700: #6b4e0a;
+  --color-bubbly-yellow-100: #fff7d6;
+  --color-bubbly-yellow-500: #ffc107;
+  --color-bubbly-yellow-700: #8a6100;
+  --color-bubbly-green-100: #dff5e1;
+  --color-bubbly-green-500: #4caf50;
+  --color-bubbly-green-700: #2e7d32;
+  --color-bubbly-teal-100: #d8f3ef;
+  --color-bubbly-teal-500: #009688;
+  --color-bubbly-teal-700: #00695c;
+  --color-bubbly-cyan-100: #d9f6fb;
+  --color-bubbly-cyan-500: #00bcd4;
+  --color-bubbly-cyan-700: #00707f;
+  --color-bubbly-blue-100: #e1f0ff;
+  --color-bubbly-blue-500: #2196f3;
+  --color-bubbly-blue-700: #1565c0;
+  --color-bubbly-indigo-100: #e2e5f8;
+  --color-bubbly-indigo-500: #3f51b5;
+  --color-bubbly-indigo-700: #283593;
+  --color-bubbly-purple-100: #f1e1fa;
+  --color-bubbly-purple-500: #9c27b0;
+  --color-bubbly-purple-700: #6a1b9a;
+  --color-bubbly-pink-100: #ffe0ec;
+  --color-bubbly-pink-500: #e91e63;
+  --color-bubbly-pink-700: #ad1457;
+  --color-bubbly-brown-100: #efe5df;
+  --color-bubbly-brown-500: #795548;
+  --color-bubbly-brown-700: #4e342e;
+  --color-bubbly-slate-100: #e3eaee;
+  --color-bubbly-slate-500: #607d8b;
+  --color-bubbly-slate-700: #37474f;
+
+  /* Chunky "toy brick" edge. Pressing collapses it into the page. */
+  --shadow-card: 0 6px 0 0 rgb(0 0 0 / 0.1);
+  --shadow-card-press: 0 1px 0 0 rgb(0 0 0 / 0.12);
+
+  --animate-pop: pop 220ms ease-out;
+  --animate-bounce-in: bounce-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-wiggle: wiggle 400ms ease-in-out;
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.86);
+    }
+    60% {
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes bounce-in {
+    0% {
+      transform: scale(0) translateY(12px);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-3deg);
+    }
+    75% {
+      transform: rotate(3deg);
+    }
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    /* No pull-to-refresh / rubber-banding: this is an app, not a page. */
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /*
+    Guarantee, not discipline: decorative animations are neutralised for users
+    who ask for reduced motion. Transitions are left alone on purpose - the
+    press-scale is instant state feedback, not motion.
+  */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}

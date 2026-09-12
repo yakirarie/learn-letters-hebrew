@@ -1,2 +1,8 @@
 node_modules/
+dist/
 .env
+*.local
+.DS_Store
+
+# Agent harness state (not part of the app)
+.codewhale/
