@@ -124,11 +124,41 @@
   }
 }
 
+@layer components {
+  /*
+    App shell height.
+
+    `svh` is the SMALL viewport height, so the shell can never be taller than
+    what is actually on screen. This was `100dvh`, which was wrong here: on a
+    phone `dvh` grows when the URL bar hides, while `height: 100%` on the
+    ancestors resolves against the small viewport. The shell therefore outgrew
+    its own container, the document scrolled, and the tab bar ended up below the
+    fold - reported as "the bottom bar disappears and I have to scroll down".
+
+    `100vh` is the fallback for browsers without svh; the later declaration wins
+    where it is supported. The document does not scroll, so the URL bar will not
+    hide on scroll, which is why svh and the visible height agree in practice.
+  */
+  .app-shell {
+    height: 100vh;
+    height: 100svh;
+  }
+}
+
 @layer base {
   html,
   body,
   #root {
     height: 100%;
+  }
+
+  /*
+    The shell owns the viewport; the document itself must never scroll. On a
+    phone a scrollable document is what pushes the tab bar below the fold.
+  */
+  html,
+  body {
+    overflow: hidden;
   }
 
   body {

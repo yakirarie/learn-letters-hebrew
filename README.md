@@ -153,9 +153,22 @@ webfont should be a decision made after looking at it on real devices.
 
 ## Layout notes
 
-- The shell uses `h-[100dvh]`, not `h-screen`: on mobile browsers `100vh` is the
-  URL-bar-hidden height, so `h-screen overflow-hidden` clips the footer whenever
-  the address bar is showing.
+- The shell's height comes from `.app-shell` in `src/index.css` and is **`100svh`**
+  (small viewport height) with a `100vh` fallback, not `100dvh`.
+
+  This was a real bug. The ancestors (`html`, `body`, `#root`) are `height: 100%`,
+  which on a phone resolves against the **small** viewport, while `dvh` is the
+  **dynamic** one and grows when the URL bar hides. The shell therefore outgrew
+  its own container, the document scrolled, and the tab bar ended up below the
+  fold — visible only after scrolling down. `svh` can never exceed what is
+  actually on screen, so the tab bar is always where it should be.
+
+  Because the document does not scroll, the URL bar does not hide on scroll,
+  so `svh` and the visible height agree in practice.
+- `html` and `body` are `overflow: hidden`: the shell owns the viewport and the
+  document itself must never scroll. Screens that need to scroll do it in their
+  own containers (`main` in short landscape, the letter grid, the memory grid),
+  which still work.
 - Scrollable children carry `min-h-0`, without which a flex child refuses to
   shrink below its content and pushes a scrollbar onto the page.
 
