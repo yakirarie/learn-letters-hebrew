@@ -12,22 +12,6 @@ export type LetterDatum = {
   l: string
   palette: PaletteKey
   examples: LetterExample[]
-  /**
-   * Only the five letters that take a different shape at the end of a word:
-   * kaf, mem, nun, pe, tsadi.
-   *
-   * These are the SAME letters, not five extra ones, so they are deliberately
-   * not separate entries in `letters`. Final-form words live in their own field
-   * rather than in `examples` because the quiz builds "which letter does this
-   * word start with?" from `examples`, and no example emoji is currently shared
-   * between two letters - that is what keeps those questions unambiguous.
-   */
-  final?: {
-    /** The glyph used when this letter ends a word. */
-    form: string
-    /** Example words that END in this letter. */
-    examples: LetterExample[]
-  }
 }
 
 /**
@@ -143,13 +127,6 @@ export const letters: LetterDatum[] = [
       { word: "כִּסֵּא", pic: "🪑" },
       { word: "כַּדּוּר", pic: "⚽" },
     ],
-    final: {
-      form: 'ך',
-      examples: [
-        { word: "מֶלֶךְ", pic: "👑" },
-        { word: "דֶּרֶךְ", pic: "🛣️" },
-      ],
-    },
   },
   {
     l: "ל",
@@ -170,13 +147,6 @@ export const letters: LetterDatum[] = [
       { word: "מִגְדָּל", pic: "🗼" },
       { word: "מְלָפְפוֹן", pic: "🥒" },
     ],
-    final: {
-      form: 'ם',
-      examples: [
-        { word: "עוֹלָם", pic: "🌍" },
-        { word: "מַיִם", pic: "💧" },
-      ],
-    },
   },
   {
     l: "נ",
@@ -187,13 +157,6 @@ export const letters: LetterDatum[] = [
       { word: "נֵר", pic: "🕯️" },
       { word: "נֶשֶׁר", pic: "🦅" },
     ],
-    final: {
-      form: 'ן',
-      examples: [
-        { word: "עָנָן", pic: "☁️" },
-        { word: "אֶבֶן", pic: "🪨" },
-      ],
-    },
   },
   {
     l: "ס",
@@ -224,13 +187,6 @@ export const letters: LetterDatum[] = [
       { word: "פִּיל", pic: "🐘" },
       { word: "פִּינְגְּוִין", pic: "🐧" },
     ],
-    final: {
-      form: 'ף',
-      examples: [
-        { word: "כֶּסֶף", pic: "🪙" },
-        { word: "חוֹף", pic: "🏖️" },
-      ],
-    },
   },
   {
     l: "צ",
@@ -241,13 +197,6 @@ export const letters: LetterDatum[] = [
       { word: "צְבִי", pic: "🦌" },
       { word: "צָהֹב", pic: "💛" },
     ],
-    final: {
-      form: 'ץ',
-      examples: [
-        { word: "אֶרֶץ", pic: "🗺️" },
-        { word: "עֵץ", pic: "🌳" },
-      ],
-    },
   },
   {
     l: "ק",
@@ -290,3 +239,67 @@ export const letters: LetterDatum[] = [
     ],
   },
 ]
+
+/**
+ * The five letters that change shape at the end of a word - kaf, mem, nun, pe
+ * and tsadi - as entries in their own right.
+ *
+ * Ordered by where their base letters appear above, so the alphabet reads
+ * ... ת, then ך ם ן ף ץ.
+ *
+ * Each inherits its base letter's palette deliberately: they are the same
+ * letters in a different position, and inventing five new hues would suggest
+ * five unrelated letters.
+ *
+ * Kept out of the quiz and the memory game on purpose - every word here ENDS
+ * with its letter, so "which letter does this word start with?" would be false
+ * if one of these were ever an answer.
+ */
+export const finalLetters: LetterDatum[] = [
+  {
+    l: "ך",
+    palette: 'gold',
+    examples: [
+      { word: "מֶלֶךְ", pic: "👑" },
+      { word: "דֶּרֶךְ", pic: "🛣️" },
+    ],
+  },
+  {
+    l: "ם",
+    palette: 'green',
+    examples: [
+      { word: "עוֹלָם", pic: "🌍" },
+      { word: "מַיִם", pic: "💧" },
+    ],
+  },
+  {
+    l: "ן",
+    palette: 'teal',
+    examples: [
+      { word: "עָנָן", pic: "☁️" },
+      { word: "אֶבֶן", pic: "🪨" },
+    ],
+  },
+  {
+    l: "ף",
+    palette: 'purple',
+    examples: [
+      { word: "כֶּסֶף", pic: "🪙" },
+      { word: "חוֹף", pic: "🏖️" },
+    ],
+  },
+  {
+    l: "ץ",
+    palette: 'green',
+    examples: [
+      { word: "אֶרֶץ", pic: "🗺️" },
+      { word: "עֵץ", pic: "🌳" },
+    ],
+  },
+]
+
+/**
+ * What the letters grid and the tracing letters mode show: the 22 letters
+ * followed by the five final forms.
+ */
+export const gridLetters: LetterDatum[] = [...letters, ...finalLetters]

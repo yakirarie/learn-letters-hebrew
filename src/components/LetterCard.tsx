@@ -16,11 +16,7 @@ export function LetterCard({ letter, selected = false, onSelect }: Props) {
     <button
       type="button"
       onClick={() => onSelect(letter)}
-      aria-label={
-        letter.final
-          ? `האות ${letter.l}, כמו ${example.word}, וּבַסּוֹף ${letter.final.form}`
-          : `האות ${letter.l}, כמו ${example.word}`
-      }
+      aria-label={`האות ${letter.l}, כמו ${example.word}`}
       aria-current={selected ? 'true' : undefined}
       className={[
         // aspect-square keeps every tile identical; min-h guarantees the
@@ -47,27 +43,6 @@ export function LetterCard({ letter, selected = false, onSelect }: Props) {
       <span className="text-xl leading-none sm:text-2xl" aria-hidden="true">
         {example.pic}
       </span>
-
-      {/*
-        Discovery hint for the five letters that change shape at the end of a
-        word. Placed at the inline END of the card - which is the left in RTL,
-        the same side a word ends on - and absolutely positioned so it cannot
-        affect the card's measured size. aria-hidden because the card's label
-        already spells this out.
-
-        Near-neutral ink rather than the letter's own `deep` shade: at 11px this
-        is ordinary text needing 4.5:1, and deep-on-soft only manages 4.46 for
-        the green letters. An earlier opacity-80 made it worse still (3.23 for
-        mem). Ink at 80% clears 7:1 on every tint in the palette.
-      */}
-      {letter.final && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-1 end-1.5 text-[11px] font-bold leading-none text-ink/80"
-        >
-          {letter.final.form}
-        </span>
-      )}
     </button>
   )
 }

@@ -85,26 +85,29 @@ Five Hebrew letters take a different shape when they end a word:
 כ → ך   מ → ם   נ → ן   פ → ף   צ → ץ
 ```
 
-These are **the same five letters, not five extra ones**, which is why they are
-not separate entries in `src/data/letters.ts`. Each of those entries carries an
-optional `final` field holding the end-of-word glyph and example words that end
-in it.
+They are entries in their own right — `finalLetters` in `src/data/letters.ts` —
+not a property of the letter they belong to. They are ordered by where their
+base letters appear, so the alphabet reads `... ק ר ש ת` then `ך ם ן ף ץ`.
 
-The letters grid marks the five affected cards with a small corner hint, and the
-practice view shows both shapes together. Tracing has a dedicated
-`סוֹפִיּוֹת` mode for the five final shapes.
+Each inherits its base letter's palette (ך is kaf's gold, ם is mem's green).
+They are the same letters in a different position, and five new hues would
+suggest five unrelated letters.
 
-Final-form words live in their own field rather than being merged into
-`examples` on purpose: the quiz builds *"which letter does this word start
-with?"* from `examples`, and no example emoji is shared between two letters —
-that is what keeps those questions unambiguous. Final-form examples never reach
-the quiz, the memory game or the trace pictures mode.
+`gridLetters` is the combined list — 22 + 5 = 27 — and it is what both the
+letters grid and the tracing letters mode iterate. There is no separate tracing
+mode for them.
+
+**Final letters are deliberately not in the quiz or the memory game.** Every
+word they carry *ends* with the letter, so `"which letter does this word start
+with?"` would be false if one of them were ever an answer. `check:data` fails
+the build if a final form leaks into that pool.
 
 > `npm run check:data` verifies the mechanics: that every end-of-word example
-> actually ends in its final form, that exactly the five expected letters carry
-> one, that no example emoji is shared between two letters, and that every word
-> carries vowel points. It runs as part of `npm run build`, so a bad edit fails
-> the build rather than shipping.
+> actually ends in its final form, that the five finals are the right letters in
+> the right order inheriting the right palette, that no final form appears in the
+> quiz pool, that no example emoji is shared between two letters, and that every
+> word carries vowel points. It runs as part of `npm run build`, so a bad edit
+> fails the build rather than shipping.
 >
 > It **cannot** check whether the vowel points are *correct* — only that they are
 > present. They were authored by hand and should be reviewed by a Hebrew speaker.
