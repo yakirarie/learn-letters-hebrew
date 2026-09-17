@@ -61,24 +61,41 @@ export function LetterPracticeScreen({ index, onNavigate }: Props) {
       <div
         className={`flex min-h-0 flex-1 flex-col items-center justify-center gap-1 rounded-3xl border-4 p-2 shadow-card sm:gap-2 sm:p-3 short-landscape:gap-1 short-landscape:p-2 ${c.soft} ${c.edge}`}
       >
-        <button
-          type="button"
-          onClick={speakLetter}
-          aria-label={`הַשְׁמַע אֶת הָאוֹת ${datum.l}`}
-          className="select-none touch-manipulation rounded-3xl px-3 transition-transform duration-150 ease-out active:scale-95 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink motion-reduce:transition-none"
-        >
-          {/*
-            Keyed on the letter so the node remounts and the pop animation
-            replays on every navigation. Without the key React would reuse the
-            element and the animation would only ever run once.
-          */}
-          <span
-            key={datum.l}
-            className={`block animate-pop text-[clamp(4.5rem,30vmin,12rem)] font-bold leading-none short-landscape:text-[clamp(2.5rem,16vh,5rem)] ${c.deep}`}
+        {/*
+          Letters that change shape at the end of a word show both forms
+          together. They are one letter with two shapes, not two letters, so
+          presenting them as separate cards would teach the wrong thing.
+        */}
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={speakLetter}
+            aria-label={`הַשְׁמַע אֶת הָאוֹת ${datum.l}`}
+            className="select-none touch-manipulation rounded-3xl px-3 transition-transform duration-150 ease-out active:scale-95 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink motion-reduce:transition-none"
           >
-            {datum.l}
-          </span>
-        </button>
+            {/*
+              Keyed on the letter so the node remounts and the pop animation
+              replays on every navigation. Without the key React would reuse the
+              element and the animation would only ever run once.
+            */}
+            <span
+              key={datum.l}
+              className={`block animate-pop ${datum.final ? 'text-[clamp(3.25rem,21vmin,9rem)]' : 'text-[clamp(4.5rem,30vmin,12rem)]'} font-bold leading-none short-landscape:text-[clamp(2.5rem,16vh,5rem)] ${c.deep}`}
+            >
+              {datum.l}
+            </span>
+          </button>
+          {datum.final && (
+            <div className="flex flex-col items-center gap-0.5">
+              <span
+                className={`text-[clamp(2rem,13vmin,4.5rem)] font-bold leading-none short-landscape:text-[clamp(1.25rem,8vh,2.5rem)] ${c.deep}`}
+              >
+                {datum.final.form}
+              </span>
+              <span className="text-[11px] font-bold text-ink/70">בַּסוֹף</span>
+            </div>
+          )}
+        </div>
 
         <p
           key={`${datum.l}-${example.word}`}

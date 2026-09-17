@@ -7,9 +7,10 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
+    "check:data": "node scripts/check-data.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "prebuild": "node scripts/generate-icons.mjs",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run check:data && tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "repository": {

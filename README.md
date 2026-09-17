@@ -18,7 +18,8 @@ right-to-left layout throughout.
 - **חִידּוֹן — Quiz.** 24 mixed questions across letters, counting and arithmetic,
   with a star score and a progress bar.
 - **כְּתִיבָה — Tracing.** A drawing canvas with the target letter or number as a
-  faint guide, twelve colours, and letters / numbers / pictures modes.
+  faint guide, twelve colours, and letters / numbers / pictures / final-forms
+  modes.
 - **זִכָּרוֹן — Memory.** Ten pairs of letters, numbers and pictures.
 
 ## Getting started
@@ -31,6 +32,7 @@ npm run dev        # dev server with hot reload
 npm run build      # typecheck, then build to dist/
 npm run preview    # serve the built output
 npm run typecheck  # tsc --noEmit only
+npm run check:data # verify the letter dataset's invariants
 ```
 
 `npm run build` runs `tsc --noEmit` before Vite, so a type error fails the build
@@ -74,6 +76,38 @@ of `א`. `--preview` exists so that failure is visible rather than shipped.
 
 The source SVG uses a full-bleed square background with the glyph inside the
 maskable safe zone, which is why one file serves both `any` and `maskable`.
+
+## Final letters
+
+Five Hebrew letters take a different shape when they end a word:
+
+```
+כ → ך   מ → ם   נ → ן   פ → ף   צ → ץ
+```
+
+These are **the same five letters, not five extra ones**, which is why they are
+not separate entries in `src/data/letters.ts`. Each of those entries carries an
+optional `final` field holding the end-of-word glyph and example words that end
+in it.
+
+The letters grid marks the five affected cards with a small corner hint, and the
+practice view shows both shapes together. Tracing has a dedicated
+`סוֹפִיּוֹת` mode for the five final shapes.
+
+Final-form words live in their own field rather than being merged into
+`examples` on purpose: the quiz builds *"which letter does this word start
+with?"* from `examples`, and no example emoji is shared between two letters —
+that is what keeps those questions unambiguous. Final-form examples never reach
+the quiz, the memory game or the trace pictures mode.
+
+> `npm run check:data` verifies the mechanics: that every end-of-word example
+> actually ends in its final form, that exactly the five expected letters carry
+> one, that no example emoji is shared between two letters, and that every word
+> carries vowel points. It runs as part of `npm run build`, so a bad edit fails
+> the build rather than shipping.
+>
+> It **cannot** check whether the vowel points are *correct* — only that they are
+> present. They were authored by hand and should be reviewed by a Hebrew speaker.
 
 ## Design system
 
@@ -137,6 +171,7 @@ src/
   state/        AppStateProvider (sound, tab, current letter; localStorage)
 scripts/
   generate-icons.mjs
+  check-data.mjs
   post-merge.sh
 ```
 

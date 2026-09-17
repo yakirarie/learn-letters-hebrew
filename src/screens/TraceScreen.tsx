@@ -5,7 +5,7 @@ import { palette, type PaletteKey } from '../lib/palette'
 import { useAppState } from '../state/AppStateProvider'
 import { NavButton } from '../components/NavButton'
 
-type TraceMode = 'letters' | 'numbers' | 'pictures'
+type TraceMode = 'letters' | 'numbers' | 'pictures' | 'finals'
 
 type TraceItem = {
   display: string
@@ -66,6 +66,22 @@ export function TraceScreen() {
         label: `צַיֵּר אֶת הַמִּסְפָּר: ${n.n}`,
         speech: `צַיֵּר אֶת הַמִּסְפָּר ${n.n}`,
       }))
+    }
+    if (mode === 'finals') {
+      // Only the five letters that change shape at the end of a word. These are
+      // shapes to learn to write, so they get their own tracing set.
+      return letters.flatMap((l) =>
+        l.final
+          ? [
+              {
+                display: l.final.form,
+                palette: l.palette,
+                label: `צַיֵּר אֶת הָאוֹת הַסּוֹפִית: ${l.final.form}`,
+                speech: `צַיֵּר אֶת הָאוֹת הַסּוֹפִית ${l.final.form}`,
+              },
+            ]
+          : [],
+      )
     }
     // Unique pictures drawn from the letters' example words.
     const seen = new Map<string, TraceItem>()
@@ -199,6 +215,7 @@ export function TraceScreen() {
     { id: 'letters', label: '📚 אוֹתִיּוֹת' },
     { id: 'numbers', label: '🔢 מִסְפָּרִים' },
     { id: 'pictures', label: '🖼️ תְּמוּנוֹת' },
+    { id: 'finals', label: '🔚 סוֹפִיּוֹת' },
   ]
 
   return (

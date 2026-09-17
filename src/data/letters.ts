@@ -12,6 +12,22 @@ export type LetterDatum = {
   l: string
   palette: PaletteKey
   examples: LetterExample[]
+  /**
+   * Only the five letters that take a different shape at the end of a word:
+   * kaf, mem, nun, pe, tsadi.
+   *
+   * These are the SAME letters, not five extra ones, so they are deliberately
+   * not separate entries in `letters`. Final-form words live in their own field
+   * rather than in `examples` because the quiz builds "which letter does this
+   * word start with?" from `examples`, and no example emoji is currently shared
+   * between two letters - that is what keeps those questions unambiguous.
+   */
+  final?: {
+    /** The glyph used when this letter ends a word. */
+    form: string
+    /** Example words that END in this letter. */
+    examples: LetterExample[]
+  }
 }
 
 /**
@@ -127,6 +143,13 @@ export const letters: LetterDatum[] = [
       { word: "כִּסֵּא", pic: "🪑" },
       { word: "כַּדּוּר", pic: "⚽" },
     ],
+    final: {
+      form: 'ך',
+      examples: [
+        { word: "מֶלֶךְ", pic: "👑" },
+        { word: "דֶּרֶךְ", pic: "🛣️" },
+      ],
+    },
   },
   {
     l: "ל",
@@ -147,6 +170,13 @@ export const letters: LetterDatum[] = [
       { word: "מִגְדָּל", pic: "🗼" },
       { word: "מְלָפְפוֹן", pic: "🥒" },
     ],
+    final: {
+      form: 'ם',
+      examples: [
+        { word: "עוֹלָם", pic: "🌍" },
+        { word: "מַיִם", pic: "💧" },
+      ],
+    },
   },
   {
     l: "נ",
@@ -157,6 +187,13 @@ export const letters: LetterDatum[] = [
       { word: "נֵר", pic: "🕯️" },
       { word: "נֶשֶׁר", pic: "🦅" },
     ],
+    final: {
+      form: 'ן',
+      examples: [
+        { word: "עָנָן", pic: "☁️" },
+        { word: "אֶבֶן", pic: "🪨" },
+      ],
+    },
   },
   {
     l: "ס",
@@ -187,6 +224,13 @@ export const letters: LetterDatum[] = [
       { word: "פִּיל", pic: "🐘" },
       { word: "פִּינְגְּוִין", pic: "🐧" },
     ],
+    final: {
+      form: 'ף',
+      examples: [
+        { word: "כֶּסֶף", pic: "🪙" },
+        { word: "חוֹף", pic: "🏖️" },
+      ],
+    },
   },
   {
     l: "צ",
@@ -197,6 +241,13 @@ export const letters: LetterDatum[] = [
       { word: "צְבִי", pic: "🦌" },
       { word: "צָהֹב", pic: "💛" },
     ],
+    final: {
+      form: 'ץ',
+      examples: [
+        { word: "אֶרֶץ", pic: "🗺️" },
+        { word: "עֵץ", pic: "🌳" },
+      ],
+    },
   },
   {
     l: "ק",
