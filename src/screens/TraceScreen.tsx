@@ -220,8 +220,7 @@ export function TraceScreen() {
 
   const show = useCallback(
     (nextIndex: number, nextItems: TraceItem[]) => {
-      const wrapped =
-        ((nextIndex % nextItems.length) + nextItems.length) % nextItems.length
+      const wrapped = ((nextIndex % nextItems.length) + nextItems.length) % nextItems.length
       setIndex(wrapped)
       clear()
       speakRef.current(nextItems[wrapped].speech, { rate: 0.8, pitch: 1.2 })
@@ -243,53 +242,95 @@ export function TraceScreen() {
   ]
 
   return (
-    <section className="flex h-full min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain px-3 short-landscape:h-auto short-landscape:min-h-full" dir="rtl">
-      <div className="flex shrink-0 flex-wrap justify-center gap-2">
-        {MODE_LABELS.map((m) => (
+    <section
+      className="flex h-full min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain px-3 short-landscape:h-auto short-landscape:min-h-full short-landscape:flex-row short-landscape:gap-3"
+      dir="rtl"
+    >
+      {/*
+        `contents` in portrait keeps these four blocks as direct children of the
+        section, so the canvas can still sit between them. In landscape the
+        wrapper becomes a real column and the canvas moves alongside it.
+      */}
+      <div className="contents short-landscape:flex short-landscape:flex-1 short-landscape:flex-col short-landscape:justify-center short-landscape:gap-2">
+        <div className="order-1 flex shrink-0 flex-wrap justify-center gap-2">
+          {MODE_LABELS.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => changeMode(m.id)}
+              aria-pressed={mode === m.id}
+              className={[
+                'min-h-[56px] select-none touch-manipulation rounded-2xl border-2 px-2 text-[11px] font-bold',
+                'transition-transform duration-150 ease-out active:scale-95',
+                'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink',
+                'motion-reduce:transition-none',
+                mode === m.id
+                  ? 'border-transparent bg-bubbly-blue-500 text-white'
+                  : 'border-black/10 bg-white text-ink',
+              ].join(' ')}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        <p className="order-2 shrink-0 text-center text-base font-bold text-ink" aria-live="polite">
+          {item.label}
+        </p>
+
+        <div className="order-4 flex shrink-0 flex-wrap justify-center gap-2">
+          {COLORS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setColor(c)}
+              aria-label={`צֶבַע ${c}`}
+              aria-pressed={color === c}
+              style={{ backgroundColor: c }}
+              className={[
+                'h-11 w-11 min-h-[44px] min-w-[44px] select-none touch-manipulation rounded-full',
+                'transition-transform duration-150 ease-out active:scale-95',
+                'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink',
+                'motion-reduce:transition-none',
+                color === c
+                  ? 'ring-4 ring-ink ring-offset-2 ring-offset-cream'
+                  : 'ring-2 ring-black/10',
+              ].join(' ')}
+            />
+          ))}
+        </div>
+
+        <div className="order-5 flex shrink-0 items-center justify-between gap-2 pb-1">
           <button
-            key={m.id}
             type="button"
-            onClick={() => changeMode(m.id)}
-            aria-pressed={mode === m.id}
-            className={[
-              'min-h-[56px] select-none touch-manipulation rounded-2xl border-2 px-2 text-[11px] font-bold',
-              'transition-transform duration-150 ease-out active:scale-95',
-              'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink',
-              'motion-reduce:transition-none',
-              mode === m.id
-                ? 'border-transparent bg-bubbly-blue-500 text-white'
-                : 'border-black/10 bg-white text-ink',
-            ].join(' ')}
+            onClick={clear}
+            className="min-h-[56px] select-none touch-manipulation rounded-2xl border-2 border-black/10 bg-white px-5 text-base font-bold text-ink shadow-card transition-transform duration-150 active:scale-95 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink motion-reduce:transition-none"
           >
-            {m.label}
+            🗑️ נַקֵּה
           </button>
-        ))}
+          <div className="flex gap-2">
+            <NavButton direction="prev" onClick={() => show(index - 1, items)} />
+            <NavButton direction="next" onClick={() => show(index + 1, items)} />
+          </div>
+        </div>
       </div>
-
-      <p className="shrink-0 text-center text-base font-bold text-ink" aria-live="polite">
-        {item.label}
-      </p>
-
       <div
         ref={areaRef}
-        className="flex min-h-[10rem] min-w-0 flex-1 items-center justify-center"
+        className="order-3 flex min-h-[10rem] min-w-0 flex-1 items-center justify-center short-landscape:order-first short-landscape:min-h-0"
       >
         {/*
-          Sized from BOTH axes, not width alone. The box is a square, so it
-          needs to know the height it actually has: it previously used
-          `w-full` with a vh cap, which meant a square sized from width could
-          exceed a shorter container and spill over the colour palette below
-          (79px of overlap at 360 wide, 121px at 320, once the mode row grew to
-          two lines). `min(100%, 100cqh)` is the largest square that fits.
+          The square's side is measured, not expressed in CSS - see `side`
+          above. It previously used `w-full` with a vh cap, which ignored the
+          height actually available and spilled the canvas over the colour
+          palette (79px of overlap at 360 wide, 121px at 320, once the mode row
+          grew to two lines).
 
-          The size container is the flex parent, so `100cqh` is that area's
-          height. `aspect-square` still derives the other axis, which is what
-          keeps the 600x600 drawing buffer from being stretched.
+          In landscape this area becomes its own column beside the controls
+          (`order-first` puts it on the right in RTL, matching the letters,
+          numbers and maths screens), so it gets the full viewport height rather
+          than the leftover after a stacked column.
         */}
-        <div
-          className="relative aspect-square"
-          style={{ width: side, height: side }}
-        >
+        <div className="relative aspect-square" style={{ width: side, height: side }}>
           <div
             className={`pointer-events-none absolute inset-0 flex select-none items-center justify-center font-bold leading-none opacity-10 ${palette[item.palette].deep} text-[clamp(6rem,42vmin,16rem)]`}
             aria-hidden="true"
@@ -300,48 +341,6 @@ export function TraceScreen() {
             ref={canvasRef}
             aria-label={`לּוּחַ צִיּוּר לְ${item.display}`}
             className="h-full w-full touch-none rounded-2xl border-4 border-dashed border-black/15 bg-white/70"
-          />
-        </div>
-      </div>
-
-      <div className="flex shrink-0 flex-wrap justify-center gap-2">
-        {COLORS.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => setColor(c)}
-            aria-label={`צֶבַע ${c}`}
-            aria-pressed={color === c}
-            style={{ backgroundColor: c }}
-            className={[
-              'h-11 w-11 min-h-[44px] min-w-[44px] select-none touch-manipulation rounded-full',
-              'transition-transform duration-150 ease-out active:scale-95',
-              'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink',
-              'motion-reduce:transition-none',
-              color === c
-                ? 'ring-4 ring-ink ring-offset-2 ring-offset-cream'
-                : 'ring-2 ring-black/10',
-            ].join(' ')}
-          />
-        ))}
-      </div>
-
-      <div className="flex shrink-0 items-center justify-between gap-2 pb-1">
-        <button
-          type="button"
-          onClick={clear}
-          className="min-h-[56px] select-none touch-manipulation rounded-2xl border-2 border-black/10 bg-white px-5 text-base font-bold text-ink shadow-card transition-transform duration-150 active:scale-95 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink motion-reduce:transition-none"
-        >
-          🗑️ נַקֵּה
-        </button>
-        <div className="flex gap-2">
-          <NavButton
-            direction="prev"
-            onClick={() => show(index - 1, items)}
-          />
-          <NavButton
-            direction="next"
-            onClick={() => show(index + 1, items)}
           />
         </div>
       </div>
