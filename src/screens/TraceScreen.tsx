@@ -42,6 +42,30 @@ export function TraceScreen() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
+  const areaRef = useRef<HTMLDivElement>(null)
+
+  /**
+   * Side length of the drawing square, in CSS pixels.
+   *
+   * Measured rather than expressed in CSS. Three approaches were tried and each
+   * failed in a different place: `aspect-square` + `h-full` let the box stretch
+   * non-square (600x600 buffer drawn into a 366x431 box), `w-full` + a `vh` cap
+   * ignored the height available and spilled the canvas over the colour palette,
+   * and a container query (`w-[min(100%,100cqh)]`) resolved to 0 in landscape.
+   * Measuring the area and taking the smaller side is unambiguous.
+   */
+  const [side, setSide] = useState(0)
+
+  useEffect(() => {
+    const area = areaRef.current
+    if (!area) return
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setSide(Math.max(0, Math.floor(Math.min(width, height))))
+    })
+    observer.observe(area)
+    return () => observer.disconnect()
+  }, [])
   // The draw handlers are bound once; reading the colour through a ref keeps
   // them from needing to be re-bound on every colour change.
   const colorRef = useRef(color)
@@ -219,7 +243,7 @@ export function TraceScreen() {
   ]
 
   return (
-    <section className="flex h-full min-h-0 flex-col gap-2 px-3 short-landscape:h-auto short-landscape:min-h-full" dir="rtl">
+    <section className="flex h-full min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain px-3 short-landscape:h-auto short-landscape:min-h-full" dir="rtl">
       <div className="flex shrink-0 flex-wrap justify-center gap-2">
         {MODE_LABELS.map((m) => (
           <button
@@ -228,7 +252,7 @@ export function TraceScreen() {
             onClick={() => changeMode(m.id)}
             aria-pressed={mode === m.id}
             className={[
-              'min-h-[56px] select-none touch-manipulation rounded-2xl border-2 px-4 text-sm font-bold',
+              'min-h-[56px] select-none touch-manipulation rounded-2xl border-2 px-2 text-[11px] font-bold',
               'transition-transform duration-150 ease-out active:scale-95',
               'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink',
               'motion-reduce:transition-none',
@@ -246,14 +270,26 @@ export function TraceScreen() {
         {item.label}
       </p>
 
-      <div className="flex min-h-0 flex-1 items-center justify-center">
+      <div
+        ref={areaRef}
+        className="flex min-h-[10rem] min-w-0 flex-1 items-center justify-center"
+      >
         {/*
-          Sized from width, with `aspect-square` deriving the height. The box
-          previously used `h-full`, which overrides the aspect ratio: that left
-          the 600x600 drawing buffer stretched into a non-square box, squashing
-          the dotted guides and making every dot an ellipse.
+          Sized from BOTH axes, not width alone. The box is a square, so it
+          needs to know the height it actually has: it previously used
+          `w-full` with a vh cap, which meant a square sized from width could
+          exceed a shorter container and spill over the colour palette below
+          (79px of overlap at 360 wide, 121px at 320, once the mode row grew to
+          two lines). `min(100%, 100cqh)` is the largest square that fits.
+
+          The size container is the flex parent, so `100cqh` is that area's
+          height. `aspect-square` still derives the other axis, which is what
+          keeps the 600x600 drawing buffer from being stretched.
         */}
-        <div className="relative aspect-square w-full max-w-[min(100%,78vh)] short-landscape:max-w-[min(100%,50vh)]">
+        <div
+          className="relative aspect-square"
+          style={{ width: side, height: side }}
+        >
           <div
             className={`pointer-events-none absolute inset-0 flex select-none items-center justify-center font-bold leading-none opacity-10 ${palette[item.palette].deep} text-[clamp(6rem,42vmin,16rem)]`}
             aria-hidden="true"
