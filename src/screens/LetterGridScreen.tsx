@@ -1,4 +1,4 @@
-import { gridLetters } from '../data/letters'
+import { gridLetters, spokenName } from '../data/letters'
 import { LetterGrid } from '../components/LetterGrid'
 import { useAppState } from '../state/AppStateProvider'
 
@@ -19,7 +19,7 @@ export function LetterGridScreen() {
         letters={gridLetters}
         onSelect={(letter) => {
           openLetter(gridLetters.indexOf(letter))
-          speak(letter.l, { rate: 0.75, pitch: 1.3 })
+          speak(spokenName(letter), { rate: 0.75, pitch: 1.3 })
         }}
       />
     </section>

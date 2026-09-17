@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { gridLetters, letters } from '../data/letters'
+import { gridLetters, letters, spokenName } from '../data/letters'
 import { numbers } from '../data/numbers'
 import { palette, type PaletteKey } from '../lib/palette'
 import { useAppState } from '../state/AppStateProvider'
@@ -79,8 +79,8 @@ export function TraceScreen() {
       return gridLetters.map((l) => ({
         display: l.l,
         palette: l.palette,
-        label: `צַיֵּר אֶת הָאוֹת: ${l.l}`,
-        speech: `צַיֵּר אֶת הָאוֹת ${l.l}`,
+        label: `צַיֵּר אֶת הָאוֹת: ${spokenName(l)}`,
+        speech: `צַיֵּר אֶת הָאוֹת ${spokenName(l)}`,
       }))
     }
     if (mode === 'numbers') {

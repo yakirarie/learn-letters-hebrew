@@ -107,6 +107,29 @@ for (const [base, form] of EXPECTED) {
   }
 }
 
+// ---- the finals must carry a spoken name ----------------------------------
+// The name is what gets said out loud, so it has to say which form it is.
+const SOFIT = '\u05e1\u05d5\u05b9\u05e4\u05b4\u05d9\u05ea'   // סוֹפִית
+const SOFIT_BARE = stripMarks(SOFIT)
+for (const entry of finalLetters ?? []) {
+  check(
+    typeof entry.name === 'string' && entry.name.length > 0,
+    `${entry.l} has no spoken name; it would be announced as a bare glyph`,
+  )
+  if (typeof entry.name === 'string') {
+    check(
+      stripMarks(entry.name).endsWith(SOFIT_BARE),
+      `${entry.l}: name "${entry.name}" does not end in "sofít"`,
+    )
+  }
+}
+for (const letter of letters) {
+  check(
+    letter.name === undefined,
+    `${letter.l} has a spoken name "${letter.name}"; only the final forms should`,
+  )
+}
+
 // ---- the finals must stay out of the quiz and memory pool ------------------
 for (const entry of finalLetters ?? []) {
   check(

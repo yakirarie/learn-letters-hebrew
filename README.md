@@ -93,6 +93,13 @@ Each inherits its base letter's palette (ך is kaf's gold, ם is mem's green).
 They are the same letters in a different position, and five new hues would
 suggest five unrelated letters.
 
+Each also carries a `name`, which is what gets said out loud — "מֵם סוֹפִית"
+rather than a bare "ם", so the spoken form says which shape it is. Everywhere
+a letter is named (the practice view, the grid card's accessible name, the
+tracing instruction) goes through `spokenName()`, which falls back to the glyph
+for the 22 letters that have no `name`. `check:data` enforces that the finals
+have one ending in "sofít" and that the plain letters do not.
+
 `gridLetters` is the combined list — 22 + 5 = 27 — and it is what both the
 letters grid and the tracing letters mode iterate. There is no separate tracing
 mode for them.

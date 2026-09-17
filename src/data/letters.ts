@@ -10,8 +10,21 @@ export type LetterExample = {
 export type LetterDatum = {
   /** The letter glyph, without nikud. */
   l: string
+  /**
+   * The letter's full name, spoken instead of the bare glyph.
+   *
+   * Only the five final forms carry one: "מֵם סוֹפִית" rather than "ם", so the
+   * name itself says which form it is. A plain letter has no entry and its glyph
+   * is spoken, as before.
+   */
+  name?: string
   palette: PaletteKey
   examples: LetterExample[]
+}
+
+/** What to say for a letter: its full name if it has one, otherwise its glyph. */
+export function spokenName(letter: LetterDatum): string {
+  return letter.name ?? letter.l
 }
 
 /**
@@ -259,6 +272,7 @@ export const finalLetters: LetterDatum[] = [
   {
     l: "ך",
     palette: 'gold',
+    name: "כַּף סוֹפִית",
     examples: [
       { word: "מֶלֶךְ", pic: "👑" },
       { word: "דֶּרֶךְ", pic: "🛣️" },
@@ -267,6 +281,7 @@ export const finalLetters: LetterDatum[] = [
   {
     l: "ם",
     palette: 'green',
+    name: "מֵם סוֹפִית",
     examples: [
       { word: "עוֹלָם", pic: "🌍" },
       { word: "מַיִם", pic: "💧" },
@@ -275,6 +290,7 @@ export const finalLetters: LetterDatum[] = [
   {
     l: "ן",
     palette: 'teal',
+    name: "נוּן סוֹפִית",
     examples: [
       { word: "עָנָן", pic: "☁️" },
       { word: "אֶבֶן", pic: "🪨" },
@@ -283,6 +299,7 @@ export const finalLetters: LetterDatum[] = [
   {
     l: "ף",
     palette: 'purple',
+    name: "פֵּא סוֹפִית",
     examples: [
       { word: "כֶּסֶף", pic: "🪙" },
       { word: "חוֹף", pic: "🏖️" },
@@ -291,6 +308,7 @@ export const finalLetters: LetterDatum[] = [
   {
     l: "ץ",
     palette: 'green',
+    name: "צָדִי סוֹפִית",
     examples: [
       { word: "אֶרֶץ", pic: "🗺️" },
       { word: "עֵץ", pic: "🌳" },

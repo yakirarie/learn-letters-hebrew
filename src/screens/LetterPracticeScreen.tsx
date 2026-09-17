@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { gridLetters } from '../data/letters'
+import { gridLetters, spokenName } from '../data/letters'
 import { palette } from '../lib/palette'
 import { useAppState } from '../state/AppStateProvider'
 import { NavButton } from '../components/NavButton'
@@ -35,14 +35,14 @@ export function LetterPracticeScreen({ index, onNavigate }: Props) {
   // Speaks once per letter. The pre-migration app re-spoke on every resize or
   // rotation, because it re-ran its whole render routine on window resize.
   useEffect(() => {
-    speakRef.current(`${datum.l}! ${datum.l} כְּמוֹ ${datum.examples[0].word}`, {
+    speakRef.current(`${spokenName(datum)}! ${spokenName(datum)} כְּמוֹ ${datum.examples[0].word}`, {
       rate: 0.75,
       pitch: 1.3,
     })
   }, [datum])
 
   const speakLetter = () =>
-    speak(`${datum.l}! ${datum.l} כְּמוֹ ${example.word}`, {
+    speak(`${spokenName(datum)}! ${spokenName(datum)} כְּמוֹ ${example.word}`, {
       rate: 0.75,
       pitch: 1.3,
     })
@@ -50,7 +50,7 @@ export function LetterPracticeScreen({ index, onNavigate }: Props) {
   const selectExample = (i: number) => {
     setExampleIndex(i)
     const next = datum.examples[i]
-    if (next) speak(`${datum.l} כְּמוֹ ${next.word}`, { rate: 0.75, pitch: 1.3 })
+    if (next) speak(`${spokenName(datum)} כְּמוֹ ${next.word}`, { rate: 0.75, pitch: 1.3 })
   }
 
   return (
@@ -64,7 +64,7 @@ export function LetterPracticeScreen({ index, onNavigate }: Props) {
         <button
           type="button"
           onClick={speakLetter}
-          aria-label={`הַשְׁמַע אֶת הָאוֹת ${datum.l}`}
+          aria-label={`הַשְׁמַע אֶת הָאוֹת ${spokenName(datum)}`}
           className="select-none touch-manipulation rounded-3xl px-3 transition-transform duration-150 ease-out active:scale-95 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-ink motion-reduce:transition-none"
         >
           {/*

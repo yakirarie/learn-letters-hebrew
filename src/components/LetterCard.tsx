@@ -1,5 +1,5 @@
 import { palette } from '../lib/palette'
-import type { LetterDatum } from '../data/letters'
+import { spokenName, type LetterDatum } from '../data/letters'
 
 type Props = {
   letter: LetterDatum
@@ -16,7 +16,7 @@ export function LetterCard({ letter, selected = false, onSelect }: Props) {
     <button
       type="button"
       onClick={() => onSelect(letter)}
-      aria-label={`האות ${letter.l}, כמו ${example.word}`}
+      aria-label={`האות ${spokenName(letter)}, כמו ${example.word}`}
       aria-current={selected ? 'true' : undefined}
       className={[
         // aspect-square keeps every tile identical; min-h guarantees the
