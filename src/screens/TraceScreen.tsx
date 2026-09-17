@@ -106,7 +106,16 @@ export function TraceScreen() {
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
 
-    let drawing = false
+    /**
+     * Only one pointer may draw at a time.
+     *
+     * Previously `drawing`/`lastX`/`lastY` were shared and unchecked, so a
+     * second finger (or a resting palm) overwrote the last point and the next
+     * move from the first finger drew a long stray line from the second touch
+     * point. Lifting either pointer also ended the stroke while the other was
+     * still down.
+     */
+    let activePointer: number | null = null
     let lastX = 0
     let lastY = 0
 
@@ -121,9 +130,10 @@ export function TraceScreen() {
     }
 
     const down = (event: PointerEvent) => {
+      if (activePointer !== null) return
       event.preventDefault()
+      activePointer = event.pointerId
       canvas.setPointerCapture(event.pointerId)
-      drawing = true
       const p = toCanvas(event)
       lastX = p.x
       lastY = p.y
@@ -135,7 +145,7 @@ export function TraceScreen() {
     }
 
     const move = (event: PointerEvent) => {
-      if (!drawing) return
+      if (event.pointerId !== activePointer) return
       event.preventDefault()
       const p = toCanvas(event)
       ctx.beginPath()
@@ -149,7 +159,8 @@ export function TraceScreen() {
     }
 
     const up = (event: PointerEvent) => {
-      drawing = false
+      if (event.pointerId !== activePointer) return
+      activePointer = null
       if (canvas.hasPointerCapture(event.pointerId)) {
         canvas.releasePointerCapture(event.pointerId)
       }

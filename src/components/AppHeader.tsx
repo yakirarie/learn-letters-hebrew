@@ -48,7 +48,10 @@ export function AppHeader({
         <button
           type="button"
           onClick={onToggleSound}
-          aria-label={soundEnabled ? 'כַּבֵּה קוֹל' : 'הַדְלֵק קוֹל'}
+          // Constant name plus aria-pressed. A label that also flips between
+          // "turn on" / "turn off" double-encodes the state, and a screen
+          // reader announces the confusing "turn off sound, pressed".
+          aria-label="קוֹל"
           aria-pressed={soundEnabled}
           className={ICON_BUTTON}
         >

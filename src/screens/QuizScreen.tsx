@@ -146,6 +146,19 @@ export function QuizScreen() {
   const speakRef = useRef(speak)
   speakRef.current = speak
 
+  /**
+   * Pending advance/unlock timer, held in a ref so it can be cleared if the
+   * screen unmounts mid-answer (switching tabs). Without this the callback
+   * fires against an unmounted component - a no-op in React 19, but a leak.
+   */
+  const pendingRef = useRef<number | null>(null)
+  useEffect(
+    () => () => {
+      if (pendingRef.current !== null) window.clearTimeout(pendingRef.current)
+    },
+    [],
+  )
+
   useEffect(() => {
     if (finished || !item) return
     speakRef.current(item.speech, { rate: 0.8, pitch: 1.2 })
@@ -164,12 +177,12 @@ export function QuizScreen() {
         setScore((s) => s + 1)
         setFeedback({ index, kind: 'correct', text: '🎉 מְצֻיָּן!' })
         speakRef.current('כָּל הַכָּבוֹד!', { rate: 0.85, pitch: 1.4 })
-        window.setTimeout(() => setIndex((i) => i + 1), 1200)
+        pendingRef.current = window.setTimeout(() => setIndex((i) => i + 1), 1200)
       } else {
         setFeedback({ index, kind: 'wrong', text: '🤔 נַסּוּ שׁוּב' })
         speakRef.current('נַסּוּ שׁוּב', { rate: 0.8, pitch: 1.1 })
         // Unlock without advancing: the child retries the same question.
-        window.setTimeout(() => {
+        pendingRef.current = window.setTimeout(() => {
           setFeedback(null)
           setLockedIndex(null)
         }, 1100)
@@ -179,6 +192,7 @@ export function QuizScreen() {
   )
 
   const restart = () => {
+    if (pendingRef.current !== null) window.clearTimeout(pendingRef.current)
     setItems(buildQuiz())
     setIndex(0)
     setScore(0)
@@ -201,7 +215,7 @@ export function QuizScreen() {
         <p className="text-xl font-bold text-bubbly-indigo-700">
           צָבַרְתָּ {score} מִתּוֹךְ {items.length} נְקֻדּוֹת
         </p>
-        <p className="text-base font-bold text-ink/60">
+        <p className="text-base font-bold text-ink/70">
           הַשִּׂיא שֶׁלְּךָ: {Math.max(bestQuizScore, score)}
         </p>
         <button
@@ -217,10 +231,21 @@ export function QuizScreen() {
 
   return (
     <section className="flex h-full min-h-0 flex-col gap-2 px-3 short-landscape:h-auto short-landscape:min-h-full" dir="rtl">
-      {/* Progress: stars carry the score, the bar carries the position. */}
+      {/*
+        Stars carry the score, the bar carries the position.
+
+        24 stars do not fit a phone in one row: at text-lg each star is ~16px, so
+        the row measured 400px of content inside a 366px box and the outermost
+        stars were cut off entirely - 2 at 390px, 4 at 360px, 6 at 320px. It now
+        wraps and steps down in size, so no star can be clipped. `role="img"`
+        gives the score a name that is actually exposed: a bare aria-label on a
+        roleless div is ignored by several screen readers, and every star inside
+        is aria-hidden.
+      */}
       <div className="shrink-0 space-y-1">
         <div
-          className="flex justify-center gap-0.5 text-lg"
+          role="img"
+          className="flex flex-wrap justify-center gap-x-0.5 text-sm leading-tight sm:text-base md:text-lg"
           aria-label={`נִקֻדּוֹת: ${score} מִתּוֹךְ ${items.length}`}
         >
           {items.map((_, i) => (
@@ -262,7 +287,10 @@ export function QuizScreen() {
         </p>
       </div>
 
-      <ul className="grid shrink-0 grid-cols-2 gap-2 pb-1 sm:grid-cols-4">
+      <ul
+        role="list"
+        className="grid shrink-0 grid-cols-2 gap-2 pb-1 sm:grid-cols-4"
+      >
         {item.options.map((option) => (
           <li key={option}>
             <button

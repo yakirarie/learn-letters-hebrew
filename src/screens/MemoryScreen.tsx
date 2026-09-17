@@ -77,6 +77,22 @@ function buildDeck(): Card[] {
   return shuffle(deck)
 }
 
+/**
+ * Accessible name for one card.
+ *
+ * Every face-down card used to share the single name "closed card", so a
+ * screen-reader user could not tell positions apart or track which ones they
+ * had already tried - which is the whole game. The index makes each distinct,
+ * and a face-up card now names its category as well as its contents.
+ */
+function cardLabel(card: Card, index: number, faceUp: boolean): string {
+  if (!faceUp) return `קַלְפִּית סְגוּרָה, מָקוֹם ${index + 1}`
+  if (card.category === 'letter') return `הָאוֹת ${card.display}`
+  if (card.category === 'number') return `הַמִּסְפָּר ${card.display}`
+  const word = wordForPicture(card.display)
+  return word ? `תְּמוּנָה: ${word}` : `תְּמוּנָה ${card.display}`
+}
+
 export function MemoryScreen() {
   const { speak } = useAppState()
   const [deck, setDeck] = useState<Card[]>(buildDeck)
@@ -162,7 +178,9 @@ export function MemoryScreen() {
           : `זוּגוֹת: ${matchedPairs}/${PAIRS}  •  מַהֲלָכִים: ${moves}`}
       </p>
 
-      <ul className="mx-auto grid min-h-0 w-full max-w-3xl flex-1 grid-cols-4 content-start gap-2 overflow-y-auto overscroll-contain sm:grid-cols-5 short-landscape:grid-cols-8">
+      <ul
+        role="list"
+        className="mx-auto grid min-h-0 w-full max-w-3xl flex-1 grid-cols-4 content-start gap-2 overflow-y-auto overscroll-contain sm:grid-cols-5 short-landscape:grid-cols-8">
         {deck.map((card, i) => {
           const faceUp = card.matched || flipped.includes(i)
           const c = palette[card.palette]
@@ -172,11 +190,7 @@ export function MemoryScreen() {
                 type="button"
                 onClick={() => flip(i)}
                 disabled={faceUp || locked}
-                aria-label={
-                  faceUp
-                    ? `${card.display}`
-                    : 'קַלְפִּית סְגוּרָה'
-                }
+                aria-label={cardLabel(card, i, faceUp)}
                 className={[
                   'flex aspect-square w-full min-h-[64px] select-none touch-manipulation',
                   'items-center justify-center rounded-2xl border-2',

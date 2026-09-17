@@ -24,7 +24,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
+        // `svg` is deliberately excluded: icon.svg is only the source for the
+        // generated PNGs and is never requested at runtime, so precaching it
+        // would ship dead weight to every install.
+        globPatterns: ['**/*.{js,css,html,png,ico,webmanifest}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,

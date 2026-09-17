@@ -28,7 +28,7 @@ export function TabBar({ active, onChange }: Props) {
       className="shrink-0 border-t border-black/10 bg-white/80 backdrop-blur"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <ul className="grid grid-cols-6">
+      <ul role="list" className="grid grid-cols-6">
         {TABS.map((tab) => {
           const isActive = tab.id === active
           return (
@@ -36,7 +36,9 @@ export function TabBar({ active, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => onChange(tab.id)}
-                aria-current={isActive ? 'page' : undefined}
+                // "true" rather than "page": nothing navigates a URL here, so no
+                // page is current - this is the current item in a set.
+                aria-current={isActive ? 'true' : undefined}
                 className={[
                   'flex min-h-[64px] w-full select-none touch-manipulation flex-col',
                   'items-center justify-center gap-0.5 px-1 py-1.5',
@@ -44,7 +46,7 @@ export function TabBar({ active, onChange }: Props) {
                   'focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-ink',
                   isActive
                     ? 'bg-bubbly-blue-100 text-bubbly-blue-700'
-                    : 'text-ink/60',
+                    : 'text-ink/70',
                 ].join(' ')}
               >
                 <span className="text-xl leading-none" aria-hidden="true">

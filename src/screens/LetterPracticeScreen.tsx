@@ -100,7 +100,10 @@ export function LetterPracticeScreen({ index, onNavigate }: Props) {
         without clipping them.
       */}
       <div className="flex shrink-0 flex-col gap-2 short-landscape:flex-1 short-landscape:justify-center">
-        <ul className="flex shrink-0 flex-wrap justify-center gap-2">
+        <ul
+          role="list"
+          className="flex shrink-0 flex-wrap justify-center gap-2"
+        >
           {datum.examples.map((ex, i) => {
           const isActive = i === exampleIndex
           return (

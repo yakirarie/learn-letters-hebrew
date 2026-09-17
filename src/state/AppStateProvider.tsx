@@ -42,8 +42,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     saveState(state)
   }, [state])
 
-  // React 19 no-ops the setState when the value is unchanged, so toggling
-  // twice is safe without an explicit equality check here.
+  // Keeps the stored object identity stable when the tab has not changed, so a
+  // same-tab tap does not trigger a needless localStorage write.
   const setTab = useCallback((tab: Tab) => {
     setState((s) => (s.lastTab === tab ? s : { ...s, lastTab: tab }))
     setLetterIndex(null)

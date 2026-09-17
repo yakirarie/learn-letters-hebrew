@@ -17,6 +17,7 @@ type Props = {
 export function LetterGrid({ letters, selectedLetter, onSelect }: Props) {
   return (
     <ul
+      role="list"
       className="mx-auto grid w-full max-w-6xl grid-cols-4 gap-4 overflow-y-auto
                  overscroll-contain px-3 pt-2
                  sm:grid-cols-5
