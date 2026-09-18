@@ -3,20 +3,39 @@ import { MathExpr } from '../components/MathExpr'
 import { useAppState } from '../state/AppStateProvider'
 import { letters } from '../data/letters'
 import { numbers } from '../data/numbers'
+import { buildBank, buildableWords, type BankTile, type BuildWord } from '../lib/spelling'
+import { WordBuilder } from '../components/WordBuilder'
 
-type QuizItem = {
-  kind: 'letter' | 'count' | 'math'
+type BaseItem = {
   /** Large visual shown as the question. */
   prompt: string
   /** Math prompts must render left-to-right inside the RTL layout. */
   promptIsMath: boolean
   question: string
   speech: string
+}
+
+/** A question answered by picking one of four buttons. */
+type ChoiceItem = BaseItem & {
+  kind: 'letter' | 'count' | 'math'
   options: string[]
   answer: string
 }
 
-const PER_TYPE = 8
+/** A question answered by spelling the word, in WordBuilder. */
+type BuildItem = BaseItem & {
+  kind: 'build'
+  target: BuildWord
+  bank: BankTile[]
+}
+
+type QuizItem = ChoiceItem | BuildItem
+
+/**
+ * Questions of each kind. Four kinds at six each keeps the round at 24, so the
+ * star row and the score denominator are unchanged.
+ */
+const PER_TYPE = 6
 
 function shuffle<T>(items: readonly T[]): T[] {
   const out = [...items]
@@ -115,6 +134,24 @@ function buildQuiz(): QuizItem[] {
     })
   }
 
+  // Word build. Drawn from every example word short enough to spell, which
+  // includes the final-letter words - spelling is the one place a final form
+  // belongs, since a child spelling מֶלֶךְ needs the ך.
+  const pool = letters.map((l) => l.l)
+  for (const target of shuffle(buildableWords).slice(0, PER_TYPE)) {
+    items.push({
+      kind: 'build',
+      prompt: target.pic,
+      promptIsMath: false,
+      question: 'אֵיךְ כּוֹתְבִים?',
+      // Say the word: the question is where the letters go, not what the
+      // picture is called. Without this it tests emoji recall, not spelling.
+      speech: target.word,
+      target,
+      bank: buildBank(target, pool),
+    })
+  }
+
   return shuffle(items)
 }
 
@@ -170,7 +207,7 @@ export function QuizScreen() {
 
   const answer = useCallback(
     (choice: string) => {
-      if (locked || !item) return
+      if (locked || !item || item.kind === 'build') return
       setLockedIndex(index)
 
       if (choice === item.answer) {
@@ -190,6 +227,20 @@ export function QuizScreen() {
     },
     [locked, item, index],
   )
+
+  /**
+   * Called by WordBuilder once the word is spelled correctly. Scoring and
+   * advancing match a correct choice answer exactly, so the star row, the
+   * progress bar and the celebration need to know nothing about this type.
+   */
+  const solvedBuild = useCallback(() => {
+    setScore((s) => s + 1)
+    setFeedback({ index, kind: 'correct', text: '🎉 מְצֻיָּן!' })
+    // Freezes the board for the pause, exactly as a correct choice disables the
+    // option buttons.
+    setLockedIndex(index)
+    pendingRef.current = window.setTimeout(() => setIndex((i) => i + 1), 1200)
+  }, [index])
 
   const restart = () => {
     if (pendingRef.current !== null) window.clearTimeout(pendingRef.current)
@@ -287,6 +338,17 @@ export function QuizScreen() {
         </p>
       </div>
 
+      {item.kind === 'build' ? (
+        <WordBuilder
+          // Keyed on the question so a new word starts from a clean board.
+          key={index}
+          target={item.target}
+          bank={item.bank}
+          disabled={locked}
+          onSolved={solvedBuild}
+          speak={speak}
+        />
+      ) : (
       <ul
         role="list"
         className="grid shrink-0 grid-cols-2 gap-2 pb-1 sm:grid-cols-4"
@@ -311,6 +373,7 @@ export function QuizScreen() {
           </li>
         ))}
       </ul>
+      )}
     </section>
   )
 }

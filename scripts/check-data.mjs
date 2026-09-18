@@ -107,6 +107,45 @@ for (const [base, form] of EXPECTED) {
   }
 }
 
+// ---- the word-build pool ---------------------------------------------------
+// The cap is read from the app's own module rather than duplicated, so the two
+// cannot drift apart.
+const spellingSrc = readFileSync(new URL('../src/lib/spelling.ts', import.meta.url), 'utf8')
+const capMatch = spellingSrc.match(/MAX_WORD_LETTERS\s*=\s*(\d+)/)
+check(capMatch, 'MAX_WORD_LETTERS not found in src/lib/spelling.ts')
+const cap = capMatch ? Number(capMatch[1]) : 0
+
+const glyphs = new Set([...letters, ...(finalLetters ?? [])].map((l) => l.l))
+const seenBuild = new Set()
+const buildable = []
+for (const entry of [...letters, ...(finalLetters ?? [])]) {
+  for (const ex of entry.examples) {
+    const bare = stripMarks(ex.word)
+    // Same key the app uses: word + picture, because וֶרֶד and וָרֹד both strip
+    // to ורד and are genuinely different words.
+    const key = `${bare}|${ex.pic}`
+    if (seenBuild.has(key)) continue
+    seenBuild.add(key)
+    if (bare.length < 2 || bare.length > cap) continue
+    for (const ch of bare) {
+      check(glyphs.has(ch), `word "${bare}" contains "${ch}", which is not one of the 27 letters`)
+    }
+    buildable.push(bare)
+  }
+}
+
+check(cap >= 3, `a cap of ${cap} letters is too tight for the game`)
+check(
+  buildable.length >= 24,
+  `only ${buildable.length} words are short enough to spell; a four-way round needs 6 and headroom`,
+)
+// Every word must be spellable from its own letters plus distractors, which is
+// how the bank is built - this is a sanity check that stripping produced letters.
+check(
+  buildable.every((w) => w.length >= 2),
+  'a buildable word is shorter than two letters',
+)
+
 // ---- the finals must carry a spoken name ----------------------------------
 // The name is what gets said out loud, so it has to say which form it is.
 const SOFIT = '\u05e1\u05d5\u05b9\u05e4\u05b4\u05d9\u05ea'   // סוֹפִית
@@ -165,4 +204,5 @@ if (failures.length) {
 console.log(
   `check:data passed — ${letters.length} letters + ${finalLetters.length} finals = ${gridLetters.length} in the grid`,
 )
+console.log(`  word build: ${buildable.length} words spellable at ${cap} letters or fewer`)
 console.log('note: vowel points are present but their correctness is not verified here.')

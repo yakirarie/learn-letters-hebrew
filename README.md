@@ -77,6 +77,43 @@ of `א`. `--preview` exists so that failure is visible rather than shipped.
 The source SVG uses a full-bleed square background with the glyph inside the
 maskable safe zone, which is why one file serves both `any` and `maskable`.
 
+## Word build
+
+One of the quiz's four question types. An emoji is shown, the question asks
+אֵיךְ כּוֹתְבִים?, and the child spells the word by placing letters into one box
+per letter from a bank below.
+
+- **Tap** a bank tile and it fills the first empty box.
+- **Drag** a tile and it lands in the box you drop it on. Drop it on an occupied
+  box and the letter already there goes back to the bank.
+- **Tap a filled box** to send that letter back, so a mis-tap is recoverable.
+  Tap is the primary interaction and drag is the enhancement on top of it.
+- On completion the boxes turn green or red, the app says כָּל הַכַּבּוֹד or
+  נַסּוּ שׁוּב, and **boxes that are already right stay locked in green** while
+  the wrong letters go back to the bank. The question only advances once the
+  whole word is right.
+
+`src/lib/spelling.ts` holds the logic and it is pure:
+
+- `stripMarks` removes nikud — a child places letters, not vowel points, so the
+  box count is the *written* length (בַּיִת → ב,י,ת = 3 boxes).
+- `buildableWords` is every example word short enough to spell, deduplicated on
+  word + picture. `וֶרֶד` (a rose) and `וָרֹד` (pink) both strip to ורד and are
+  genuinely different words, so they are both kept.
+- `buildBank` returns the word's **own** letters shuffled, plus three that are
+  not in it. Building the bank from the word is why the puzzle is always
+  solvable, and why a final form appears automatically when the word needs one —
+  spelling מֶלֶךְ puts a ך in the bank with no special case. This is the one quiz
+  type where final letters belong: the other questions exclude them because
+  "which letter does this word *start* with?" would be false.
+
+`MAX_WORD_LETTERS` caps the pool at 5. The example words run to eight letters
+(הֶלִיקוֹפְּטֶר) and at that length the boxes fall below the touch floor; at 5
+they are 45–56px across the viewports tested. 87 words qualify.
+
+Drag uses **pointer events, not HTML5 drag-and-drop** — HTML5 DnD does not fire
+on touch at all, so it would pass every desktop test and be dead on a phone.
+
 ## Final letters
 
 Five Hebrew letters take a different shape when they end a word:
