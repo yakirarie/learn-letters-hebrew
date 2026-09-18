@@ -10,6 +10,7 @@ import { NumbersScreen } from './screens/NumbersScreen'
 import { QuizScreen } from './screens/QuizScreen'
 import { TraceScreen } from './screens/TraceScreen'
 import { useAppState } from './state/AppStateProvider'
+import { useQuiz } from './state/QuizSession'
 
 const TITLES: Record<Tab, string> = {
   learn: 'לוֹמְדִים אוֹתִיּוֹת 📖',
@@ -30,10 +31,18 @@ export function App() {
     openLetter,
     closeLetter,
   } = useAppState()
+  const { session } = useQuiz()
 
   // The practice view is a sub-view of the letters tab, so the header grows a
   // back button and the grid is replaced.
   const inPractice = tab === 'learn' && letterIndex !== null
+  /**
+   * A running quiz is a dedicated window: the tab bar is not rendered at all,
+   * so the child cannot wander off mid-round. The quit button in the quiz's own
+   * status row is the only exit - and because the session is saved, quitting is
+   * safe rather than destructive.
+   */
+  const inQuiz = session !== null
 
   return (
     <AppShell>
@@ -62,7 +71,7 @@ export function App() {
         {tab === 'memory' && <MemoryScreen />}
       </main>
 
-      <TabBar active={tab} onChange={setTab} />
+      {!inQuiz && <TabBar active={tab} onChange={setTab} />}
     </AppShell>
   )
 }

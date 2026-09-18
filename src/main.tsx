@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { App } from './App'
 import { AppStateProvider } from './state/AppStateProvider'
+import { QuizSessionProvider } from './state/QuizSession'
 
 const container = document.getElementById('root')
 if (!container) throw new Error('Root element #root is missing from index.html')
@@ -10,7 +11,9 @@ if (!container) throw new Error('Root element #root is missing from index.html')
 createRoot(container).render(
   <StrictMode>
     <AppStateProvider>
-      <App />
+      <QuizSessionProvider>
+        <App />
+      </QuizSessionProvider>
     </AppStateProvider>
   </StrictMode>,
 )

@@ -14,6 +14,8 @@ type Props = {
   disabled?: boolean
   /** Called once the word is spelled correctly. */
   onSolved: () => void
+  /** Called on each incorrect check, so a strike limit applies here too. */
+  onWrong?: () => void
   speak: (text: string, options?: SpeakOptions) => void
 }
 
@@ -33,7 +35,6 @@ const DRAG_THRESHOLD_PX = 8
 const SLOT_SIZE = 'h-[min(3.5rem,14vw)] w-[min(3.5rem,14vw)]'
 const TILE_SIZE = 'h-[min(3.25rem,13vw)] w-[min(3.25rem,13vw)]'
 
-const PRAISE = 'כֹּל הַכָּבוֹד!'
 const RETRY = 'נַסּוּ שׁוּב'
 
 /**
@@ -48,7 +49,7 @@ const RETRY = 'נַסּוּ שׁוּב'
  * Drag uses pointer events, not HTML5 drag-and-drop: HTML5 DnD does not fire on
  * touch at all, so it would pass every desktop test and be dead on a phone.
  */
-export function WordBuilder({ target, bank, disabled = false, onSolved, speak }: Props) {
+export function WordBuilder({ target, bank, disabled = false, onSolved, onWrong, speak }: Props) {
   const [placed, setPlaced] = useState<(BankTile | null)[]>(() =>
     target.letters.map(() => null),
   )
@@ -172,10 +173,10 @@ export function WordBuilder({ target, bank, disabled = false, onSolved, speak }:
       settledRef.current = true
       setConfirmed(target.letters.map((_, i) => i))
       setWrong([])
-      speak(PRAISE, { rate: 0.85, pitch: 1.4 })
       // Handed over immediately: the quiz already pauses before advancing, and
       // stacking a second delay here made a build question take 2.4s to move on
       // where a choice question takes 1.2s. The green stays up for that pause.
+      // The praise is spoken by the runner, so it is not said twice.
       onSolved()
       return
     }
@@ -189,6 +190,7 @@ export function WordBuilder({ target, bank, disabled = false, onSolved, speak }:
     setWrong(wrongSlots)
     setConfirmed(correctSlots)
     speak(RETRY, { rate: 0.8, pitch: 1.1 })
+    onWrong?.()
 
     // Show the red for a moment, then hand the wrong letters back.
     timerRef.current = window.setTimeout(() => {

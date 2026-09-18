@@ -15,9 +15,9 @@ right-to-left layout throughout.
   emoji, plus correct Hebrew number/noun agreement.
 - **חֶשְׁבּוֹן — Maths.** Fifteen addition and subtraction challenges, animated:
   the `+` collapses and the two groups join, or the subtracted items fade away.
-- **חִידּוֹן — Quiz.** 24 mixed questions, weighted toward letters: 10 naming a
-  letter, 6 building a word, 4 counting and 4 arithmetic, with a star score and
-  a progress bar.
+- **חִידּוֹן — Quiz.** A lobby where the child picks how many questions, and
+  whether to have a time or strike limit, then a dedicated full-screen round of
+  word building, counting and arithmetic, weighted toward letters.
 - **כְּתִיבָה — Tracing.** A drawing canvas with the target letter or number as a
   faint guide, twelve colours, and letters / numbers / pictures / final-forms
   modes.
@@ -78,25 +78,70 @@ of `א`. `--preview` exists so that failure is visible rather than shipped.
 The source SVG uses a full-bleed square background with the glyph inside the
 maskable safe zone, which is why one file serves both `any` and `maskable`.
 
+## Quiz
+
+**The lobby.** Tapping the quiz tab opens a setup screen rather than starting
+straight away. Start is the dominant action and the defaults are playable as
+they are — 10 questions, no time limit, no strike limit — because the child may
+not read: two taps gets them into a sensible round. The three settings are chips
+rather than steppers, so nothing needs dragging, and each is optional.
+
+If a saved round exists, a green **resume** card sits above the settings showing
+the question and score it would return to. The app never drops a child straight
+back into a quiz — they choose.
+
+**The round is a dedicated window.** The tab bar is not rendered at all while a
+quiz is running, so the child cannot wander off mid-round. The quit button in the
+status row is the only exit, and because the session is saved, quitting is safe
+rather than destructive — no "are you sure?" a five-year-old has to navigate.
+
+**Everything is saved.** `src/lib/quiz.ts` defines the session and
+`src/state/QuizSession.tsx` owns it:
+
+```ts
+type QuizSession = {
+  version: 1                  // a save from another shape is discarded, not parsed
+  settings, items, index, score, strikes, elapsedMs, startedAt
+}
+```
+
+- **`items` is persisted, not regenerated.** Rebuilding on resume would reshuffle
+  the round and change the letter bank a child is halfway through spelling with.
+- **`elapsedMs` is accumulated, not a deadline.** A wall-clock limit would expire
+  while the app was closed and punish a child for going to dinner. The clock runs
+  only while the quiz is on screen, and only while the app is visible.
+- Written on question change, answer and settings change. A corrupt or
+  version-mismatched save falls back to a fresh lobby rather than crashing.
+
+**Strikes allow retry.** A wrong answer costs one strike and the child still gets
+to try again; the round ends when the strikes run out. Without that, a strike
+counter would never move a round on, because a wrong answer is otherwise simply
+retried. Word-build questions report each incorrect check, so the limit applies
+there too.
+
 ## Quiz mix
 
-`PER_KIND` in `src/screens/QuizScreen.tsx` sets how many questions of each kind a
-round contains:
+`BUILD_SHARE` in `src/lib/quiz.ts` sets how much of a round is word building. The
+rest splits evenly between counting and maths, and the counts scale with the
+chosen length:
 
 ```
-letter  10   name the letter a word starts with
-build    6   spell the word
-count    4   count the objects
-math     4   solve the sum
+  5 questions ->  3 build / 1 count / 1 maths     letters  3 vs 2
+ 10 questions ->  6 build / 2 count / 2 maths     letters  6 vs 4
+ 15 questions ->  9 build / 3 count / 3 maths     letters  9 vs 6
+ 20 questions -> 12 build / 4 count / 4 maths     letters 12 vs 8
 ```
 
-16 letter questions against 8 numbers/maths. Word build counts as a letters
-exercise — it is spelling with letters, not arithmetic — so the letters side is
-twice the size of the rest. This is asserted twice: at module load in
-`QuizScreen.tsx`, and again by `check:data` reading `PER_KIND` out of the source,
-so a later tweak cannot quietly unbalance the quiz.
+Word build is the letters exercise: the "which letter does this word start
+with?" question was removed, because spelling the word tests the same knowledge
+more thoroughly and without an ambiguous prompt. The "which letter" wording
+could also be false — every final-form word *ends* with its letter.
 
-The total stays 24, so the star row and the score denominator are unchanged.
+`Math.ceil` rather than rounding matters at the small end: at five questions
+rounding gives 2 build against 2 numeric, which is not a majority. Asserted at
+module load in `quiz.ts` and again by `check:data`, which reads `BUILD_SHARE` and
+`QUESTION_CHOICES` back out of the source and checks every offered size — so a
+change to the ratio fails the build rather than shipping a letters-light quiz.
 
 ## Word build
 

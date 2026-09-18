@@ -147,34 +147,56 @@ check(
 )
 
 // ---- the quiz is weighted toward letters -----------------------------------
-// Read from the screen itself, so the guard cannot drift from the code it guards.
-const quizSrc = readFileSync(new URL('../src/screens/QuizScreen.tsx', import.meta.url), 'utf8')
-const mixMatch = quizSrc.match(/const PER_KIND = \{([\s\S]*?)\} as const/)
-check(mixMatch, 'PER_KIND not found in QuizScreen.tsx')
-const mix = {}
-if (mixMatch) {
-  for (const kind of ['letter', 'build', 'count', 'math']) {
-    const m = mixMatch[1].match(new RegExp(`${kind}:\\s*(\\d+)`))
-    check(m, `PER_KIND is missing a count for "${kind}"`)
-    mix[kind] = m ? Number(m[1]) : 0
-  }
+// Read out of the app's own module, so the guard cannot drift from the code it
+// guards. Word build is the letters exercise now; the "which letter does this
+// word start with?" question is gone.
+const quizSrc = readFileSync(new URL('../src/lib/quiz.ts', import.meta.url), 'utf8')
+
+const shareMatch = quizSrc.match(/BUILD_SHARE\s*=\s*([\d.]+)/)
+check(shareMatch, 'BUILD_SHARE not found in src/lib/quiz.ts')
+const share = shareMatch ? Number(shareMatch[1]) : 0
+
+const choicesMatch = quizSrc.match(/QUESTION_CHOICES\s*=\s*\[([^\]]+)\]/)
+check(choicesMatch, 'QUESTION_CHOICES not found in src/lib/quiz.ts')
+const choices = choicesMatch
+  ? choicesMatch[1].split(',').map((x) => Number(x.trim())).filter((n) => Number.isFinite(n))
+  : []
+check(choices.length >= 2, `only ${choices.length} question counts are offered`)
+
+// Mirrors mixFor(). Kept in step by reading the share above rather than
+// hardcoding the ratio here.
+const mixAt = (n) => {
+  const build = Math.ceil(n * share)
+  const rest = n - build
+  const count = Math.ceil(rest / 2)
+  return { build, count, math: rest - count }
 }
 
-const letterQuestions = mix.letter + mix.build // build is spelling with letters
-const numericQuestions = mix.count + mix.math
-check(
-  letterQuestions > numericQuestions,
-  `quiz is not weighted toward letters: ${letterQuestions} letter questions vs ` +
-    `${numericQuestions} numbers/maths (${JSON.stringify(mix)})`,
-)
-check(
-  letterQuestions + numericQuestions >= 8,
-  `a round of ${letterQuestions + numericQuestions} questions is too short to score`,
-)
-check(
-  mix.build <= buildable.length,
-  `the quiz wants ${mix.build} word-build questions but only ${buildable.length} words are spellable`,
-)
+for (const n of choices) {
+  const { build, count, math } = mixAt(n)
+  check(build + count + math === n, `at ${n} questions the mix sums to ${build + count + math}`)
+  check(
+    build > count + math,
+    `at ${n} questions word build is ${build} against ${count + math} numbers/maths - ` +
+      'letters must outweigh the rest',
+  )
+  check(build <= buildable.length, `at ${n} questions ${build} words are needed but only ${buildable.length} are spellable`)
+  check(
+    build + count + math >= 3,
+    `a round of ${n} questions is too short to score`,
+  )
+}
+
+if (choices.length) {
+  const smallest = Math.min(...choices)
+  const { build, count, math } = mixAt(smallest)
+  check(build >= 1, `the shortest round (${smallest}) has no word-build question`)
+  console.log(
+    `  quiz mix:   at ${smallest} questions ${build} build / ${count} count / ${math} maths; ` +
+      `at ${Math.max(...choices)} questions ${mixAt(Math.max(...choices)).build} build / ` +
+      `${mixAt(Math.max(...choices)).count} count / ${mixAt(Math.max(...choices)).math} maths`,
+  )
+}
 
 // ---- the finals must carry a spoken name ----------------------------------
 // The name is what gets said out loud, so it has to say which form it is.
@@ -235,5 +257,4 @@ console.log(
   `check:data passed — ${letters.length} letters + ${finalLetters.length} finals = ${gridLetters.length} in the grid`,
 )
 console.log(`  word build: ${buildable.length} words spellable at ${cap} letters or fewer`)
-console.log(`  quiz mix:   ${letterQuestions} letter (${mix.letter} name + ${mix.build} build) vs ${numericQuestions} numbers/maths`)
 console.log('note: vowel points are present but their correctness is not verified here.')

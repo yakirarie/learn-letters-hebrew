@@ -62,3 +62,43 @@ export function saveState(state: PersistedState): void {
     console.warn('Could not save state.', err)
   }
 }
+
+// ------------------------------------------------------------- quiz session
+
+/**
+ * The in-progress round, kept apart from the preference state above because it
+ * is a large object written on a different cadence and must be discardable
+ * without touching a child's settings.
+ */
+export const QUIZ_STORAGE_KEY = 'learn-hebrew-quiz-session'
+
+/** Raw, unvalidated. Parsing and shape checking happen in lib/quiz.ts. */
+export function loadQuizRaw(): unknown {
+  if (typeof localStorage === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(QUIZ_STORAGE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch (err) {
+    console.warn('Could not read the saved quiz.', err)
+    return null
+  }
+}
+
+export function saveQuiz(session: unknown): void {
+  if (typeof localStorage === 'undefined') return
+  try {
+    localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(session))
+  } catch (err) {
+    // Quota or private mode. Losing a saved round is not worth breaking the app.
+    console.warn('Could not save the quiz.', err)
+  }
+}
+
+export function clearQuiz(): void {
+  if (typeof localStorage === 'undefined') return
+  try {
+    localStorage.removeItem(QUIZ_STORAGE_KEY)
+  } catch (err) {
+    console.warn('Could not clear the saved quiz.', err)
+  }
+}
