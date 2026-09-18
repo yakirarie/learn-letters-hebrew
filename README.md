@@ -15,8 +15,9 @@ right-to-left layout throughout.
   emoji, plus correct Hebrew number/noun agreement.
 - **חֶשְׁבּוֹן — Maths.** Fifteen addition and subtraction challenges, animated:
   the `+` collapses and the two groups join, or the subtracted items fade away.
-- **חִידּוֹן — Quiz.** 24 mixed questions across letters, counting and arithmetic,
-  with a star score and a progress bar.
+- **חִידּוֹן — Quiz.** 24 mixed questions, weighted toward letters: 10 naming a
+  letter, 6 building a word, 4 counting and 4 arithmetic, with a star score and
+  a progress bar.
 - **כְּתִיבָה — Tracing.** A drawing canvas with the target letter or number as a
   faint guide, twelve colours, and letters / numbers / pictures / final-forms
   modes.
@@ -76,6 +77,26 @@ of `א`. `--preview` exists so that failure is visible rather than shipped.
 
 The source SVG uses a full-bleed square background with the glyph inside the
 maskable safe zone, which is why one file serves both `any` and `maskable`.
+
+## Quiz mix
+
+`PER_KIND` in `src/screens/QuizScreen.tsx` sets how many questions of each kind a
+round contains:
+
+```
+letter  10   name the letter a word starts with
+build    6   spell the word
+count    4   count the objects
+math     4   solve the sum
+```
+
+16 letter questions against 8 numbers/maths. Word build counts as a letters
+exercise — it is spelling with letters, not arithmetic — so the letters side is
+twice the size of the rest. This is asserted twice: at module load in
+`QuizScreen.tsx`, and again by `check:data` reading `PER_KIND` out of the source,
+so a later tweak cannot quietly unbalance the quiz.
+
+The total stays 24, so the star row and the score denominator are unchanged.
 
 ## Word build
 

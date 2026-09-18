@@ -32,10 +32,35 @@ type BuildItem = BaseItem & {
 type QuizItem = ChoiceItem | BuildItem
 
 /**
- * Questions of each kind. Four kinds at six each keeps the round at 24, so the
- * star row and the score denominator are unchanged.
+ * How many questions of each kind, totalling 24 so the round length, the star
+ * row and the score denominator all stay as they were.
+ *
+ * Weighted toward letters, which is what this app is for. Word build counts as
+ * a letters exercise: it is spelling with letters, not a numbers exercise.
+ *
+ *   letters         10 + 6 = 16
+ *   numbers & maths  4 + 4 =  8
  */
-const PER_TYPE = 6
+const PER_KIND = {
+  letter: 10,
+  build: 6,
+  count: 4,
+  math: 4,
+} as const
+
+/**
+ * A Hebrew alphabet app should not spend as much of the quiz on arithmetic as
+ * on letters. Asserted at module load so a later tweak to the numbers above
+ * fails loudly here rather than quietly shipping an unbalanced quiz.
+ */
+const LETTER_SKILL_QUESTIONS = PER_KIND.letter + PER_KIND.build
+const NUMERIC_QUESTIONS = PER_KIND.count + PER_KIND.math
+if (LETTER_SKILL_QUESTIONS <= NUMERIC_QUESTIONS) {
+  throw new Error(
+    `quiz mix is unbalanced: ${LETTER_SKILL_QUESTIONS} letter questions vs ` +
+      `${NUMERIC_QUESTIONS} numbers/maths. Letters must outweigh the rest.`,
+  )
+}
 
 function shuffle<T>(items: readonly T[]): T[] {
   const out = [...items]
@@ -71,7 +96,7 @@ function makeOptions(answer: number, min: number, max: number): string[] {
 function buildQuiz(): QuizItem[] {
   const items: QuizItem[] = []
 
-  for (const letterIndex of shuffle([...letters.keys()]).slice(0, PER_TYPE)) {
+  for (const letterIndex of shuffle([...letters.keys()]).slice(0, PER_KIND.letter)) {
     const datum = letters[letterIndex]
     const example =
       datum.examples[Math.floor(Math.random() * datum.examples.length)]
@@ -92,7 +117,7 @@ function buildQuiz(): QuizItem[] {
   }
 
   const countEmojis = ['🍎', '⚽', '🌸', '🐱', '🐟', '🍌', '🍇', '🍓']
-  for (const numberIndex of shuffle([...numbers.keys()]).slice(0, PER_TYPE)) {
+  for (const numberIndex of shuffle([...numbers.keys()]).slice(0, PER_KIND.count)) {
     const datum = numbers[numberIndex]
     const emoji = countEmojis[numberIndex % countEmojis.length]
     items.push({
@@ -106,7 +131,7 @@ function buildQuiz(): QuizItem[] {
     })
   }
 
-  for (let i = 0; i < PER_TYPE; i++) {
+  for (let i = 0; i < PER_KIND.math; i++) {
     let a: number
     let b: number
     let op: '+' | '-'
@@ -138,7 +163,7 @@ function buildQuiz(): QuizItem[] {
   // includes the final-letter words - spelling is the one place a final form
   // belongs, since a child spelling מֶלֶךְ needs the ך.
   const pool = letters.map((l) => l.l)
-  for (const target of shuffle(buildableWords).slice(0, PER_TYPE)) {
+  for (const target of shuffle(buildableWords).slice(0, PER_KIND.build)) {
     items.push({
       kind: 'build',
       prompt: target.pic,

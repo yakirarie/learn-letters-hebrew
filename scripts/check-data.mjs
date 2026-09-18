@@ -146,6 +146,36 @@ check(
   'a buildable word is shorter than two letters',
 )
 
+// ---- the quiz is weighted toward letters -----------------------------------
+// Read from the screen itself, so the guard cannot drift from the code it guards.
+const quizSrc = readFileSync(new URL('../src/screens/QuizScreen.tsx', import.meta.url), 'utf8')
+const mixMatch = quizSrc.match(/const PER_KIND = \{([\s\S]*?)\} as const/)
+check(mixMatch, 'PER_KIND not found in QuizScreen.tsx')
+const mix = {}
+if (mixMatch) {
+  for (const kind of ['letter', 'build', 'count', 'math']) {
+    const m = mixMatch[1].match(new RegExp(`${kind}:\\s*(\\d+)`))
+    check(m, `PER_KIND is missing a count for "${kind}"`)
+    mix[kind] = m ? Number(m[1]) : 0
+  }
+}
+
+const letterQuestions = mix.letter + mix.build // build is spelling with letters
+const numericQuestions = mix.count + mix.math
+check(
+  letterQuestions > numericQuestions,
+  `quiz is not weighted toward letters: ${letterQuestions} letter questions vs ` +
+    `${numericQuestions} numbers/maths (${JSON.stringify(mix)})`,
+)
+check(
+  letterQuestions + numericQuestions >= 8,
+  `a round of ${letterQuestions + numericQuestions} questions is too short to score`,
+)
+check(
+  mix.build <= buildable.length,
+  `the quiz wants ${mix.build} word-build questions but only ${buildable.length} words are spellable`,
+)
+
 // ---- the finals must carry a spoken name ----------------------------------
 // The name is what gets said out loud, so it has to say which form it is.
 const SOFIT = '\u05e1\u05d5\u05b9\u05e4\u05b4\u05d9\u05ea'   // סוֹפִית
@@ -205,4 +235,5 @@ console.log(
   `check:data passed — ${letters.length} letters + ${finalLetters.length} finals = ${gridLetters.length} in the grid`,
 )
 console.log(`  word build: ${buildable.length} words spellable at ${cap} letters or fewer`)
+console.log(`  quiz mix:   ${letterQuestions} letter (${mix.letter} name + ${mix.build} build) vs ${numericQuestions} numbers/maths`)
 console.log('note: vowel points are present but their correctness is not verified here.')
