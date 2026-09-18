@@ -148,7 +148,7 @@ export function MemoryScreen() {
           i === first || i === second ? { ...c, matched: true } : c,
         ),
       )
-      speakRef.current('כָּל הַכָּבוֹד! זוּג!', { rate: 0.85, pitch: 1.4 })
+      speakRef.current('כֹּל הַכָּבוֹד! זוּג!', { rate: 0.85, pitch: 1.4 })
       setFlipped([])
       setLocked(false)
       return
@@ -163,7 +163,7 @@ export function MemoryScreen() {
 
   useEffect(() => {
     if (solved) {
-      speakRef.current('מַדְהִים! מָצָאתָ אֶת כָּל הַזּוּגוֹת!', {
+      speakRef.current('מַדְהִים! מָצָאתָ אֶת כֹּל הַזּוּגוֹת!', {
         rate: 0.8,
         pitch: 1.4,
       })

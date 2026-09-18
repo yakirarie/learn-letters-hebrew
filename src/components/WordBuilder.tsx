@@ -23,7 +23,7 @@ const DRAG_THRESHOLD_PX = 8
 const SLOT_SIZE = 'h-[min(3.5rem,14vw)] w-[min(3.5rem,14vw)]'
 const TILE_SIZE = 'h-[min(3.25rem,13vw)] w-[min(3.25rem,13vw)]'
 
-const PRAISE = 'כָּל הַכַּבּוֹד!'
+const PRAISE = 'כֹּל הַכָּבוֹד!'
 const RETRY = 'נַסּוּ שׁוּב'
 
 /**

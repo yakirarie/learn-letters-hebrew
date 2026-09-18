@@ -144,9 +144,11 @@ function buildQuiz(): QuizItem[] {
       prompt: target.pic,
       promptIsMath: false,
       question: 'אֵיךְ כּוֹתְבִים?',
-      // Say the word: the question is where the letters go, not what the
-      // picture is called. Without this it tests emoji recall, not spelling.
-      speech: target.word,
+      // The whole question, word included. Naming only the word made the
+      // speaker sound like it was answering the question rather than asking it,
+      // and the word still has to be in there: without it this tests emoji
+      // recall, not spelling.
+      speech: `אֵיךְ כּוֹתְבִים ${target.word}?`,
       target,
       bank: buildBank(target, pool),
     })
@@ -213,7 +215,7 @@ export function QuizScreen() {
       if (choice === item.answer) {
         setScore((s) => s + 1)
         setFeedback({ index, kind: 'correct', text: '🎉 מְצֻיָּן!' })
-        speakRef.current('כָּל הַכָּבוֹד!', { rate: 0.85, pitch: 1.4 })
+        speakRef.current('כֹּל הַכָּבוֹד!', { rate: 0.85, pitch: 1.4 })
         pendingRef.current = window.setTimeout(() => setIndex((i) => i + 1), 1200)
       } else {
         setFeedback({ index, kind: 'wrong', text: '🤔 נַסּוּ שׁוּב' })
@@ -261,7 +263,7 @@ export function QuizScreen() {
           🏆
         </span>
         <p className="text-2xl font-bold text-ink sm:text-3xl">
-          כָּל הַכָּבוֹד! סִיַּמְתָּ אֶת הַחִידּוֹן!
+          כֹּל הַכָּבוֹד! סִיַּמְתָּ אֶת הַחִידּוֹן!
         </p>
         <p className="text-xl font-bold text-bubbly-indigo-700">
           צָבַרְתָּ {score} מִתּוֹךְ {items.length} נְקֻדּוֹת
