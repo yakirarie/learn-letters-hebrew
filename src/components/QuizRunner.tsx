@@ -3,6 +3,8 @@ import { MathExpr } from './MathExpr'
 import { SpeakerButton } from './SpeakerButton'
 import { WordBuilder } from './WordBuilder'
 import { useAppState } from '../state/AppStateProvider'
+import { Confetti } from './Celebration'
+import { playFanfare, playOutOfStrikes, playTimeUp } from '../lib/sfx'
 import { useQuiz } from '../state/QuizSession'
 import { isFinished, outOfStrikes, ranOutOfTime, type QuizSession } from '../lib/quiz'
 
@@ -71,6 +73,19 @@ export function QuizRunner({ session }: { session: QuizSession }) {
     speakRef.current(item.speech, { rate: 0.8, pitch: 1.2 })
   }, [item, over])
 
+  /**
+   * One sound per ending. Guarded by a ref because React 19 runs effects twice
+   * on mount in development, which would otherwise double the fanfare.
+   */
+  const soundedRef = useRef<Outcome>(null)
+  useEffect(() => {
+    if (!outcome || soundedRef.current === outcome) return
+    soundedRef.current = outcome
+    if (outcome === 'done') playFanfare(soundEnabled)
+    else if (outcome === 'time') playTimeUp(soundEnabled)
+    else playOutOfStrikes(soundEnabled)
+  }, [outcome, soundEnabled])
+
   const recordScore = useAppState().recordQuizScore
   useEffect(() => {
     if (over) recordScore(score)
@@ -113,6 +128,7 @@ export function QuizRunner({ session }: { session: QuizSession }) {
   // round while `index` is still inside the array, so `item` still exists and
   // the summary would never have rendered.
   if (over) {
+    const won = outcome === 'done'
     const headline =
       outcome === 'time'
         ? 'נִגְמַר הַזְּמַן!'
@@ -120,10 +136,34 @@ export function QuizRunner({ session }: { session: QuizSession }) {
           ? 'נִגְמְרוּ הַנִּסָּיוֹנוֹת!'
           : PRAISE
     return (
-      <section className="flex h-full min-h-0 flex-col items-center justify-center gap-4 px-6 text-center">
-        <span className="animate-bounce-in text-7xl" aria-hidden="true">
-          {outcome === 'done' ? '🏆' : '⏰'}
-        </span>
+      <section className="relative flex h-full min-h-0 flex-col items-center justify-center gap-4 px-6 text-center">
+        {won && <Confetti />}
+
+        <div className="relative flex items-center justify-center">
+          {/*
+            Wins get motion; the two failures get almost none. A large animation
+            after losing reads as being told off, which is the opposite of what a
+            child who just ran out of time or hearts needs.
+          */}
+          {outcome === 'time' && (
+            <span
+              aria-hidden="true"
+              className="absolute h-24 w-24 animate-pulse-ring rounded-full bg-bubbly-slate-500/40 motion-reduce:animate-none"
+            />
+          )}
+          <span
+            aria-hidden="true"
+            className={[
+              'text-7xl',
+              won ? 'animate-bounce-in' : '',
+              outcome === 'strikes' ? 'animate-wiggle' : '',
+              'motion-reduce:animate-none',
+            ].join(' ')}
+          >
+            {won ? '🏆' : outcome === 'strikes' ? '💔' : '⏰'}
+          </span>
+        </div>
+
         <p className="text-2xl font-bold text-ink sm:text-3xl">{headline}</p>
         <p className="text-xl font-bold text-bubbly-indigo-700">
           צָבַרְתָּ {score} מִתּוֹךְ {items.length} נְקֻדּוֹת
