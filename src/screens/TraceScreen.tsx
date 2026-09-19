@@ -59,10 +59,24 @@ export function TraceScreen() {
   useEffect(() => {
     const area = areaRef.current
     if (!area) return
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect
+
+    const measure = () => {
+      const { width, height } = area.getBoundingClientRect()
       setSide(Math.max(0, Math.floor(Math.min(width, height))))
-    })
+    }
+
+    measure()
+
+    // Fall back to measuring on resize where ResizeObserver is missing. It is
+    // in every current browser, but this is the only modern API the app uses
+    // without a guard, and it would throw on an old WebView - the kind a
+    // parental-control wrapper may ship.
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', measure)
+      return () => window.removeEventListener('resize', measure)
+    }
+
+    const observer = new ResizeObserver(measure)
     observer.observe(area)
     return () => observer.disconnect()
   }, [])
